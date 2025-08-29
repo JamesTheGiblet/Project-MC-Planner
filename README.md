@@ -1,5 +1,18 @@
 # Project PI Planner
 
+<div align="center">
+  <img src="https://via.placeholder.com/800x400/2E3440/88C0D0?text=Project+PI+Planner" alt="Project PI Planner Interface" width="800"/>
+  
+  <h3>Visual GPIO Pin Planning for Raspberry Pi Projects</h3>
+  
+  <img src="https://img.shields.io/badge/Python-3.6%2B-blue" alt="Python Version"/>
+  <img src="https://img.shields.io/badge/Platform-Raspberry%20Pi-red" alt="Platform"/>
+  <img src="https://img.shields.io/badge/License-MIT-green" alt="License"/>
+  <img src="https://img.shields.io/badge/GUI-Pygame-yellow" alt="GUI Framework"/>
+</div>
+
+---
+
 A comprehensive visual tool for planning and managing Raspberry Pi GPIO pin allocations in electronics projects. Avoid pin conflicts and generate production-ready Python code with an intuitive interface.
 
 ## Overview
