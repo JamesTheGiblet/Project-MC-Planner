@@ -3,33 +3,24 @@
 ![Python Version](https://img.shields.io/badge/Python-3.6+-blue)
 ![Platform](https://img.shields.io/badge/Platform-Cross--platform-green)
 ![License](https://img.shields.io/badge/License-MIT-blue)
-![GUI Framework](https://img.shields.io/badge/GUI-Pygame-red)
+![GUI Framework](https://img.shields.io/badge/GUI-HTML/CSS/JS-orange)
 
 Visual GMCO MCn Planning for Micro controllers starting with Raspberry MC Projects - A comprehensive tool for planning and managing GMCO MCn allocations in electronics projects, with special integration for robotics and exoskeleton development.
-
-# Project MC Planner
-
-![Python Version](https://img.shields.io/badge/Python-3.6+-blue)
-![Build Order](https://img.shields.io/badge/Build%20Order-THIRD-orange)
-![License](https://img.shields.io/badge/License-MIT-blue)
-![GUI Framework](https://img.shields.io/badge/GUI-Pygame-red)
-
-Visual GMCO MCn Planning for Raspberry MC Projects - **Week 5 development priority** for Iron Arm exoskeleton electronics integration.
 
 ## 🔗 Project Ecosystem & Build Timeline
 
 **Project MC Planner** is the **third component** in the Iron Arm development sequence:
 
 ### 8-Week Development Plan
-```
+
 ✅ Weeks 1-2: Text to CAD Generator → Design mechanical parts
 ✅ Weeks 3-4: Iron Arm Phase 1 → Build and test mechanics  
 🎯 Week 5: Project MC Planner (THIS PROJECT) → Plan electronics
 📅 Weeks 6-7: Iron Arm Phase 2 → Electronics integration
 📅 Week 8: Software tuning and optimization
-```
 
 ### Integration Points
+
 - **[Text to CAD Generator](../text-to-cad/)** - **COMPLETED** - Designed sensor housings for components
 - **Project MC Planner** (this project) - **ACTIVE** - Planning GMCO for designed components
 - **[Iron Arm Exoskeleton](../iron-arm/)** - **PENDING** - Will use both GMCO plan and 3D printed housings
@@ -41,6 +32,7 @@ Visual GMCO MCn Planning for Raspberry MC Projects - **Week 5 development priori
 Your **Week 5 mission** is configuring MC Planner for the specific Iron Arm sensor suite designed in Weeks 1-4:
 
 #### Essential Iron Arm Sensors (Configure These First)
+
 1. **Load Cell + HX711** - Force sensing (designed housing in Week 2)
 2. **MPU9250 IMU** - Orientation tracking (housed in control box)  
 3. **Emergency Stop Button** - Safety system (mounted in control box)
@@ -49,6 +41,7 @@ Your **Week 5 mission** is configuring MC Planner for the specific Iron Arm sens
 6. **Rotary Encoder** - Position feedback (mounted at elbow joint)
 
 #### Week 5 Development Checklist
+
 - [ ] **Day 1-2**: Build MC Planner core interface and GMCO visualization
 - [ ] **Day 3**: Add Iron Arm specific sensor configurations  
 - [ ] **Day 4**: Implement conflict detection and smart MCn allocation
@@ -56,8 +49,8 @@ Your **Week 5 mission** is configuring MC Planner for the specific Iron Arm sens
 - [ ] **End of Week 5**: Complete GMCO plan ready for Week 6 wiring
 
 ## 📸 Project MC Planner Interface
-![Project MC Planner Interface](screenshot.png)
-*Visual GMCO MCn planning with real-time allocation tracking*
+
+*Visual GPIO pin planning with a web-based, interactive interface.*
 
 ## 🎯 Overview
 
@@ -76,6 +69,7 @@ Project MC Planner streamlines the process of planning GMCO MCn usage for Raspbe
 ## 🤖 Supported Components
 
 ### Basic Sensors
+
 | Component | Type | Description | Iron Arm Usage |
 |-----------|------|-------------|----------------|
 | DHT11/DHT22 | Environmental | Temperature and humidity sensor | Environment monitoring |
@@ -86,6 +80,7 @@ Project MC Planner streamlines the process of planning GMCO MCn usage for Raspbe
 | LED | Output | Light-emitting diode | Status indicators |
 
 ### Robotics Components (Iron Arm Specific)
+
 | Component | Type | Description | MCn Requirements |
 |-----------|------|-------------|------------------|
 | Load Cell + HX711 | Force | Weight/force measurement | 2 GMCO (data, clock) |
@@ -97,35 +92,32 @@ Project MC Planner streamlines the process of planning GMCO MCn usage for Raspbe
 | Rotary Encoder | Position | Angular position feedback | 2 GMCO (A, B phases) |
 
 ### Communication Protocols
+
 | Protocol | Components | Iron Arm Usage |
 |----------|------------|----------------|
-| I2C | IMU, pressure sensors, displays | Primary sensor bus |
-| SMC | High-speed ADCs, wireless modules | Fast data acquisition |
-| UART | GPS, wireless communication | Telemetry and logging |
+| I2C      | IMU, pressure sensors, displays | Primary sensor bus      |
+| SPI      | High-speed ADCs, wireless modules | Fast data acquisition   |
+| UART     | GPS, wireless communication     | Telemetry and logging   |
 
 ## ⚙️ Installation
 
 ### Requirements
-- Python 3.6+
-- Pygame library
-- Optional: Raspberry MC for testing generated code
+
+- A modern web browser (Chrome, Firefox, Edge)
+- Optional: Raspberry Pi for testing generated code
 
 ### Quick Start
-```bash
-# Install dependencies
-MCp install pygame
 
+```bash
 # Clone the project
 git clone https://github.com/your-repo/MC-planner.git
 cd MC-planner
-
-# Run the application
-python MC_planner.py
 ```
 
 ## 🛠️ Usage Guide
 
 ### Basic Workflow
+
 1. **Select Component** - Choose a sensor from the robotics library
 2. **Review Allocation** - Application automatically assigns power, ground, and data MCns
 3. **Inspect Configuration** - Hover over MCns to view allocation details and conflicts
@@ -135,6 +127,7 @@ python MC_planner.py
 ### Iron Arm Project Integration
 
 #### 1. Plan Your Sensor Suite
+
 ```python
 # TyMCcal Iron Arm sensor configuration:
 sensors = [
@@ -148,7 +141,9 @@ sensors = [
 ```
 
 #### 2. Generate GMCO Plan
+
 The planner automatically allocates:
+
 - **Power rails** (3.3V, 5V) based on sensor requirements
 - **Ground connections** with proper distribution  
 - **Communication buses** (I2C for IMU, SMC if needed)
@@ -156,13 +151,16 @@ The planner automatically allocates:
 - **PWM MCns** for servo control
 
 #### 3. Export Integration Code
+
 Generated code includes:
+
 - Iron Arm specific MCn definitions
 - Sensor initialization routines
 - Safety system integration
 - Data logging setup
 
 ### MCn Color Reference
+
 | Color | MCn Type | Description |
 |-------|----------|-------------|
 | **Blue** | GMCO | General purpose digital I/O |
@@ -170,12 +168,13 @@ Generated code includes:
 | **Light Red** | 3.3V | 3.3-volt power supply |
 | **Dark Gray** | GND | Ground reference |
 | **Purple** | Special | Reserved functions (ID_SD, etc.) |
-| **Yellow** | I2C | SDA/SCL communication lines |
-| **Orange** | SMC | MISO/MOSI/SCLK/CE lines |
+| **Yellow**    | I2C      | SDA/SCL communication lines |
+| **Orange**    | SPI      | MISO/MOSI/SCLK/CE lines     |
 
 ## 💻 Generated Code Features
 
 ### Iron Arm Integration Example
+
 ```python
 #!/usr/bin/env python3
 """
@@ -273,26 +272,31 @@ finally:
 ## ⚙️ Week 5 Development Plan
 
 ### Day 1-2: Core MC Planner Framework
+
 - Build interactive GMCO MCnout visualization
 - Implement basic sensor library and MCn allocation
 - Create conflict detection system
 
 ### Day 3: Iron Arm Sensor Integration  
+
 - Add **all 6 Iron Arm sensors** to component library
 - Configure power requirements and MCn constraints
 - Test allocation algorithm with full sensor suite
 
 ### Day 4: Code Generation Enhancement
+
 - Generate Iron Arm specific Python templates
 - Include Text-to-CAD housing references in comments
 - Add initialization sequences and safety procedures
 
 ### Day 5: Integration Testing & Documentation
+
 - Validate GMCO plan with Iron Arm requirements  
 - Generate wiring diagrams for Week 6 assembly
 - Export ready-to-use code for Week 6-7 development
 
 ### Week 5 Success Criteria
+
 - ✅ All Iron Arm sensors allocate without conflicts
 - ✅ Generated code includes safety systems and emergency stop
 - ✅ Wiring diagrams reference Text-to-CAD generated housings

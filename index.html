@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project MC Planner - Iron Arm</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Project MC Planner</h1>
+        <p>Iron Arm Exoskeleton - Week 5 GPIO Planning</p>
+    </header>
+
+    <main class="container">
+        <div class="planner-section">
+            <h2>Raspberry Pi 40-Pin GPIO Header</h2>
+            <div id="gpio-header" class="gpio-header">
+                <!-- GPIO pins will be dynamically generated here by script.js -->
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <h2>Iron Arm Components</h2>
+            <div id="component-library" class="component-library">
+                <!-- Component buttons will be added here -->
+                <button class="component" data-component="hx711">Load Cell (HX711)</button>
+                <button class="component" data-component="mpu9250">MPU9250 IMU</button>
+                <button class="component" data-component="e-stop">Emergency Stop Button</button>
+                <button class="component" data-component="ws2812">Status LEDs (WS2812)</button>
+                <button class="component" data-component="servo">Servo Motor</button>
+                <button class="component" data-component="encoder">Rotary Encoder</button>
+            </div>
+            <button id="generate-code-btn" class="action-btn">Generate Python Code</button>
+            <button id="reset-btn" class="action-btn secondary">Reset Plan</button>
+        </div>
+
+        <div class="code-section">
+            <h2>Generated Python Code</h2>
+            <pre><code id="generated-code" class="language-python"># Your generated Python code for the Iron Arm will appear here...
+            </code></pre>
+        </div>
+    </main>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
