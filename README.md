@@ -1,11 +1,11 @@
-# Project PI Planner
+# Project MC Planner
 
 ![Python Version](https://img.shields.io/badge/Python-3.6+-blue)
 ![Platform](https://img.shields.io/badge/Platform-Cross--platform-green)
 ![License](https://img.shields.io/badge/License-MIT-blue)
 ![GUI Framework](https://img.shields.io/badge/GUI-Pygame-red)
 
-Visual GPIO Pin Planning for Raspberry Pi Projects - A comprehensive tool for planning and managing GPIO pin allocations in electronics projects, with special integration for robotics and exoskeleton development.
+Visual GPIO Pin Planning for Micro controllers starting with Raspberry Pi Projects - A comprehensive tool for planning and managing GPIO pin allocations in electronics projects, with special integration for robotics and exoskeleton development.
 
 # Project PI Planner
 
