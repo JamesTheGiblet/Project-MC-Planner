@@ -83,7 +83,7 @@
             <div class="visual-planner">
                 <div class="planner-header">
                     <h2 class="planner-title">Raspberry Pi 4 Pinout</h2>
-                    <button class="btn btn-primary">
+                    <button class="btn btn-primary" id="clear-board-btn">
                         <i class="fas fa-broom"></i> Clear Board
                     </button>
                 </div>
@@ -139,7 +139,47 @@
         </div>
     </div>
 
-    <label for="import-json-input" class="visually-hidden">Import Project JSON File</label>
+    <div id="add-component-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Custom Component</h3>
+                <button id="add-component-modal-close-btn" class="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="add-component-form">
+                    <div class="form-group">
+                        <label for="component-name-input">Component Name</label>
+                        <input type="text" id="component-name-input" required placeholder="e.g., Temperature Sensor">
+                    </div>
+                    <div class="form-group">
+                        <label for="component-icon-input">Font Awesome Icon</label>
+                        <input type="text" id="component-icon-input" required placeholder="e.g., fas fa-thermometer-half">
+                    </div>
+                    <div class="form-group">
+                        <label for="component-data-select">Data Pin Type</label>
+                        <select id="component-data-select" required>
+                            <option value="gpio">GPIO</option>
+                            <option value="i2c">I2C</option>
+                            <option value="spi">SPI</option>
+                            <option value="uart">UART</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="component-power-input">Power Pins Required</label>
+                        <input type="number" id="component-power-input" min="0" value="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="component-ground-input">Ground Pins Required</label>
+                        <input type="number" id="component-ground-input" min="0" value="1" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Add Component</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <input type="file" id="import-json-input" class="hidden" accept=".json,application/json" title="Import Project JSON File">
 
     <script src="data/boards.js"></script>

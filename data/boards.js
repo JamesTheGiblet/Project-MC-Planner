@@ -50,7 +50,7 @@ const boardData = {
     uno: {
         title: 'Arduino Uno Pinout',
         name: 'Arduino Uno R3',
-        image: 'images/Arduino_Uno_R3.png',
+        image: 'images/Arduino_logo.png',
         layout: '1col-list',
         pins: [
             // Digital Pins
@@ -87,7 +87,7 @@ const boardData = {
     esp32: {
         title: 'ESP32 DevKit Pinout',
         name: 'ESP32 DevKitC',
-        image: 'images/esp32.png',
+        image: 'images/esp32.jpg',
         layout: '2col-grid',
         pins: [
             { name: 'GND', type: 'ground', title: 'Ground' }, { name: 'GND', type: 'ground', title: 'Ground' },

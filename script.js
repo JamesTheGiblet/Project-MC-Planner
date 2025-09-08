@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const projectComponentsList = document.querySelector('.components-panel .components-list');
     const validationFeedback = document.querySelector('.validation-feedback');
     const pinDetailsPanel = document.querySelector('.pin-details');
-    const clearBoardBtn = document.querySelector('.planner-header .btn-primary');
+    const clearBoardBtn = document.getElementById('clear-board-btn');
     const plannerTitle = document.querySelector('.planner-title');
     const saveProjectBtn = document.getElementById('save-project-btn');
     const importJsonBtn = document.getElementById('import-json-btn');
@@ -67,6 +67,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     importJsonInput.addEventListener('change', handleJsonImport);
 
+    // Custom Component List (Delete)
+    addComponentsList.addEventListener('click', handleComponentListClick);
+
     // Component Search
     componentSearch.addEventListener('input', handleComponentSearch);
 
@@ -124,12 +127,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        document.querySelectorAll('.pin').forEach(pin => {
-            // Only unassign if it's actually assigned
-            if (pin.dataset.assignedComponent) {
-                unassignComponentFromPin(pin);
-            }
+        // Find only the main data pins that are assigned, which are the ones
+        // that have an assignedComponent but are not assigned FOR another pin.
+        const assignedDataPins = document.querySelectorAll('.pin.assigned:not([data-assigned-for])');
+
+        assignedDataPins.forEach(pin => {
+            unassignComponentFromPin(pin);
         });
+
         projectComponentsList.innerHTML = '';
         clearValidation();
         pinDetailsPanel.classList.add('hidden');
@@ -174,24 +179,51 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // --- Helper Functions ---
+    // --- Component Management Functions ---
+
+    function handleComponentListClick(e) {
+        const deleteBtn = e.target.closest('.delete-component-btn');
+        if (!deleteBtn) return;
+
+        const componentItem = deleteBtn.closest('.component-item');
+        const componentId = componentItem.dataset.component;
+
+        if (componentItem.classList.contains('disabled')) {
+            alert("Cannot delete a component that is currently assigned to the board. Please remove it from the board first.");
+            return;
+        }
+
+        if (confirm(`Are you sure you want to permanently delete the "${componentData[componentId].name}" component?`)) {
+            deleteCustomComponent(componentId);
+        }
+    }
+
+    function deleteCustomComponent(componentId) {
+        const customComponents = getCustomComponents();
+        delete customComponents[componentId];
+        saveCustomComponents(customComponents); // New function to save the whole object
+        delete componentData[componentId];
+        renderAndAttachComponentListeners();
+    }
 
     function handleAddComponent(e) {
         e.preventDefault();
-        const name = document.getElementById('component-name-input').value;
-        const icon = document.getElementById('component-icon-input').value;
+        const nameInput = document.getElementById('component-name-input');
+        const iconInput = document.getElementById('component-icon-input');
+        const name = nameInput.value;
+        const icon = iconInput.value;
         const dataType = document.getElementById('component-data-select').value;
         const power = parseInt(document.getElementById('component-power-input').value, 10);
         const ground = parseInt(document.getElementById('component-ground-input').value, 10);
     
-        if (!name || !icon || !dataType) {
-            alert("Please fill out all fields.");
+        if (!name.trim() || !icon.trim()) {
+            alert("Please fill out Name and Icon fields.");
             return;
         }
     
         const newComponentId = `custom-${name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
         
-        componentData[newComponentId] = {
+        const newComponentDefinition = {
             name: name,
             icon: icon,
             requires: {
@@ -200,11 +232,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 ground: ground
             }
         };
+        
+        componentData[newComponentId] = newComponentDefinition; // Add to in-memory object
+        saveCustomComponent(newComponentId, newComponentDefinition); // Save to localStorage
     
         renderAndAttachComponentListeners();
         addComponentForm.reset();
         addComponentModal.classList.add('hidden');
     }
+
+    function getCustomComponents() {
+        return JSON.parse(localStorage.getItem('pinpoint-custom-components') || '{}');
+    }
+    
+    function saveCustomComponent(id, data) {
+        const customComponents = getCustomComponents();
+        customComponents[id] = data;
+        localStorage.setItem('pinpoint-custom-components', JSON.stringify(customComponents));
+    }
+    
+    function saveCustomComponents(components) {
+        localStorage.setItem('pinpoint-custom-components', JSON.stringify(components));
+    }
+
+    function loadCustomComponents() {
+        const customComponents = getCustomComponents();
+        // Merge custom components into the base componentData object
+        Object.assign(componentData, customComponents);
+    }
+
+    // --- Helper Functions ---
 
     function renderAndAttachComponentListeners() {
         addComponentsList.innerHTML = ''; // Clear existing components
@@ -218,8 +275,18 @@ document.addEventListener('DOMContentLoaded', function() {
             const iconEl = document.createElement('i');
             iconEl.className = `${data.icon} component-icon`;
     
-            componentEl.appendChild(iconEl);
-            componentEl.appendChild(document.createTextNode(` ${data.name}`));
+            const nameWrapper = document.createElement('div');
+            nameWrapper.appendChild(iconEl);
+            nameWrapper.appendChild(document.createTextNode(` ${data.name}`));
+            componentEl.appendChild(nameWrapper);
+
+            if (id.startsWith('custom-')) {
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-component-btn';
+                deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
+                deleteBtn.title = 'Delete custom component';
+                componentEl.appendChild(deleteBtn);
+            }
     
             addComponentsList.appendChild(componentEl);
         }
@@ -378,6 +445,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function unassignComponentFromPin(pin) {
+        const pinNumber = pin.textContent.trim();
+
+        // Find and unassign auxiliary power/ground pins linked to this data pin
+        const auxPins = document.querySelectorAll(`.pin[data-assigned-for="${pinNumber}"]`);
+        auxPins.forEach(auxPin => {
+            auxPin.classList.remove('assigned', 'conflict');
+            auxPin.title = auxPin.dataset.originalTitle;
+            delete auxPin.dataset.assignedComponent;
+            delete auxPin.dataset.assignedFor;
+        });
+
+        // Unassign the main data pin itself
         pin.classList.remove('assigned', 'conflict');
         pin.title = pin.dataset.originalTitle;
         delete pin.dataset.assignedComponent;
@@ -385,16 +464,39 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function assignComponentToPin(componentInfo, pinEl) {
         clearValidation();
+        const dataPinNumber = pinEl.textContent.trim();
+
+        // Allocate and assign required power and ground pins
+        const requiredPower = componentInfo.requires.power || 0;
+        const requiredGround = componentInfo.requires.ground || 0;
+        const availablePower = [...document.querySelectorAll('.pin.power:not(.assigned)')];
+        const availableGround = [...document.querySelectorAll('.pin.ground:not(.assigned)')];
+
+        for (let i = 0; i < requiredPower; i++) {
+            const powerPin = availablePower[i];
+            powerPin.classList.add('assigned');
+            powerPin.dataset.assignedComponent = componentInfo.name;
+            powerPin.dataset.assignedFor = dataPinNumber; // Link to the data pin
+            powerPin.title = `${powerPin.dataset.originalTitle} - Assigned for ${componentInfo.name}`;
+        }
+        for (let i = 0; i < requiredGround; i++) {
+            const groundPin = availableGround[i];
+            groundPin.classList.add('assigned');
+            groundPin.dataset.assignedComponent = componentInfo.name;
+            groundPin.dataset.assignedFor = dataPinNumber; // Link to the data pin
+            groundPin.title = `${groundPin.dataset.originalTitle} - Assigned for ${componentInfo.name}`;
+        }
+
+        // Assign the main data pin
         pinEl.classList.add('assigned');
         pinEl.dataset.assignedComponent = componentInfo.name;
         pinEl.title = `${pinEl.dataset.originalTitle} - Assigned to ${componentInfo.name}`;
 
-        const pinNumber = pinEl.textContent.trim();
         const newBadge = document.createElement('div');
         newBadge.classList.add('component-badge');
-        newBadge.dataset.pinNumber = pinNumber;
+        newBadge.dataset.pinNumber = dataPinNumber;
         newBadge.dataset.componentId = componentInfo.id;
-        newBadge.innerHTML = `${componentInfo.icon} ${componentInfo.name} (Pin ${pinNumber})`;
+        newBadge.innerHTML = `${componentInfo.icon} ${componentInfo.name} (Pin ${dataPinNumber})`;
         projectComponentsList.appendChild(newBadge);
 
         // Disable the component in the sidebar
@@ -721,6 +823,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set theme from localStorage
     const savedTheme = localStorage.getItem('theme') || 'light';
     setTheme(savedTheme);
+
+    // Load custom components from localStorage and merge with base data
+    loadCustomComponents();
 
     // Render the component list from data
     renderAndAttachComponentListeners();

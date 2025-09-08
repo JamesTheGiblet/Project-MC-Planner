@@ -246,6 +246,9 @@ header {
     cursor: grab;
     transition: var(--transition);
     border-left: 4px solid var(--primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .component-item:hover {
@@ -261,6 +264,24 @@ header {
 
 .component-item.disabled:hover {
     transform: none;
+}
+
+.delete-component-btn {
+    background: none;
+    border: none;
+    color: var(--gray);
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 5px;
+    border-radius: 50%;
+    transition: var(--transition);
+    visibility: hidden; /* Hide by default */
+    opacity: 0;
+}
+
+.component-item:hover .delete-component-btn {
+    visibility: visible; /* Show on hover */
+    opacity: 1;
 }
 
 .project-item {
@@ -392,6 +413,9 @@ body.dark-mode .board-name {
 
 .pin.assigned {
     background-color: var(--success);
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
+    text-decoration-color: rgba(255, 255, 255, 0.7);
 }
 
 .pin.conflict {
@@ -561,6 +585,18 @@ body.dark-mode .board-name {
 
 .hidden {
     display: none !important;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Modal Styles */
