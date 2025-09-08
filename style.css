@@ -446,6 +446,17 @@ body.dark-mode .board-name {
     left: auto;
 }
 
+.board-layout-1col-list .pins-container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 5px;
+    position: static;
+    padding: 10px;
+    align-items: stretch;
+    width: 100%;
+}
+
 .components-panel {
     background-color: var(--surface-color);
     border-radius: var(--border-radius);
@@ -587,6 +598,12 @@ body.dark-mode .board-name {
     display: none !important;
 }
 
+.no-items-message {
+    color: var(--gray);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -675,6 +692,38 @@ body.dark-mode .board-name {
     padding: 2px 6px;
     border-radius: 4px;
     font-family: 'Courier New', Courier, monospace;
+}
+
+.modal-body h4 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+    color: var(--primary);
+    border-bottom: 1px solid var(--light-gray);
+    padding-bottom: 5px;
+}
+
+.modal-body h4:first-child {
+    margin-top: 0;
+}
+
+.modal-body ul {
+    padding-left: 20px;
+    margin-bottom: 15px;
+}
+
+.modal-body li {
+    margin-bottom: 8px;
+}
+
+.modal-body a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.modal-body a:hover {
+    text-decoration: underline;
 }
 
 .form-group {

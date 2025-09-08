@@ -33,7 +33,10 @@
                 <button class="btn btn-outline" id="wiring-diagram-btn" title="Generate Wiring Diagram">
                     <i class="fas fa-sitemap"></i> Wiring
                 </button>
-                <button class="btn btn-primary">
+                <button class="btn btn-outline" id="docs-btn" title="View Board Documentation">
+                    <i class="fas fa-book-open"></i> Docs
+                </button>
+                <button class="btn btn-primary" id="plan-my-board-btn">
                     <i class="fas fa-bolt"></i> Plan My Board
                 </button>
             </div>
@@ -120,7 +123,7 @@
             <div class="upgrade-cta">
                 <h3>Unlock the AI Smart Planner</h3>
                 <p>Let AI optimize your pin layout automatically.</p>
-                <button class="btn btn-primary upgrade-btn-margin" title="Upgrade to Pro">
+                <button class="btn btn-primary upgrade-btn-margin" id="upgrade-pro-btn" title="Upgrade to Pro">
                     Upgrade to Pro <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
@@ -180,10 +183,23 @@
         </div>
     </div>
 
+    <div id="docs-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="docs-modal-title">Board Documentation</h3>
+                <button id="docs-modal-close-btn" class="modal-close-btn">&times;</button>
+            </div>
+            <div id="docs-modal-content" class="modal-body">
+                <!-- Documentation will be generated here -->
+            </div>
+        </div>
+    </div>
+
     <input type="file" id="import-json-input" class="hidden" accept=".json,application/json" title="Import Project JSON File">
 
     <script src="data/boards.js"></script>
     <script src="data/components.js"></script>
+    <script src="data/documentation.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
