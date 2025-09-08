@@ -18,11 +18,20 @@
                 <button class="btn btn-outline" id="dark-mode-toggle" title="Toggle Dark Mode">
                     <i class="fas fa-moon"></i>
                 </button>
-                <button class="btn btn-outline">
+                <button class="btn btn-outline" id="save-project-btn" title="Save Current Project">
                     <i class="fas fa-save"></i> Save
                 </button>
-                <button class="btn btn-outline">
-                    <i class="fas fa-file-export"></i> Export
+                <button class="btn btn-outline" id="import-json-btn" title="Import Project from JSON">
+                    <i class="fas fa-file-import"></i> Import
+                </button>
+                <button class="btn btn-outline" id="export-md-btn" title="Export as Markdown">
+                    <i class="fas fa-file-alt"></i> MD
+                </button>
+                <button class="btn btn-outline" id="export-json-btn" title="Export as JSON">
+                    <i class="fas fa-file-code"></i> JSON
+                </button>
+                <button class="btn btn-outline" id="wiring-diagram-btn" title="Generate Wiring Diagram">
+                    <i class="fas fa-sitemap"></i> Wiring
                 </button>
                 <button class="btn btn-primary">
                     <i class="fas fa-bolt"></i> Plan My Board
@@ -49,41 +58,23 @@
                 </div>
             </div>
             <div class="sidebar-section">
-                <h3 class="sidebar-title"><i class="fas fa-plus-circle"></i> Add Components</h3>
-                <div class="component-list">
-                    <div class="component-item" data-component="dht22" draggable="true">
-                        <i class="fas fa-thermometer-half component-icon"></i> DHT22 Sensor
-                    </div>
-                    <div class="component-item" data-component="bmp280" draggable="true">
-                        <i class="fas fa-tachometer-alt component-icon"></i> BMP280 Sensor
-                    </div>
-                    <div class="component-item" data-component="servo" draggable="true">
-                        <i class="fas fa-sliders-h component-icon"></i> Servo Motor
-                    </div>
-                    <div class="component-item" data-component="led" draggable="true">
-                        <i class="fas fa-lightbulb component-icon"></i> LED
-                    </div>
-                    <div class="component-item" data-component="lcd" draggable="true">
-                        <i class="fas fa-code component-icon"></i> LCD Display
-                    </div>
-                    <div class="component-item" data-component="wifi" draggable="true">
-                        <i class="fas fa-broadcast-tower component-icon"></i> WiFi Module
-                    </div>
+                <div class="sidebar-title-container">
+                    <h3 class="sidebar-title"><i class="fas fa-plus-circle"></i> Add Components</h3>
+                    <button id="add-component-btn" class="sidebar-action-btn" title="Add Custom Component">+</button>
+                </div>
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="component-search" placeholder="Search components...">
+                </div>
+                <div id="add-components-list" class="component-list">
+                    <!-- Components are dynamically loaded here -->
                 </div>
             </div>
 
             <div class="sidebar-section">
                 <h3 class="sidebar-title"><i class="fas fa-project-diagram"></i> My Projects</h3>
-                <div class="component-list">
-                    <div class="component-item">
-                        <i class="fas fa-thermometer-half component-icon"></i> Weather Station
-                    </div>
-                    <div class="component-item">
-                        <i class="fas fa-robot component-icon"></i> Robot Arm
-                    </div>
-                    <div class="component-item">
-                        <i class="fas fa-home component-icon"></i> Smart Home Hub
-                    </div>
+                <div id="projects-list" class="component-list">
+                    <!-- Saved projects will be dynamically inserted here -->
                 </div>
             </div>
         </aside>
@@ -135,6 +126,21 @@
             </div>
         </aside>
     </div>
+
+    <div id="wiring-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Wiring Diagram</h3>
+                <button id="modal-close-btn" class="modal-close-btn">&times;</button>
+            </div>
+            <div id="wiring-diagram-content" class="modal-body">
+                <!-- Diagram will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <label for="import-json-input" class="visually-hidden">Import Project JSON File</label>
+    <input type="file" id="import-json-input" class="hidden" accept=".json,application/json" title="Import Project JSON File">
 
     <script src="data/boards.js"></script>
     <script src="data/components.js"></script>

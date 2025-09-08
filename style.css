@@ -136,6 +136,67 @@ header {
     gap: 8px;
 }
 
+.sidebar-title-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.sidebar-title {
+    margin-bottom: 0;
+}
+
+.sidebar-action-btn {
+    background: var(--light-gray);
+    color: var(--dark);
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sidebar-action-btn:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.search-container {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+#component-search {
+    width: 100%;
+    padding: 10px 10px 10px 35px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--light-gray);
+    background-color: var(--light);
+    color: var(--dark);
+    transition: var(--transition);
+}
+
+#component-search:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 20%, transparent);
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray);
+}
+
 .board-selection {
     display: flex;
     flex-direction: column;
@@ -190,6 +251,38 @@ header {
 .component-item:hover {
     background-color: var(--light-gray);
     transform: translateX(4px);
+}
+
+.component-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: var(--light-gray);
+}
+
+.component-item.disabled:hover {
+    transform: none;
+}
+
+.project-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.delete-project-btn {
+    background: none;
+    border: none;
+    color: var(--gray);
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 5px;
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.delete-project-btn:hover {
+    color: var(--danger);
 }
 
 .component-icon {
@@ -468,6 +561,112 @@ body.dark-mode .board-name {
 
 .hidden {
     display: none !important;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: var(--surface-color);
+    padding: 25px;
+    border-radius: var(--border-radius);
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--light-gray);
+    padding-bottom: 15px;
+}
+
+.modal-header h3 {
+    font-size: 1.5rem;
+    color: var(--dark);
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    font-weight: 300;
+    color: var(--gray);
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+
+.modal-body {
+    line-height: 1.8;
+}
+
+/* Wiring Diagram Specific Styles */
+.wiring-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.wiring-list li {
+    padding: 8px;
+    border-bottom: 1px solid var(--light);
+}
+
+.wiring-list li:last-child {
+    border-bottom: none;
+}
+
+.wiring-list code {
+    background-color: var(--light-gray);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: var(--gray);
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--light-gray);
+    background-color: var(--light);
+    color: var(--dark);
+    font-size: 1rem;
+}
+
+.form-actions {
+    margin-top: 25px;
+    text-align: right;
 }
 
 /* Responsive Design */
