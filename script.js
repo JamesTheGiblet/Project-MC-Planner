@@ -139,11 +139,6 @@ document.addEventListener('DOMContentLoaded', function() {
         clearValidation();
         pinDetailsPanel.classList.add('hidden');
 
-        // Re-enable all components in the sidebar
-        components.forEach(comp => {
-            comp.classList.remove('disabled');
-            comp.draggable = true;
-        });
     });
 
     // Remove component by clicking its badge
@@ -159,13 +154,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const pinToClear = Array.from(pins).find(p => p.textContent.trim() === pinNumber);
 
         if (pinToClear) {
-            // Re-enable the component in the sidebar
-            const componentItem = document.querySelector(`.component-item[data-component="${componentId}"]`);
-            if (componentItem) {
-                componentItem.classList.remove('disabled');
-                componentItem.draggable = true;
-            }
-
             unassignComponentFromPin(pinToClear);
             clickedBadge.remove();
 
@@ -188,8 +176,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const componentItem = deleteBtn.closest('.component-item');
         const componentId = componentItem.dataset.component;
 
-        if (componentItem.classList.contains('disabled')) {
-            alert("Cannot delete a component that is currently assigned to the board. Please remove it from the board first.");
+        const isAssigned = !!projectComponentsList.querySelector(`[data-component-id="${componentId}"]`);
+        if (isAssigned) {
+            alert("Cannot delete this component type because one or more instances are assigned to the board. Please remove all instances first.");
             return;
         }
 
@@ -388,13 +377,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!draggedComponent) return;
 
             // --- Validation ---
-            // Check if component is already on the board
-            const isAlreadyAssigned = !!projectComponentsList.querySelector(`.component-badge[data-component-id="${draggedComponent.id}"]`);
-            if (isAlreadyAssigned) {
-                showValidationError(`${draggedComponent.name} is already assigned to a pin.`);
-                return;
-            }
-
             if (pin.classList.contains('assigned')) {
                 showValidationError(`Pin ${pin.textContent.trim()} is already assigned.`);
                 return;
@@ -498,13 +480,6 @@ document.addEventListener('DOMContentLoaded', function() {
         newBadge.dataset.componentId = componentInfo.id;
         newBadge.innerHTML = `${componentInfo.icon} ${componentInfo.name} (Pin ${dataPinNumber})`;
         projectComponentsList.appendChild(newBadge);
-
-        // Disable the component in the sidebar
-        const componentItem = document.querySelector(`.component-item[data-component="${componentInfo.id}"]`);
-        if (componentItem) {
-            componentItem.classList.add('disabled');
-            componentItem.draggable = false;
-        }
 
         updatePinDetails(pinEl);
     }
