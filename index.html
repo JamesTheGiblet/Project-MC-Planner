@@ -3,265 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart MC Planner - Datasheet-Driven GPIO Planning</title>
-    <link rel="stylesheet" href="style.css">
+    <title>PinPoint Planner - Project Planner for SBCs</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-microchip"></i> Smart MC Planner</h1>
-            <p class="tagline">AI-Powered GPIO Planning with Real Component Datasheets</p>
-            <div class="features">
-                <div class="feature">
-                    <i class="fas fa-database"></i>
-                    <span>10,000+ Component Database</span>
-                </div>
-                <div class="feature">
-                    <i class="fas fa-brain"></i>
-                    <span>Smart Pin Recommendations</span>
-                </div>
-                <div class="feature">
-                    <i class="fas fa-file-alt"></i>
-                    <span>Datasheet Integration</span>
-                </div>
+            <div class="logo">
+                <i class="fas fa-microchip"></i>
+                <span>PinPoint Planner</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-outline" id="dark-mode-toggle" title="Toggle Dark Mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="btn btn-outline">
+                    <i class="fas fa-save"></i> Save
+                </button>
+                <button class="btn btn-outline">
+                    <i class="fas fa-file-export"></i> Export
+                </button>
+                <button class="btn btn-primary">
+                    <i class="fas fa-bolt"></i> Plan My Board
+                </button>
             </div>
         </header>
-        
-        <div class="main-content">
-            <!-- Component Selection Card -->
-            <div class="card">
-                <h2 class="card-title">
-                    <i class="fas fa-search"></i>
-                    Find Components
-                </h2>
-                
-                <div class="search-container">
-                    <input type="text" class="component-search" id="component-search" 
-                           placeholder="Search for components (e.g., DHT22, ESP32, Servo...)">
-                    <i class="fas fa-search search-icon"></i>
-                    
-                    <div class="search-results" id="search-results">
-                        <!-- Populated by JavaScript -->
+
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title"><i class="fas fa-desktop"></i> Select Board</h3>
+                <div class="board-selection">
+                    <div class="board-option active" data-board="rpi4">
+                        <img src="images/raspberry-pi-1.jpg" alt="Raspberry Pi 4">
+                        <div>Raspberry Pi 4</div>
+                    </div>
+                    <div class="board-option" data-board="uno">
+                        <img src="images/Arduino_Uno.png" alt="Arduino Uno">
+                        <div>Arduino Uno</div>
+                    </div>
+                    <div class="board-option" data-board="esp32">
+                        <img src="images/esp32.png" alt="ESP32">
+                        <div>ESP32 DevKit</div>
                     </div>
                 </div>
-                
-                <div id="selected-component" class="datasheet-info hidden">
-                    <div class="datasheet-title">
-                        <i class="fas fa-file-alt"></i>
-                        <span id="component-title">Component Specifications</span>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title"><i class="fas fa-plus-circle"></i> Add Components</h3>
+                <div class="component-list">
+                    <div class="component-item" data-component="dht22" draggable="true">
+                        <i class="fas fa-thermometer-half component-icon"></i> DHT22 Sensor
                     </div>
-                    
-                    <div class="specs-grid" id="specs-grid">
-                        <!-- Populated by JavaScript -->
+                    <div class="component-item" data-component="bmp280" draggable="true">
+                        <i class="fas fa-tachometer-alt component-icon"></i> BMP280 Sensor
                     </div>
-                    
-                    <div class="pinout-requirements">
-                        <h4>Pin Requirements</h4>
-                        <div id="pin-requirements">
-                            <!-- Populated by JavaScript -->
-                        </div>
+                    <div class="component-item" data-component="servo" draggable="true">
+                        <i class="fas fa-sliders-h component-icon"></i> Servo Motor
                     </div>
-                    <button id="add-to-project" class="export-btn add-to-project-btn">
-                        <i class="fas fa-plus"></i> Add to Project
+                    <div class="component-item" data-component="led" draggable="true">
+                        <i class="fas fa-lightbulb component-icon"></i> LED
+                    </div>
+                    <div class="component-item" data-component="lcd" draggable="true">
+                        <i class="fas fa-code component-icon"></i> LCD Display
+                    </div>
+                    <div class="component-item" data-component="wifi" draggable="true">
+                        <i class="fas fa-broadcast-tower component-icon"></i> WiFi Module
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title"><i class="fas fa-project-diagram"></i> My Projects</h3>
+                <div class="component-list">
+                    <div class="component-item">
+                        <i class="fas fa-thermometer-half component-icon"></i> Weather Station
+                    </div>
+                    <div class="component-item">
+                        <i class="fas fa-robot component-icon"></i> Robot Arm
+                    </div>
+                    <div class="component-item">
+                        <i class="fas fa-home component-icon"></i> Smart Home Hub
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main">
+            <div class="visual-planner">
+                <div class="planner-header">
+                    <h2 class="planner-title">Raspberry Pi 4 Pinout</h2>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-broom"></i> Clear Board
                     </button>
                 </div>
 
-                <div class="compatibility-warning" id="compatibility-warning">
-                    <i class="fas fa-exclamation-triangle warning-icon"></i>
-                    <span id="warning-message"></span>
+                <div class="board-display">
+                    <div class="board">
+                        <img class="board-image hidden" src="" alt="Board top-down view">
+                        <div class="board-name">Raspberry Pi 4 Model B</div>
+                        <div class="pins-container">
+                            <!-- Pins are rendered dynamically by script.js -->
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Board Selection Card -->
-            <div class="card">
-                <h2 class="card-title">
-                    <i class="fas fa-microchip"></i>
-                    Select Board
-                </h2>
-                
-                <div class="board-selector">
-                    <div class="board-option active" data-board="raspberry-pi">
-                        <div class="board-icon">
-                            <i class="fas fa-raspberry-pi"></i>
-                        </div>
-                        <h3>Raspberry Pi</h3>
-                        <p>40-pin GPIO</p>
-                    </div>
-                    <div class="board-option" data-board="esp32">
-                        <div class="board-icon">
-                            <i class="fas fa-wifi"></i>
-                        </div>
-                        <h3>ESP32</h3>
-                        <p>30 GPIO pins</p>
-                    </div>
-                    <div class="board-option" data-board="arduino">
-                        <div class="board-icon">
-                            <i class="fas fa-plus"></i>
-                        </div>
-                        <h3>Arduino</h3>
-                        <p>14 digital pins</p>
-                    </div>
-                </div>
-                
-                <div class="smart-recommendations">
-                    <div class="recommendation-header">
-                        <i class="fas fa-brain"></i>
-                        <span>Smart Recommendations</span>
-                        <span class="ai-badge">AI-Powered</span>
-                    </div>
-                    <ul class="recommendation-list" id="smart-recommendations">
-                        <li>Select components to see intelligent pin recommendations</li>
-                    </ul>
+            <div class="components-panel">
+                <h3 class="components-title">Project Components</h3>
+                <div class="components-list">
+                    <!-- Components assigned to the board will appear here -->
                 </div>
             </div>
+        </main>
+
+        <aside class="properties-panel">
+            <h3 class="properties-title"><i class="fas fa-info-circle"></i> Properties & Validation</h3>
             
-            <!-- Pinout Visualization Card -->
-            <div class="card">
-                <h2 class="card-title">
-                    <i class="fas fa-sitemap"></i>
-                    Interactive Pinout
-                </h2>
-                
-                <div class="pinout-display">
-                    <div class="pinout-container">
-                        <svg class="pinout-svg" viewBox="0 0 350 600" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Board outline -->
-                            <rect x="50" y="50" width="250" height="500" rx="15" fill="#2c3e50" stroke="#34495e" stroke-width="3"/>
-                            
-                            <!-- GPIO Header -->
-                            <rect x="70" y="80" width="210" height="200" rx="5" fill="#34495e"/>
-                            
-                            <!-- Pin rows -->
-                            <g id="pin-grid">
-                                <!-- Row 1 -->
-                                <circle cx="90" cy="110" r="8" class="pin special-function" data-pin="3V3" data-function="Power"/>
-                                <circle cx="120" cy="110" r="8" class="pin special-function" data-pin="5V" data-function="Power"/>
-                                <circle cx="150" cy="110" r="8" class="pin available" data-pin="GPIO2" data-function="I2C_SDA"/>
-                                <circle cx="180" cy="110" r="8" class="pin special-function" data-pin="5V" data-function="Power"/>
-                                <circle cx="210" cy="110" r="8" class="pin available" data-pin="GPIO3" data-function="I2C_SCL"/>
-                                <circle cx="240" cy="110" r="8" class="pin special-function" data-pin="GND" data-function="Ground"/>
-                                
-                                <!-- Row 2 -->
-                                <circle cx="90" cy="140" r="8" class="pin available" data-pin="GPIO4" data-function="Digital"/>
-                                <circle cx="120" cy="140" r="8" class="pin available" data-pin="GPIO14" data-function="UART_TX"/>
-                                <circle cx="150" cy="140" r="8" class="pin special-function" data-pin="GND" data-function="Ground"/>
-                                <circle cx="180" cy="140" r="8" class="pin available" data-pin="GPIO15" data-function="UART_RX"/>
-                                <circle cx="210" cy="140" r="8" class="pin available" data-pin="GPIO17" data-function="Digital"/>
-                                <circle cx="240" cy="140" r="8" class="pin available" data-pin="GPIO18" data-function="PWM"/>
-                                
-                                <!-- Row 3 -->
-                                <circle cx="90" cy="170" r="8" class="pin available" data-pin="GPIO27" data-function="Digital"/>
-                                <circle cx="120" cy="170" r="8" class="pin special-function" data-pin="GND" data-function="Ground"/>
-                                <circle cx="150" cy="170" r="8" class="pin available" data-pin="GPIO22" data-function="Digital"/>
-                                <circle cx="180" cy="170" r="8" class="pin available" data-pin="GPIO23" data-function="Digital"/>
-                                <circle cx="210" cy="170" r="8" class="pin special-function" data-pin="3V3" data-function="Power"/>
-                                <circle cx="240" cy="170" r="8" class="pin available" data-pin="GPIO24" data-function="Digital"/>
-                                
-                                <!-- Row 4 -->
-                                <circle cx="90" cy="200" r="8" class="pin available" data-pin="GPIO10" data-function="SPI_MOSI"/>
-                                <circle cx="120" cy="200" r="8" class="pin special-function" data-pin="GND" data-function="Ground"/>
-                                <circle cx="150" cy="200" r="8" class="pin available" data-pin="GPIO9" data-function="SPI_MISO"/>
-                                <circle cx="180" cy="200" r="8" class="pin available" data-pin="GPIO25" data-function="Digital"/>
-                                <circle cx="210" cy="200" r="8" class="pin available" data-pin="GPIO11" data-function="SPI_SCK"/>
-                                <circle cx="240" cy="200" r="8" class="pin available" data-pin="GPIO8" data-function="SPI_CE0"/>
-                                
-                                <!-- Row 5 -->
-                                <circle cx="90" cy="230" r="8" class="pin special-function" data-pin="GND" data-function="Ground"/>
-                                <circle cx="120" cy="230" r="8" class="pin available" data-pin="GPIO7" data-function="SPI_CE1"/>
-                                <circle cx="150" cy="230" r="8" class="pin available" data-pin="GPIO0" data-function="Digital"/>
-                                <circle cx="180" cy="230" r="8" class="pin available" data-pin="GPIO1" data-function="Digital"/>
-                                <circle cx="210" cy="230" r="8" class="pin available" data-pin="GPIO5" data-function="Digital"/>
-                                <circle cx="240" cy="230" r="8" class="pin special-function" data-pin="GND" data-function="Ground"/>
-                            </g>
-                            
-                            <!-- Pin labels -->
-                            <text x="90" y="100" text-anchor="middle" fill="white" font-size="8">3V3</text>
-                            <text x="120" y="100" text-anchor="middle" fill="white" font-size="8">5V</text>
-                            <text x="150" y="100" text-anchor="middle" fill="white" font-size="8">GP2</text>
-                            <text x="180" y="100" text-anchor="middle" fill="white" font-size="8">5V</text>
-                            <text x="210" y="100" text-anchor="middle" fill="white" font-size="8">GP3</text>
-                            <text x="240" y="100" text-anchor="middle" fill="white" font-size="8">GND</text>
-                            
-                            <!-- Board label -->
-                            <text x="175" y="40" text-anchor="middle" fill="white" font-weight="bold" font-size="16">
-                                Raspberry Pi 4B
-                            </text>
-                            
-                            <!-- Connectors -->
-                            <rect x="70" y="320" width="60" height="30" rx="5" fill="#c0392b"/>
-                            <text x="100" y="340" text-anchor="middle" fill="white" font-size="10">USB</text>
-                            
-                            <rect x="220" y="320" width="60" height="30" rx="5" fill="#16a085"/>
-                            <text x="250" y="340" text-anchor="middle" fill="white" font-size="10">HDMI</text>
-                        </svg>
-                    </div>
-                    
-                    <div class="pin-legend">
-                        <ul class="legend-grid">
-                            <li class="legend-item">
-                                <span class="legend-color-dot legend-color-dot--available"></span>
-                                <span>Available</span>
-                            </li>
-                            <li class="legend-item">
-                                <span class="legend-color-dot legend-color-dot--used"></span>
-                                <span>Used</span>
-                            </li>
-                            <li class="legend-item">
-                                <span class="legend-color-dot legend-color-dot--power"></span>
-                                <span>Power/Ground</span>
-                            </li>
-                            <li class="legend-item">
-                                <span class="legend-color-dot legend-color-dot--recommended"></span>
-                                <span>Recommended</span>
-                            </li>
-                        </ul>
-                    </div>
-                    
-                    <div class="export-options">
-                        <button class="export-btn">
-                            <i class="fas fa-download"></i> Export Config
-                        </button>
-                        <button class="export-btn secondary">
-                            <i class="fas fa-code"></i> Generate Code
-                        </button>
-                        <button class="export-btn">
-                            <i class="fas fa-share"></i> Share Project
-                        </button>
-                        <button class="export-btn secondary">
-                            <i class="fas fa-file-pdf"></i> Export PDF
-                        </button>
-                    </div>
-                </div>
+            <div class="validation-feedback hidden">
+                <!-- Validation messages will appear here -->
             </div>
 
-            <!-- Project Components Card -->
-            <div class="card">
-                <h2 class="card-title"><i class="fas fa-tasks"></i> Project Components</h2>
-                <div id="project-components">
-                    <p class="no-components-message">
-                        No components added yet. Search and add components to get started!
-                    </p>
-                </div>
+            <div class="pin-details hidden">
+                <!-- Details of the selected pin will appear here -->
             </div>
-        </div>
-        
-        <footer>
-            <p><strong>Smart MC Planner</strong> - Revolutionizing embedded system design with AI-powered component intelligence</p>
-            <p>© 2024 Smart MC Planner | Real datasheets, smarter designs</p>
-        </footer>
-    </div>
-    <!-- Edit Component Modal -->
-    <div id="edit-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <h3 id="modal-title">Edit Component Pins</h3>
-            <div id="modal-body"></div>
-            <div class="modal-footer">
-                <button id="modal-cancel" class="export-btn secondary">Cancel</button>
-                <button id="modal-save" class="export-btn">Save Changes</button>
+            <div class="upgrade-cta">
+                <h3>Unlock the AI Smart Planner</h3>
+                <p>Let AI optimize your pin layout automatically.</p>
+                <button class="btn btn-primary upgrade-btn-margin" title="Upgrade to Pro">
+                    Upgrade to Pro <i class="fas fa-arrow-right"></i>
+                </button>
             </div>
-        </div>
+        </aside>
     </div>
-    <script src="script.js" defer></script>
+
+    <script src="data/boards.js"></script>
+    <script src="data/components.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
