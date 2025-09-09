@@ -46,7 +46,7 @@ const boardData = {
         image: 'images/Raspberry Pi 4B.png',
         width: 1600,
         height: 967,
-        pinLayout: { top: '7%', right: '26.25%', gap: '2px 6.9%' },
+        pinLayout: { top: '7%', right: '24.25%', gap: '2px 6.9%' },
         layout: '2col-grid',
         pins: [
             { name: '3.3V', type: 'power', title: 'Pin 1: 3.3V Power Rail' },
