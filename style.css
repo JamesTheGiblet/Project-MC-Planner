@@ -401,31 +401,40 @@ header {
     background-color: #2b2d42;
     border-radius: 12px;
     padding: 0;
-    position: relative;
     overflow: hidden;
     max-width: 100%; /* Ensure board scales down gracefully */
+    display: grid;
+    place-items: center; /* Centers image if smaller than container */
+}
+
+.board-image,
+.board-name,
+.pins-container {
+    /* This places all items in the same grid cell, creating an overlay */
+    grid-area: 1 / 1 / 2 / 2;
 }
 
 .board-image {
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover; /* Default to cover, can be overridden by data */
-    z-index: 1;
+    opacity: 0; /* Hidden by default for fade-in effect */
+    transition: opacity 0.3s ease-in-out;
+}
+
+.board-image.loaded {
+    opacity: 1; /* Fade in when loaded */
 }
 
 .board-name {
     color: white;
     font-weight: 500;
-    position: absolute;
-    top: 15px;
-    left: 20px;
-    z-index: 3;
     background: rgba(43, 45, 66, 0.7);
     padding: 5px 10px;
     border-radius: 5px;
+    align-self: start;
+    justify-self: start;
+    margin: 15px 20px;
 }
 
 body.dark-mode .board-name {
@@ -435,12 +444,8 @@ body.dark-mode .board-name {
 .pins-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    position: absolute;
-    z-index: 2;
-    top: 60px;
-    left: 20px;
-    right: 20px;
+    align-self: start;
+    justify-self: end;
 }
 
 .pin {
