@@ -217,15 +217,22 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Find only the main data pins that are assigned, which are the ones
-        // that have an assignedComponent but are not assigned FOR another pin.
-        const assignedDataPins = document.querySelectorAll('.pin.assigned:not([data-assigned-for])');
-
-        assignedDataPins.forEach(pin => {
-            unassignComponentFromPin(pin);
+        // A more robust way to clear: reset all pins directly.
+        pins.forEach(pin => {
+            pin.classList.remove('assigned', 'conflict');
+            // Reset title to its original state
+            if (pin.dataset.originalTitle) {
+                pin.title = pin.dataset.originalTitle;
+            }
+            // Clear assignment data attributes
+            delete pin.dataset.assignedComponent;
+            delete pin.dataset.assignedFor;
         });
 
+        // Clear the list of assigned component badges
         projectComponentsList.innerHTML = '';
+        
+        // Reset UI elements
         clearValidation();
         pinDetailsPanel.classList.add('hidden');
 
