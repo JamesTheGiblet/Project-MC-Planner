@@ -46,7 +46,7 @@ const boardData = {
         image: 'images/Raspberry Pi 4B.png',
         width: 1600,
         height: 967,
-        pinLayout: { top: '10.65%', right: '24.7%', gap: '14px 15px' },
+        pinLayout: { top: '10.65%', right: '23.5%', gap: '14px 15px' },
         layout: '2col-grid',
         pins: [
             { name: '3.3V', type: 'power', title: 'Pin 1: 3.3V Power Rail' },
@@ -136,7 +136,7 @@ const boardData = {
         image: 'images/esp32.png',
         width: 800,
         height: 450,
-        pinLayout: { top: '8.9%', right: '18.75%', gap: '5px 13.75%' },
+        pinLayout: { top: '8.9%', right: '16.25%', gap: '5px 13.75%' },
         layout: '2col-grid',
         pins: [
             { name: 'GND', type: 'ground', title: 'Ground' }, { name: 'GND', type: 'ground', title: 'Ground' },
