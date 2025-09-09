@@ -472,14 +472,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // --- Dynamically set board and pin container styles ---
-        boardEl.style.width = board.width ? `${board.width}px` : 'auto';
-        boardEl.style.height = board.height ? `${board.height}px` : 'auto';
+        boardEl.style.maxWidth = board.width ? `${board.width}px` : 'none';
+        boardEl.style.aspectRatio = board.width && board.height ? `${board.width} / ${board.height}` : 'auto';
 
         // Update board image
         if (board.image) {
             boardImageEl.classList.remove('loaded'); // Prepare for fade-in
             boardImageEl.src = board.image;
-            boardImageEl.style.objectFit = board.imageFit || 'cover'; // Use 'cover' as default
             boardImageEl.classList.remove('hidden');
             // If image is already cached by the browser, onload might not fire, so check 'complete' property
             if (boardImageEl.complete) {
@@ -491,9 +490,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Apply pin layout styles if they exist
-        pinsContainer.style.paddingTop = board.pinLayout?.top || '0';
-        pinsContainer.style.paddingRight = board.pinLayout?.right || '0';
-        pinsContainer.style.paddingLeft = board.pinLayout?.left || '0';
+        pinsContainer.style.top = board.pinLayout?.top || 'auto';
+        pinsContainer.style.right = board.pinLayout?.right || 'auto';
+        pinsContainer.style.left = board.pinLayout?.left || 'auto';
         pinsContainer.style.gap = board.pinLayout?.gap || '8px';
 
         // Update board layout class
