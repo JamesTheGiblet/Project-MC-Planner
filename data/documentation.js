@@ -15,20 +15,23 @@ const boardDocumentation = {
                 <li><strong>Video & Sound:</strong> 2 &times; micro-HDMI ports (up to 4kp60 supported), MIPI DSI display port, MIPI CSI camera port, 4-pole stereo audio and composite video port</li>
             </ul>
 
-            <h4>GPIO Header</h4>
-            <p>The 40-pin GPIO header is the gateway to connecting electronic components. Pins can be used for various protocols:</p>
+            <h4>GPIO Header Functions</h4>
+            <p>The 40-pin GPIO header is incredibly versatile. Here is a summary of the key interfaces available:</p>
             <ul>
                 <li><strong>GPIO:</strong> General-Purpose Input/Output for digital signals.</li>
-                <li><strong>I2C (Inter-Integrated Circuit):</strong> A 2-wire bus for connecting sensors and peripherals (SDA/SCL). The Pi 4 has multiple I2C buses.</li>
-                <li><strong>SPI (Serial Peripheral Interface):</strong> A fast, 4-wire bus for devices like screens and some sensors (MOSI, MISO, SCLK, CE).</li>
-                <li><strong>UART (Universal Asynchronous Receiver-Transmitter):</strong> Serial communication pins (TXD, RXD) for connecting to other devices or a serial console.</li>
+                <li><strong>I2C (Inter-Integrated Circuit):</strong> A simple, low-speed, 2-wire bus (SDA/SCL) for connecting multiple sensors and devices.</li>
+                <li><strong>SPI (Serial Peripheral Interface):</strong> A high-speed, full-duplex communication protocol for devices that need a fast data stream, like displays and ADC chips.</li>
+                <li><strong>UART (Universal Asynchronous Receiver-Transmitter):</strong> A simple serial port for text-based communication with devices like GPS modules or for accessing the Pi's console.</li>
+                <li><strong>PWM (Pulse Width Modulation):</strong> A technique to simulate an analog output by rapidly pulsing a digital pin. Used for controlling LED brightness and motor speed.</li>
                 <li><strong>Power:</strong> The header provides 3.3V and 5V power rails, as well as multiple Ground (GND) pins.</li>
+                <li><strong>Advanced:</strong> The header also exposes more specialized interfaces like 1-Wire, GPCLK (General Purpose Clock), DPI (Display Parallel Interface), PCM (Pulse-Code Modulation), and JTAG (Joint Test Action Group) for advanced use cases.</li>
             </ul>
 
             <h4>Important Considerations</h4>
             <ul>
                 <li><strong>Voltage Levels:</strong> The GPIO pins on the Raspberry Pi operate at <strong>3.3V</strong>. Connecting a 5V device directly to a GPIO pin can permanently damage the Pi. Use a logic level shifter for 5V components.</li>
                 <li><strong>Power Consumption:</strong> The Pi 4 requires a good quality USB-C power supply capable of delivering at least 3.0A. Powering many peripherals directly from the Pi's 5V rail can lead to instability.</li>
+                <li><strong>5V vs 3.3V Power:</strong> The 5V pins are directly connected to the Pi's main power input and are not regulated by the Pi itself. The 3.3V rail is regulated and is the primary supply for most sensors and chips connected to the GPIO.</li>
             </ul>
             <p>For the official documentation, please visit the <a href="https://www.raspberrypi.com/products/raspberry-pi-4-model-b/" target="_blank" rel="noopener noreferrer">Raspberry Pi Foundation website</a>.</p>
         `

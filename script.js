@@ -12,13 +12,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const exportJsonBtn = document.getElementById('export-json-btn');
     const projectsList = document.getElementById('projects-list');
     const wiringDiagramBtn = document.getElementById('wiring-diagram-btn');
+    const generateCodeBtn = document.getElementById('generate-code-btn');
+    const docsBtn = document.getElementById('docs-btn');
     const planMyBoardBtn = document.getElementById('plan-my-board-btn');
     const upgradeProBtn = document.getElementById('upgrade-pro-btn');
     const wiringModal = document.getElementById('wiring-modal');
+    const codeModal = document.getElementById('code-modal');
+    const docsModal = document.getElementById('docs-modal');
     const addComponentBtn = document.getElementById('add-component-btn');
     const addComponentsList = document.getElementById('add-components-list');
     const addComponentModal = document.getElementById('add-component-modal');
     const modalCloseBtn = document.getElementById('modal-close-btn');
+    const codeModalCloseBtn = document.getElementById('code-modal-close-btn');
+    const docsModalCloseBtn = document.getElementById('docs-modal-close-btn');
+    const copyCodeBtn = document.getElementById('copy-code-btn');
     const addComponentModalCloseBtn = document.getElementById('add-component-modal-close-btn');
     const componentSearch = document.getElementById('component-search');
     const wiringDiagramContent = document.getElementById('wiring-diagram-content');
@@ -82,6 +89,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Custom Component List (Delete)
     addComponentsList.addEventListener('click', handleComponentListClick);
 
+    // Prevent sidebar scroll when scrolling component list
+    addComponentsList.addEventListener('wheel', (e) => {
+        const { scrollTop, scrollHeight, clientHeight } = addComponentsList;
+        const isScrollable = scrollHeight > clientHeight;
+        const isAtTop = e.deltaY < 0 && scrollTop === 0;
+        // -1 for pixel rounding tolerance
+        const isAtBottom = e.deltaY > 0 && scrollTop + clientHeight >= scrollHeight - 1;
+
+        if (isScrollable && !isAtTop && !isAtBottom) {
+            e.stopPropagation();
+        }
+    });
+
     // Component Search
     componentSearch.addEventListener('input', handleComponentSearch);
 
@@ -101,6 +121,37 @@ document.addEventListener('DOMContentLoaded', function() {
     // Wiring Diagram Button
     wiringDiagramBtn.addEventListener('click', generateWiringDiagram);
 
+    // Generate Code Button
+    generateCodeBtn.addEventListener('click', () => {
+        const projectData = getProjectDataObject();
+        const { language, code } = codeGenerator.generate(projectData);
+        
+        const codeBlock = document.getElementById('code-block');
+        codeBlock.textContent = code;
+        codeBlock.className = `language-${language}`;
+        Prism.highlightElement(codeBlock);
+
+        codeModal.classList.remove('hidden');
+    });
+
+    // Docs Button
+    docsBtn.addEventListener('click', showBoardDocumentation);
+
+    // Code Modal Listeners
+    codeModalCloseBtn.addEventListener('click', () => codeModal.classList.add('hidden'));
+    codeModal.addEventListener('click', (e) => {
+        if (e.target === codeModal) codeModal.classList.add('hidden');
+    });
+    copyCodeBtn.addEventListener('click', copyGeneratedCode);
+
+    // Docs Modal Listeners
+    docsModalCloseBtn.addEventListener('click', () => docsModal.classList.add('hidden'));
+    docsModal.addEventListener('click', (e) => {
+        if (e.target === docsModal) {
+            docsModal.classList.add('hidden');
+        }
+    });
+
     // Modal Close Listeners
     modalCloseBtn.addEventListener('click', () => wiringModal.classList.add('hidden'));
     wiringModal.addEventListener('click', (e) => {
@@ -117,11 +168,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     addComponentModalCloseBtn.addEventListener('click', () => {
         addComponentModal.classList.add('hidden');
+        resetComponentModal();
     });
 
     addComponentModal.addEventListener('click', (e) => {
         if (e.target === addComponentModal) {
             addComponentModal.classList.add('hidden');
+            resetComponentModal();
         }
     });
 
@@ -181,21 +234,55 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Component Management Functions ---
 
+    function openEditComponentModal(componentId) {
+        const component = componentData[componentId];
+        if (!component) return;
+
+        // Populate form
+        document.getElementById('component-name-input').value = component.name;
+        document.getElementById('component-icon-input').value = component.icon;
+        document.getElementById('component-data-select').value = component.requires.data[0];
+        document.getElementById('component-power-input').value = component.requires.power || 0;
+        document.getElementById('component-ground-input').value = component.requires.ground || 0;
+
+        // Change modal to "edit" mode
+        addComponentModal.querySelector('h3').textContent = 'Edit Custom Component';
+        addComponentForm.querySelector('button[type="submit"]').textContent = 'Save Changes';
+        addComponentForm.dataset.editingId = componentId;
+
+        addComponentModal.classList.remove('hidden');
+    }
+
     function handleComponentListClick(e) {
         const deleteBtn = e.target.closest('.delete-component-btn');
-        if (!deleteBtn) return;
+        if (deleteBtn) {
+            const componentItem = deleteBtn.closest('.component-item');
+            const componentId = componentItem.dataset.component;
 
-        const componentItem = deleteBtn.closest('.component-item');
-        const componentId = componentItem.dataset.component;
+            const isAssigned = !!projectComponentsList.querySelector(`[data-component-id="${componentId}"]`);
+            if (isAssigned) {
+                alert("Cannot delete this component type because one or more instances are assigned to the board. Please remove all instances first.");
+                return;
+            }
 
-        const isAssigned = !!projectComponentsList.querySelector(`[data-component-id="${componentId}"]`);
-        if (isAssigned) {
-            alert("Cannot delete this component type because one or more instances are assigned to the board. Please remove all instances first.");
+            if (confirm(`Are you sure you want to permanently delete the "${componentData[componentId].name}" component?`)) {
+                deleteCustomComponent(componentId);
+            }
             return;
         }
 
-        if (confirm(`Are you sure you want to permanently delete the "${componentData[componentId].name}" component?`)) {
-            deleteCustomComponent(componentId);
+        const editBtn = e.target.closest('.edit-component-btn');
+        if (editBtn) {
+            const componentItem = editBtn.closest('.component-item');
+            const componentId = componentItem.dataset.component;
+
+            const isAssigned = !!projectComponentsList.querySelector(`[data-component-id="${componentId}"]`);
+            if (isAssigned) {
+                alert("Cannot edit this component type because one or more instances are assigned to the board. Please remove all instances first.");
+                return;
+            }
+            
+            openEditComponentModal(componentId);
         }
     }
 
@@ -209,6 +296,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function handleAddComponent(e) {
         e.preventDefault();
+        const editingId = addComponentForm.dataset.editingId;
         const nameInput = document.getElementById('component-name-input');
         const iconInput = document.getElementById('component-icon-input');
         const name = nameInput.value;
@@ -222,24 +310,38 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
     
-        const newComponentId = `custom-${name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
-        
-        const newComponentDefinition = {
+        const componentDefinition = {
             name: name,
             icon: icon,
+            tip: 'Custom user component.', // Add a default tip
             requires: {
                 data: [dataType],
                 power: power,
                 ground: ground
             }
         };
-        
-        componentData[newComponentId] = newComponentDefinition; // Add to in-memory object
-        saveCustomComponent(newComponentId, newComponentDefinition); // Save to localStorage
+
+        if (editingId) {
+            // --- EDIT MODE ---
+            componentData[editingId] = { ...componentData[editingId], ...componentDefinition };
+            saveCustomComponent(editingId, componentData[editingId]);
+        } else {
+            // --- ADD MODE ---
+            const newComponentId = `custom-${name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
+            componentData[newComponentId] = componentDefinition;
+            saveCustomComponent(newComponentId, componentDefinition);
+        }
     
         renderAndAttachComponentListeners();
-        addComponentForm.reset();
+        resetComponentModal();
         addComponentModal.classList.add('hidden');
+    }
+
+    function resetComponentModal() {
+        addComponentForm.reset();
+        delete addComponentForm.dataset.editingId;
+        addComponentModal.querySelector('h3').textContent = 'Add Custom Component';
+        addComponentForm.querySelector('button[type="submit"]').textContent = 'Add Component';
     }
 
     function getCustomComponents() {
@@ -281,13 +383,23 @@ document.addEventListener('DOMContentLoaded', function() {
             nameWrapper.appendChild(iconEl);
             nameWrapper.appendChild(document.createTextNode(` ${data.name}`));
             componentEl.appendChild(nameWrapper);
-
+            
             if (id.startsWith('custom-')) {
+                const actionsWrapper = document.createElement('div');
+                actionsWrapper.className = 'component-actions';
+
+                const editBtn = document.createElement('button');
+                editBtn.className = 'edit-component-btn';
+                editBtn.innerHTML = '<i class="fas fa-pencil-alt"></i>';
+                editBtn.title = 'Edit custom component';
+                actionsWrapper.appendChild(editBtn);
+
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'delete-component-btn';
                 deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
                 deleteBtn.title = 'Delete custom component';
-                componentEl.appendChild(deleteBtn);
+                actionsWrapper.appendChild(deleteBtn);
+                componentEl.appendChild(actionsWrapper);
             }
     
             addComponentsList.appendChild(componentEl);
@@ -336,14 +448,25 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        // --- Dynamically set board and pin container styles ---
+        boardEl.style.width = board.width ? `${board.width}px` : 'auto';
+        boardEl.style.height = board.height ? `${board.height}px` : 'auto';
+
         // Update board image
         if (board.image) {
             boardImageEl.src = board.image;
+            boardImageEl.style.objectFit = board.imageFit || 'cover'; // Use 'cover' as default
             boardImageEl.classList.remove('hidden');
         } else {
             boardImageEl.src = '';
             boardImageEl.classList.add('hidden');
         }
+
+        // Apply pin layout styles if they exist
+        pinsContainer.style.top = board.pinLayout?.top || 'auto';
+        pinsContainer.style.right = board.pinLayout?.right || 'auto';
+        pinsContainer.style.left = board.pinLayout?.left || 'auto';
+        pinsContainer.style.gap = board.pinLayout?.gap || '8px';
 
         // Update board layout class
         boardEl.className = 'board'; // Reset classes
@@ -558,6 +681,40 @@ document.addEventListener('DOMContentLoaded', function() {
                 ${!assignedFor ? auxPinsHTML : ''}
             </div>`;
         pinDetailsPanel.classList.remove('hidden');
+    }
+
+    function showBoardDocumentation() {
+        const activeBoardOption = document.querySelector('.board-option.active');
+        if (!activeBoardOption) {
+            alert("Please select a board first.");
+            return;
+        }
+        const boardId = activeBoardOption.dataset.board;
+        const docData = boardDocumentation[boardId];
+    
+        if (docData) {
+            const docsModalTitle = document.getElementById('docs-modal-title');
+            const docsModalContent = document.getElementById('docs-modal-content');
+            docsModalTitle.textContent = docData.title;
+            docsModalContent.innerHTML = docData.content;
+            docsModal.classList.remove('hidden');
+        } else {
+            alert(`Sorry, no documentation is available for the selected board (${boardId}) yet.`);
+        }
+    }
+
+    function copyGeneratedCode() {
+        const code = document.getElementById('code-block').textContent;
+        navigator.clipboard.writeText(code).then(() => {
+            const originalText = copyCodeBtn.innerHTML;
+            copyCodeBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            setTimeout(() => {
+                copyCodeBtn.innerHTML = originalText;
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy code: ', err);
+            alert('Failed to copy code to clipboard.');
+        });
     }
 
     function setTheme(theme) {
@@ -855,6 +1012,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function copyGeneratedCode() {
+        const code = document.getElementById('code-block').textContent;
+        navigator.clipboard.writeText(code).then(() => {
+            const originalText = copyCodeBtn.innerHTML;
+            copyCodeBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            setTimeout(() => {
+                copyCodeBtn.innerHTML = originalText;
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy code: ', err);
+        });
+    }
+
     // --- Initial Load ---
     // Set theme from localStorage
     const savedTheme = localStorage.getItem('theme') || 'light';
@@ -872,391 +1042,3 @@ document.addEventListener('DOMContentLoaded', function() {
     // Render the default board
     renderBoard('rpi4'); // Render the default board on page load
 });
-            auxPin.classList.remove('assigned', 'conflict');
-            auxPin.title = auxPin.dataset.originalTitle;
-            delete auxPin.dataset.assignedComponent;
-            delete auxPin.dataset.assignedFor;
-
-        // Unassign the main data pin itself
-        pin.classList.remove('assigned', 'conflict');
-        pin.title = pin.dataset.originalTitle;
-        delete pin.dataset.assignedComponent;
-
-    function assignComponentToPin(componentInfo, pinEl) {
-        clearValidation();
-        const dataPinNumber = pinEl.textContent.trim();
-
-        // Allocate and assign required power and ground pins
-        const requiredPower = componentInfo.requires.power || 0;
-        const requiredGround = componentInfo.requires.ground || 0;
-        const availablePower = [...document.querySelectorAll('.pin.power:not(.assigned)')];
-        const availableGround = [...document.querySelectorAll('.pin.ground:not(.assigned)')];
-
-        for (let i = 0; i < requiredPower; i++) {
-            const powerPin = availablePower[i];
-            powerPin.classList.add('assigned');
-            powerPin.dataset.assignedComponent = componentInfo.name;
-            powerPin.dataset.assignedFor = dataPinNumber; // Link to the data pin
-            powerPin.title = `${powerPin.dataset.originalTitle} - Assigned for ${componentInfo.name}`;
-        }
-        for (let i = 0; i < requiredGround; i++) {
-            const groundPin = availableGround[i];
-            groundPin.classList.add('assigned');
-            groundPin.dataset.assignedComponent = componentInfo.name;
-            groundPin.dataset.assignedFor = dataPinNumber; // Link to the data pin
-            groundPin.title = `${groundPin.dataset.originalTitle} - Assigned for ${componentInfo.name}`;
-        }
-
-        // Assign the main data pin
-        pinEl.classList.add('assigned');
-        pinEl.dataset.assignedComponent = componentInfo.name;
-        pinEl.title = `${pinEl.dataset.originalTitle} - Assigned to ${componentInfo.name}`;
-
-        const newBadge = document.createElement('div');
-        newBadge.classList.add('component-badge');
-        newBadge.dataset.pinNumber = dataPinNumber;
-        newBadge.dataset.componentId = componentInfo.id;
-        newBadge.innerHTML = `${componentInfo.icon} ${componentInfo.name} (Pin ${dataPinNumber})`;
-        projectComponentsList.appendChild(newBadge);
-
-        updatePinDetails(pinEl);
-    }
-
-
-    function showValidationError(message) {
-        validationFeedback.innerHTML = `
-            <div class="feedback-header feedback-error">
-                <i class="fas fa-exclamation-circle"></i> Validation Error
-            </div>
-            <p>${message}</p>`;
-        validationFeedback.classList.remove('hidden');
-    }
-
-    function clearValidation() {
-        validationFeedback.classList.add('hidden');
-    }
-
-    function updatePinDetails(pin) {
-        const pinName = pin.textContent.trim();
-        const pinType = pin.classList[1] || 'N/A';
-        const assignedComponentName = pin.dataset.assignedComponent || 'None';
-        let notesHTML = '';
-
-        // Check if there are notes for the assigned component
-        if (assignedComponentName !== 'None') {
-            const componentId = Object.keys(componentData).find(id => componentData[id].name === assignedComponentName);
-            if (componentId && componentData[componentId].notes) {
-                notesHTML = `<div class="pin-info-item"><span class="pin-info-label">Notes:</span> <span>${componentData[componentId].notes}</span></div>`;
-            }
-        }
-
-        pinDetailsPanel.innerHTML = `
-            <div class="pin-details-title">Selected Pin: ${pinName}</div>
-            <div class="pin-info">
-                <div class="pin-info-item"><span class="pin-info-label">Type:</span> <span>${pinType.toUpperCase()}</span></div>
-                <div class="pin-info-item"><span class="pin-info-label">Assignment:</span> <span>${assignedComponentName}</span></div>
-                ${notesHTML}
-            </div>`;
-        pinDetailsPanel.classList.remove('hidden');
-    }
-
-    function setTheme(theme) {
-        if (theme === 'dark') {
-            body.classList.add('dark-mode');
-            darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-            localStorage.setItem('theme', 'dark');
-        } else {
-            body.classList.remove('dark-mode');
-            darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-            localStorage.setItem('theme', 'light');
-        }
-    }
-
-    function generateMarkdownExport() {
-        const assignedBadges = projectComponentsList.querySelectorAll('.component-badge');
-        if (assignedBadges.length === 0) {
-            showValidationError("Cannot export an empty board. Please assign some components first.");
-            return;
-        }
-
-        let markdown = `# PinPoint Planner Export: ${boardName.textContent}\n\n`;
-        markdown += `## Component Pinout\n\n`;
-        markdown += `| Component | Assigned Pin | Pin Type |\n`;
-        markdown += `| :--- | :--- | :--- |\n`;
-
-        assignedBadges.forEach(badge => {
-            const componentId = badge.dataset.componentId;
-            const pinNumber = badge.dataset.pinNumber;
-            const componentName = componentData[componentId]?.name || 'Unknown Component';
-
-            const pinEl = Array.from(pins).find(p => p.textContent.trim() === pinNumber);
-            const pinType = Array.from(pinEl.classList).find(cls => ['gpio', 'i2c', 'spi', 'uart'].includes(cls)) || 'N/A';
-
-            markdown += `| ${componentName} | ${pinNumber} | ${pinType.toUpperCase()} |\n`;
-        });
-
-        markdown += `\n---\n*Generated by PinPoint Planner*`;
-
-        const filename = `${boardName.textContent.toLowerCase().replace(/\s+/g, '-')}-plan.md`;
-        downloadFile(markdown, filename, 'text/markdown');
-    }
-
-    function generateJsonExport() {
-        const projectData = getProjectDataObject();
-        if (!projectData) {
-            showValidationError("Cannot export an empty board. Please assign some components first.");
-            return;
-        }
-
-        const filename = `${projectData.boardName.toLowerCase().replace(/\s+/g, '-')}-plan.json`;
-        downloadFile(JSON.stringify(projectData, null, 2), filename, 'application/json');
-    }
-
-    function generateWiringDiagram() {
-        const projectData = getProjectDataObject();
-        if (!projectData) {
-            showValidationError("Cannot generate a diagram for an empty board.");
-            return;
-        }
-
-        wiringDiagramContent.innerHTML = ''; // Clear previous content
-
-        let html = `<ul class="wiring-list">`;
-
-        let availablePower = [...document.querySelectorAll('.pin.power:not(.assigned)')];
-        let availableGround = [...document.querySelectorAll('.pin.ground:not(.assigned)')];
-
-        projectData.assignments.forEach(assignment => {
-            const component = componentData[assignment.componentId];
-            if (!component) return;
-
-            // Data connection
-            html += `<li>Connect <code>${assignment.componentName} (DATA)</code> to <code>${projectData.boardName} (${assignment.pin})</code></li>`;
-
-            // Power connections
-            if (component.requires.power) {
-                for (let i = 0; i < component.requires.power; i++) {
-                    const powerPin = availablePower.pop();
-                    const targetPin = powerPin ? powerPin.textContent.trim() : '<strong>an available Power Pin</strong>';
-                    html += `<li>Connect <code>${assignment.componentName} (VCC/VIN)</code> to <code>${projectData.boardName} (${targetPin})</code></li>`;
-                }
-            }
-
-            // Ground connections
-            if (component.requires.ground) {
-                for (let i = 0; i < component.requires.ground; i++) {
-                    const groundPin = availableGround.pop();
-                    const targetPin = groundPin ? groundPin.textContent.trim() : '<strong>an available Ground Pin</strong>';
-                    html += `<li>Connect <code>${assignment.componentName} (GND)</code> to <code>${projectData.boardName} (${targetPin})</code></li>`;
-                }
-            }
-        });
-
-        html += `</ul>`;
-        wiringDiagramContent.innerHTML = html;
-        wiringModal.classList.remove('hidden');
-    }
-
-    // --- Project Management Functions ---
-
-    function getProjects() {
-        return JSON.parse(localStorage.getItem('pinpoint-projects') || '[]');
-    }
-
-    function saveProjects(projects) {
-        localStorage.setItem('pinpoint-projects', JSON.stringify(projects));
-    }
-
-    function saveCurrentProject() {
-        const projectData = getProjectDataObject();
-        if (!projectData) {
-            showValidationError("Cannot save an empty project. Please assign some components first.");
-            return;
-        }
-
-        const projectName = prompt("Enter a name for your project:");
-        if (!projectName?.trim()) {
-            return; // User cancelled or entered empty name
-        }
-
-        projectData.id = `proj-${Date.now()}`;
-        projectData.name = projectName;
-
-        const projects = getProjects();
-        projects.push(projectData);
-        saveProjects(projects);
-
-        loadAndRenderProjects();
-    }
-
-    function loadAndRenderProjects() {
-        const projects = getProjects();
-        projectsList.innerHTML = '';
-
-        if (projects.length === 0) {
-            const noProjectsEl = document.createElement('p');
-            noProjectsEl.className = 'no-items-message';
-            noProjectsEl.textContent = 'No saved projects.';
-            projectsList.appendChild(noProjectsEl);
-            return;
-        }
-
-        projects.forEach(project => {
-            const projectItemContainer = document.createElement('div');
-            projectItemContainer.classList.add('component-item');
-            projectItemContainer.dataset.projectId = project.id;
-            projectItemContainer.title = `Load project: ${project.name}`;
-
-            const projectItem = document.createElement('div');
-            projectItem.classList.add('project-item');
-            projectItem.innerHTML = `<span><i class="fas fa-project-diagram component-icon"></i>${project.name}</span>`;
-
-            const deleteBtn = document.createElement('button');
-            deleteBtn.classList.add('delete-project-btn');
-            deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
-            deleteBtn.title = 'Delete project';
-
-            projectItem.appendChild(deleteBtn);
-            projectItemContainer.appendChild(projectItem);
-            projectsList.appendChild(projectItemContainer);
-        });
-    }
-
-    function handleProjectsListClick(e) {
-        const deleteBtn = e.target.closest('.delete-project-btn');
-        if (deleteBtn) {
-            const projectId = deleteBtn.closest('.component-item').dataset.projectId;
-            if (confirm("Are you sure you want to delete this project?")) {
-                let projects = getProjects();
-                projects = projects.filter(p => p.id !== projectId);
-                saveProjects(projects);
-                loadAndRenderProjects();
-            }
-            return;
-        }
-
-        const projectItem = e.target.closest('.component-item');
-        if (projectItem) {
-            const projectId = projectItem.dataset.projectId;
-            loadProject(projectId);
-        }
-    }
-
-    function loadProject(projectId) {
-        const projectToLoad = getProjects().find(p => p.id === projectId);
-        if (projectToLoad) {
-            loadProjectData(projectToLoad);
-        }
-    }
-
-    function downloadFile(content, fileName, contentType) {
-        const a = document.createElement("a");
-        const file = new Blob([content], { type: contentType });
-        a.href = URL.createObjectURL(file);
-        a.download = fileName;
-        
-        // Append, click, and remove the link
-        document.body.appendChild(a);
-        a.click();
-        
-        // Clean up
-        setTimeout(() => {
-            document.body.removeChild(a);
-            URL.revokeObjectURL(a.href);
-        }, 100);
-    }
-
-    function getProjectDataObject() {
-        const assignedBadges = projectComponentsList.querySelectorAll('.component-badge');
-        if (assignedBadges.length === 0) {
-            return null;
-        }
-
-        const activeBoardOption = document.querySelector('.board-option.active');
-        const boardId = activeBoardOption ? activeBoardOption.dataset.board : 'unknown';
-
-        const assignments = Array.from(assignedBadges).map(badge => {
-            const componentId = badge.dataset.componentId;
-            const pinNumber = badge.dataset.pinNumber;
-            const pinEl = Array.from(pins).find(p => p.textContent.trim() === pinNumber);
-            const pinType = Array.from(pinEl.classList).find(cls => ['gpio', 'i2c', 'spi', 'uart'].includes(cls)) || 'N/A';
-
-            return {
-                componentId,
-                componentName: componentData[componentId]?.name || 'Unknown Component',
-                pin: pinNumber,
-                pinType,
-            };
-        });
-
-        return {
-            boardId: boardId,
-            boardName: boardName.textContent,
-            assignments: assignments,
-        };
-    }
-
-    function handleJsonImport(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            try {
-                const projectData = JSON.parse(event.target.result);
-                // Basic validation
-                if (projectData.boardId && projectData.assignments && Array.isArray(projectData.assignments)) {
-                    loadProjectData(projectData);
-                } else {
-                    showValidationError("Invalid project file format. The file must contain 'boardId' and 'assignments' properties.");
-                }
-            } catch (error) {
-                showValidationError("Could not parse JSON file. Make sure it is a valid project export.");
-                console.error("Error parsing JSON:", error);
-            } finally {
-                // Reset the input value to allow importing the same file again
-                importJsonInput.value = '';
-            }
-        };
-        reader.onerror = function() {
-            showValidationError("Error reading the project file.");
-            importJsonInput.value = '';
-        };
-        reader.readAsText(file);
-    }
-
-    function loadProjectData(projectToLoad) {
-        if (!projectToLoad) return;
-
-        clearBoardBtn.click(); // This will handle confirmation and clearing
-
-        const boardOption = document.querySelector(`.board-option[data-board="${projectToLoad.boardId}"]`);
-        if (boardOption) boardOption.click();
-
-        projectToLoad.assignments.forEach(assignment => {
-            const pinEl = Array.from(pins).find(p => p.textContent.trim() === assignment.pin);
-            const componentConfig = componentData[assignment.componentId];
-            const componentItem = document.querySelector(`.component-item[data-component="${assignment.componentId}"]`);
-            if (pinEl && componentConfig && componentItem) {
-                const componentInfo = { id: assignment.componentId, name: componentConfig.name, icon: componentItem.querySelector('i').outerHTML, requires: componentConfig.requires };
-                assignComponentToPin(componentInfo, pinEl);
-            }
-        });
-    }
-
-    // --- Initial Load ---
-    // Set theme from localStorage
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    setTheme(savedTheme);
-
-    // Load custom components from localStorage and merge with base data
-    loadCustomComponents();
-
-    // Render the component list from data
-    renderAndAttachComponentListeners();
-
-    // Load saved projects from localStorage
-    loadAndRenderProjects();
-
-    // Render the default board
-    renderBoard('rpi4'); // Render the default board on page load

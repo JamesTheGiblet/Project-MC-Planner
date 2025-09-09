@@ -22,7 +22,7 @@
 - [Find Your Plan: From Free to Pro](#-find-your-plan-from-free-to-pro)
 - [Features](#-features)
 - [Screenshots](#-screenshots)
-- [Getting Started](#-getting-started)
+- [Prerequisites](#prerequisites)
 - [Supported Hardware](#-supported-hardware)
 - [Contributing](#-contributing)
 - [Roadmap](#️-roadmap)
@@ -137,43 +137,25 @@ Start for free and upgrade to unlock the full power of PinPoint Planner.
 
 ---
 
-## 🚀 Getting Started
-
-Want to run the project locally or contribute?
+This project is built with vanilla HTML, CSS, and JavaScript. There are no build steps required.
 
 ### Prerequisites
 
-- Node.js 18+ and npm
-- Python 3.8+
-- Git
+- A modern web browser (Chrome, Firefox, Edge, etc.)
+- A local web server to serve the files. The [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension for VS Code is a great option.
 
-### Quick Start
+### Running Locally
 
-1. **Clone the Repository**
+1. **Clone the repository:**
 
     ```bash
-    git clone [https://github.com/yourusername/pinpoint-planner.git](https://github.com/yourusername/pinpoint-planner.git)
+    git clone https://github.com/your-username/pinpoint-planner.git
     cd pinpoint-planner
     ```
 
-2. **Setup Backend (Flask)**
-
-    ```bash
-    cd backend
-    python -m venv venv
-    source venv/bin/activate  # Or `venv\Scripts\activate` on Windows
-    pip install -r requirements.txt
-    python init_db.py
-    python app.py
-    ```
-
-3. **Setup Frontend (React)**
-
-    ```bash
-    cd frontend
-    npm install
-    npm run dev
-    ```
+2. **Open `index.html`:**
+    - If you are using the Live Server extension in VS Code, simply right-click `index.html` and choose "Open with Live Server".
+    - Otherwise, open the `index.html` file directly in your web browser.
 
 ---
 

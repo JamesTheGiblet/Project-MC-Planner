@@ -72,8 +72,15 @@ header {
     font-size: 1.5rem;
 }
 
-.logo i {
+.logo .logo-svg {
     margin-right: 10px;
+    color: white;
+    width: 24px;
+    height: 24px;
+}
+
+.logo .logo-svg .logo-dot {
+    fill: var(--accent);
 }
 
 .header-actions {
@@ -239,6 +246,33 @@ header {
     gap: 10px;
 }
 
+#add-components-list {
+    max-height: 250px;
+    overflow-y: auto;
+    position: relative; /* Needed for the fade effect */
+    /* Hide scrollbar for IE/Edge */
+    -ms-overflow-style: none;
+    /* Hide scrollbar for Firefox */
+    scrollbar-width: none;
+}
+
+/* Hide scrollbar for Webkit browsers */
+#add-components-list::-webkit-scrollbar {
+    display: none;
+}
+
+/* Fade-out effect at the bottom */
+#add-components-list::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30px; /* Adjust height of the fade */
+    background: linear-gradient(to bottom, transparent, var(--surface-color));
+    pointer-events: none; /* Allows clicking through the fade */
+}
+
 .component-item {
     padding: 12px;
     background-color: var(--light);
@@ -266,6 +300,12 @@ header {
     transform: none;
 }
 
+.component-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.edit-component-btn,
 .delete-component-btn {
     background: none;
     border: none;
@@ -275,13 +315,18 @@ header {
     padding: 5px;
     border-radius: 50%;
     transition: var(--transition);
-    visibility: hidden; /* Hide by default */
+    visibility: hidden;
     opacity: 0;
 }
 
+.component-item:hover .edit-component-btn,
 .component-item:hover .delete-component-btn {
-    visibility: visible; /* Show on hover */
+    visibility: visible;
     opacity: 1;
+}
+
+.edit-component-btn:hover {
+    color: var(--primary);
 }
 
 .project-item {
@@ -351,8 +396,6 @@ header {
 }
 
 .board {
-    width: 1600px;
-    height: 967px;
     background-color: #2b2d42;
     border-radius: 12px;
     padding: 0;
@@ -366,7 +409,7 @@ header {
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover; /* Default to cover, can be overridden by data */
     z-index: 1;
 }
 
@@ -440,10 +483,6 @@ body.dark-mode .board-name {
     display: grid;
     grid-template-columns: repeat(2, auto);
     grid-auto-flow: row;
-    gap: 14px 15px; /* row-gap column-gap, adjusted for fit */
-    top: 103px;
-    right: 395px; /* 20px original + 50px shift left */
-    left: auto;
 }
 
 .board-layout-1col-list .pins-container {
@@ -650,6 +689,11 @@ body.dark-mode .board-name {
     margin-bottom: 20px;
     border-bottom: 1px solid var(--light-gray);
     padding-bottom: 15px;
+    gap: 15px;
+}
+
+.modal-header h3 {
+    flex-grow: 1;
 }
 
 .modal-header h3 {
@@ -692,6 +736,24 @@ body.dark-mode .board-name {
     padding: 2px 6px;
     border-radius: 4px;
     font-family: 'Courier New', Courier, monospace;
+}
+
+/* Code Modal Specific Styles */
+#code-modal .modal-content {
+    max-width: 900px; /* Wider for code */
+}
+
+#code-modal-content {
+    background-color: #2d2d2d;
+    border-radius: var(--border-radius);
+    padding: 0;
+    margin: 0;
+}
+
+pre[class*="language-"] {
+    background: #2d2d2d !important;
+    margin: 0;
+    border-radius: var(--border-radius);
 }
 
 .modal-body h4 {
