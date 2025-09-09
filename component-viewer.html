@@ -251,7 +251,8 @@
 
         .warnings-section {
             background: color-mix(in srgb, var(--danger) 10%, transparent);
-            border: 1px solid rgba(249, 65, 68, 0.3); /* fallback for color-mix */
+            background-color: rgba(249, 65, 68, 0.1); /* Fallback */
+            border: 1px solid rgba(249, 65, 68, 0.3); /* Fallback */
             border-radius: var(--border-radius);
             padding: 15px;
         }
@@ -383,6 +384,34 @@
             text-align: center;
         }
 
+        .select-prompt {
+            text-align: center;
+            color: var(--gray);
+            margin-top: 50px;
+        }
+
+        .select-prompt-arrow {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .bom-preview-desc {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+
+        .bom-legend {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+
         @media (max-width: 768px) {
             .demo-container {
                 grid-template-columns: 1fr;
@@ -422,11 +451,11 @@
                 Select a component to see detailed requirements and dependencies
             </p>
 
-            <div id="componentDetails">
+            <div id="componentDetails" class="hidden">
                 <!-- Component details will be populated here -->
             </div>
 
-            <div class="enhanced-bom-preview" id="bomPreview">
+            <div class="enhanced-bom-preview hidden" id="bomPreview">
                 <h3><i class="fas fa-list-ol"></i> Shopping List Preview</h3>
                 <p class="bom-preview-desc">
                     This is what you'd need to buy for this component:
@@ -708,8 +737,9 @@
             const detailsContainer = document.getElementById('componentDetails');
             const selectPrompt = document.getElementById('selectPrompt');
             const bomPreview = document.getElementById('bomPreview');
-            
-            selectPrompt.style.display = 'none';
+
+            selectPrompt.classList.add('hidden');
+            detailsContainer.classList.remove('hidden');
             detailsContainer.innerHTML = '';
             
             // Pin Requirements
@@ -838,7 +868,7 @@
 
             // Show BOM preview
             generateBOMPreview(componentId);
-            bomPreview.style.display = 'block';
+            bomPreview.classList.remove('hidden');
         }
 
         // Generate BOM preview for a single component
@@ -868,7 +898,7 @@
                     <div class="bom-section">
                         <h4>Additional Items Needed</h4>
                         ${additionalItems.join('')}
-                        <p style="font-size: 0.8rem; color: var(--gray); margin-top: 10px;">
+                        <p class="bom-legend">
                             🔴 Required &nbsp; 🟡 Optional/Conditional
                         </p>
                     </div>

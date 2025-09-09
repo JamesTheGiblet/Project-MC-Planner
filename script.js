@@ -29,6 +29,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const exportBomCsvBtn = document.getElementById('export-bom-csv-btn');
     const codeModalCloseBtn = document.getElementById('code-modal-close-btn');
     const docsModalCloseBtn = document.getElementById('docs-modal-close-btn');
+    const docsModalTitle = document.getElementById('docs-modal-title');
+    const docsModalContent = document.getElementById('docs-modal-content');
     const copyCodeBtn = document.getElementById('copy-code-btn');
     const addComponentModalCloseBtn = document.getElementById('add-component-modal-close-btn');
     const componentSearch = document.getElementById('component-search');
@@ -720,8 +722,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const docData = boardDocumentation[boardId];
     
         if (docData) {
-            const docsModalTitle = document.getElementById('docs-modal-title');
-            const docsModalContent = document.getElementById('docs-modal-content');
             docsModalTitle.textContent = docData.title;
             docsModalContent.innerHTML = docData.content;
             docsModal.classList.remove('hidden');
@@ -1092,37 +1092,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const componentInfo = { id: assignment.componentId, name: componentConfig.name, icon: componentItem.querySelector('i').outerHTML, requires: componentConfig.requires };
                 assignComponentToPin(componentInfo, pinEl);
             }
-        });
-    }
-
-    function showBoardDocumentation() {
-        const activeBoardOption = document.querySelector('.board-option.active');
-        if (!activeBoardOption) {
-            alert("Please select a board first.");
-            return;
-        }
-        const boardId = activeBoardOption.dataset.board;
-        const docData = boardDocumentation[boardId];
-    
-        if (docData) {
-            docsModalTitle.textContent = docData.title;
-            docsModalContent.innerHTML = docData.content;
-            docsModal.classList.remove('hidden');
-        } else {
-            alert(`Sorry, no documentation is available for the selected board (${boardId}) yet.`);
-        }
-    }
-
-    function copyGeneratedCode() {
-        const code = document.getElementById('code-block').textContent;
-        navigator.clipboard.writeText(code).then(() => {
-            const originalText = copyCodeBtn.innerHTML;
-            copyCodeBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-            setTimeout(() => {
-                copyCodeBtn.innerHTML = originalText;
-            }, 2000);
-        }).catch(err => {
-            console.error('Failed to copy code: ', err);
         });
     }
 
