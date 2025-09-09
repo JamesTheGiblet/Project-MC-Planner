@@ -393,6 +393,8 @@ header {
     flex-wrap: wrap;
     gap: 15px;
     margin-bottom: 20px;
+    /* Fix for Firefox flexbox sizing with oversized children */
+    min-width: 0;
 }
 
 .board {
@@ -401,6 +403,7 @@ header {
     padding: 0;
     position: relative;
     overflow: hidden;
+    max-width: 100%; /* Ensure board scales down gracefully */
 }
 
 .board-image {
@@ -449,7 +452,7 @@ body.dark-mode .board-name {
     justify-content: center;
     align-items: center;
     color: white;
-    font-size: 0.8rem;
+    font-size: 12px; /* Use px for consistent cross-browser rendering */
     cursor: pointer;
     transition: var(--transition);
 }
@@ -736,6 +739,28 @@ body.dark-mode .board-name {
     padding: 2px 6px;
     border-radius: 4px;
     font-family: 'Courier New', Courier, monospace;
+}
+
+/* BOM Modal Specific Styles */
+.bom-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.bom-table th, .bom-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--light);
+}
+
+.bom-table th {
+    background-color: var(--light);
+    font-weight: 600;
+}
+
+.bom-table td:first-child {
+    font-weight: 500;
 }
 
 /* Code Modal Specific Styles */

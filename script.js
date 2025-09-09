@@ -12,17 +12,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const exportJsonBtn = document.getElementById('export-json-btn');
     const projectsList = document.getElementById('projects-list');
     const wiringDiagramBtn = document.getElementById('wiring-diagram-btn');
+    const generateBomBtn = document.getElementById('generate-bom-btn');
     const generateCodeBtn = document.getElementById('generate-code-btn');
     const docsBtn = document.getElementById('docs-btn');
     const planMyBoardBtn = document.getElementById('plan-my-board-btn');
     const upgradeProBtn = document.getElementById('upgrade-pro-btn');
     const wiringModal = document.getElementById('wiring-modal');
+    const bomModal = document.getElementById('bom-modal');
     const codeModal = document.getElementById('code-modal');
     const docsModal = document.getElementById('docs-modal');
     const addComponentBtn = document.getElementById('add-component-btn');
     const addComponentsList = document.getElementById('add-components-list');
     const addComponentModal = document.getElementById('add-component-modal');
     const modalCloseBtn = document.getElementById('modal-close-btn');
+    const bomModalCloseBtn = document.getElementById('bom-modal-close-btn');
+    const exportBomCsvBtn = document.getElementById('export-bom-csv-btn');
     const codeModalCloseBtn = document.getElementById('code-modal-close-btn');
     const docsModalCloseBtn = document.getElementById('docs-modal-close-btn');
     const copyCodeBtn = document.getElementById('copy-code-btn');
@@ -121,6 +125,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Wiring Diagram Button
     wiringDiagramBtn.addEventListener('click', generateWiringDiagram);
 
+    // Generate BOM Button
+    generateBomBtn.addEventListener('click', generateBOM);
+
     // Generate Code Button
     generateCodeBtn.addEventListener('click', () => {
         const projectData = getProjectDataObject();
@@ -150,6 +157,17 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.target === docsModal) {
             docsModal.classList.add('hidden');
         }
+    });
+
+    // BOM Modal Listeners
+    bomModalCloseBtn.addEventListener('click', () => bomModal.classList.add('hidden'));
+    bomModal.addEventListener('click', (e) => {
+        if (e.target === bomModal) {
+            bomModal.classList.add('hidden');
+        }
+    });
+    exportBomCsvBtn.addEventListener('click', () => {
+        generateBomCSV();
     });
 
     // Modal Close Listeners
@@ -767,6 +785,80 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const filename = `${projectData.boardName.toLowerCase().replace(/\s+/g, '-')}-plan.json`;
         downloadFile(JSON.stringify(projectData, null, 2), filename, 'application/json');
+    }
+
+    function generateBOM() {
+        const assignedBadges = projectComponentsList.querySelectorAll('.component-badge');
+        if (assignedBadges.length === 0) {
+            showValidationError("Cannot generate a Bill of Materials for an empty board.");
+            return;
+        }
+
+        const bomContent = document.getElementById('bom-modal-content');
+        bomContent.innerHTML = ''; // Clear previous content
+
+        const componentCounts = {};
+        assignedBadges.forEach(badge => {
+            const componentId = badge.dataset.componentId;
+            componentCounts[componentId] = (componentCounts[componentId] || 0) + 1;
+        });
+
+        let tableHTML = `<table class="bom-table">
+            <thead>
+                <tr>
+                    <th>Quantity</th>
+                    <th>Component</th>
+                    <th>Notes / Tip</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+        for (const [id, count] of Object.entries(componentCounts)) {
+            const component = componentData[id];
+            tableHTML += `<tr><td>${count}</td><td>${component.name}</td><td>${component.tip || component.notes || ''}</td></tr>`;
+        }
+
+        tableHTML += `</tbody></table>`;
+        bomContent.innerHTML = tableHTML;
+        bomModal.classList.remove('hidden');
+    }
+
+    function generateBomCSV() {
+        const assignedBadges = projectComponentsList.querySelectorAll('.component-badge');
+        if (assignedBadges.length === 0) {
+            showValidationError("Cannot export an empty BOM.");
+            return;
+        }
+
+        const componentCounts = {};
+        assignedBadges.forEach(badge => {
+            const componentId = badge.dataset.componentId;
+            componentCounts[componentId] = (componentCounts[componentId] || 0) + 1;
+        });
+
+        const headers = ['Quantity', 'Component', 'Notes / Tip'];
+        const rows = [headers.join(',')]; // Start with the header row
+
+        const escapeCsvField = (field) => {
+            if (field === null || field === undefined) return '';
+            let str = String(field);
+            str = str.replace(/"/g, '""'); // Escape double quotes
+            if (str.search(/("|,|\n)/g) >= 0) {
+                str = `"${str}"`; // Enclose in double quotes if it contains special characters
+            }
+            return str;
+        };
+
+        for (const [id, count] of Object.entries(componentCounts)) {
+            const component = componentData[id];
+            const notes = component.tip || component.notes || '';
+            const row = [count, component.name, notes].map(escapeCsvField).join(',');
+            rows.push(row);
+        }
+
+        const csvContent = rows.join('\n');
+        const filename = `${boardName.textContent.toLowerCase().replace(/\s+/g, '-')}-bom.csv`;
+        downloadFile(csvContent, filename, 'text/csv;charset=utf-8;');
     }
 
     function generateWiringDiagram() {

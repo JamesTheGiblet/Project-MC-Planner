@@ -38,6 +38,9 @@
                 <button class="btn btn-outline" id="wiring-diagram-btn" title="Generate Wiring Diagram">
                     <i class="fas fa-sitemap"></i> Wiring
                 </button>
+                <button class="btn btn-outline" id="generate-bom-btn" title="Generate Bill of Materials">
+                    <i class="fas fa-list-ol"></i> BOM
+                </button>
                 <button class="btn btn-outline" id="generate-code-btn" title="Generate Starter Code">
                     <i class="fas fa-code"></i> Code
                 </button>
@@ -212,6 +215,19 @@
             </div>
             <div id="docs-modal-content" class="modal-body">
                 <!-- Documentation will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <div id="bom-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Bill of Materials (BOM)</h3>
+                <button id="export-bom-csv-btn" class="btn btn-primary"><i class="fas fa-file-csv"></i> Export CSV</button>
+                <button id="bom-modal-close-btn" class="modal-close-btn">&times;</button>
+            </div>
+            <div id="bom-modal-content" class="modal-body">
+                <!-- BOM will be generated here -->
             </div>
         </div>
     </div>
