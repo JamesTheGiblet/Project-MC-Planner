@@ -58,15 +58,15 @@
                 <h3 class="sidebar-title"><i class="fas fa-desktop"></i> Select Board</h3>
                 <div class="board-selection">
                     <div class="board-option active" data-board="rpi4">
-                        <img src="images/raspberry-pi-1.jpg" alt="Raspberry Pi 4">
+                        <img src="images/Raspberry Pi 4B.png" alt="Raspberry Pi 4">
                         <div>Raspberry Pi 4</div>
                     </div>
                     <div class="board-option" data-board="uno">
-                        <img src="images/Arduino_Uno.png" alt="Arduino Uno">
+                        <img src="images/arduino_schematics_pins.png" alt="Arduino Uno">
                         <div>Arduino Uno</div>
                     </div>
                     <div class="board-option" data-board="esp32">
-                        <img src="images/esp32.png" alt="ESP32">
+                        <img src="images/ESP32_schematics_pins.png" alt="ESP32">
                         <div>ESP32 DevKit</div>
                     </div>
                 </div>
@@ -139,6 +139,81 @@
                 </button>
             </div>
         </aside>
+    </div>
+
+    <div id="upgrade-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Find Your Plan: From Free to Pro</h3>
+                <button id="upgrade-modal-close-btn" class="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Unlock advanced features like the AI Smart Planner, Code Generation, and more to supercharge your workflow.</p>
+                <table class="bom-table" style="margin-top: 20px;">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Free (Simple Projects)</th>
+                            <th>Pro ($7/mo)</th>
+                            <th>Business ($25/mo/seat)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Projects</td>
+                            <td>3 Public Projects</td>
+                            <td>Unlimited Public &amp; Private Projects</td>
+                            <td>Unlimited Team Projects</td>
+                        </tr>
+                        <tr>
+                            <td>Core Planner</td>
+                            <td>✅</td>
+                            <td>✅</td>
+                            <td>✅</td>
+                        </tr>
+                        <tr>
+                            <td>Intelligence</td>
+                            <td>Pin Validator</td>
+                            <td>⭐ AI Smart Planner</td>
+                            <td>⭐ AI Smart Planner</td>
+                        </tr>
+                        <tr>
+                            <td>Documentation</td>
+                            <td>Markdown Export</td>
+                            <td>PDF &amp; JSON Export</td>
+                            <td>Custom Templates</td>
+                        </tr>
+                        <tr>
+                            <td>Wiring Diagrams</td>
+                            <td>❌</td>
+                            <td>✅ Fritzing-style Diagrams</td>
+                            <td>✅ Advanced Diagrams</td>
+                        </tr>
+                        <tr>
+                            <td>Code Generation</td>
+                            <td>❌</td>
+                            <td>✅ Arduino/Python Starter Code</td>
+                            <td>✅ Custom Code Templates</td>
+                        </tr>
+                        <tr>
+                            <td>Custom Components</td>
+                            <td>❌</td>
+                            <td>✅ Add Custom Components</td>
+                            <td>✅ Shared Team Library</td>
+                        </tr>
+                        <tr>
+                            <td>Collaboration</td>
+                            <td>❌</td>
+                            <td>❌</td>
+                            <td>✅ Real-time Editing</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="form-actions">
+                     <button class="btn btn-primary" id="upgrade-now-btn">Upgrade Now</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="wiring-modal" class="modal-overlay hidden">

@@ -212,6 +212,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const docsModal = document.getElementById('docs-modal');
     const addComponentBtn = document.getElementById('add-component-btn');
     const addComponentsList = document.getElementById('add-components-list');
+    const upgradeModal = document.getElementById('upgrade-modal');
+    const upgradeModalCloseBtn = document.getElementById('upgrade-modal-close-btn');
+    const upgradeNowBtn = document.getElementById('upgrade-now-btn');
     const addComponentModal = document.getElementById('add-component-modal');
     const modalCloseBtn = document.getElementById('modal-close-btn');
     const bomModalCloseBtn = document.getElementById('bom-modal-close-btn');
@@ -278,11 +281,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Placeholder button listeners
     planMyBoardBtn.addEventListener('click', () => {
-        alert("The AI Smart Planner is a Pro feature. Upgrade to have your board planned automatically!");
+        showUpgradeModal();
     });
 
     upgradeProBtn.addEventListener('click', () => {
-        alert("Thank you for your interest! The Pro plan with the AI Smart Planner is coming soon.");
+        showUpgradeModal();
     });
 
 
@@ -315,27 +318,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Export to JSON
     exportJsonBtn.addEventListener('click', () => {
-        generateJsonExport();
+        showUpgradeModal();
     });
 
     // Wiring Diagram Button
-    wiringDiagramBtn.addEventListener('click', generateWiringDiagram);
+    wiringDiagramBtn.addEventListener('click', () => showUpgradeModal());
 
     // Generate BOM Button
     generateBomBtn.addEventListener('click', generateBOM);
 
     // Generate Code Button
-    generateCodeBtn.addEventListener('click', () => {
-        const projectData = getProjectDataObject();
-        const { language, code } = codeGenerator.generate(projectData);
-        
-        const codeBlock = document.getElementById('code-block');
-        codeBlock.textContent = code;
-        codeBlock.className = `language-${language}`;
-        Prism.highlightElement(codeBlock);
-
-        codeModal.classList.remove('hidden');
-    });
+    generateCodeBtn.addEventListener('click', () => showUpgradeModal());
 
     // Docs Button
     docsBtn.addEventListener('click', showBoardDocumentation);
@@ -376,9 +369,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Add Component Button & Modal
-    addComponentBtn.addEventListener('click', () => {
-        addComponentModal.classList.remove('hidden');
-    });
+    addComponentBtn.addEventListener('click', () => showUpgradeModal());
 
     addComponentModalCloseBtn.addEventListener('click', () => {
         addComponentModal.classList.add('hidden');
@@ -394,6 +385,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     addComponentForm.addEventListener('submit', (e) => {
         handleAddComponent(e);
+    });
+
+    // Upgrade Modal Listeners
+    upgradeModalCloseBtn.addEventListener('click', () => upgradeModal.classList.add('hidden'));
+    upgradeModal.addEventListener('click', (e) => {
+        if (e.target === upgradeModal) {
+            upgradeModal.classList.add('hidden');
+        }
+    });
+    upgradeNowBtn.addEventListener('click', () => {
+        alert('Thank you for your interest! Pricing and checkout will be available soon.');
+        upgradeModal.classList.add('hidden');
     });
 
     // Clear Board button
@@ -586,6 +589,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- Helper Functions ---
+
+    function showUpgradeModal() {
+        upgradeModal.classList.remove('hidden');
+    }
 
     function toggleCategory(e) {
         const header = e.currentTarget;

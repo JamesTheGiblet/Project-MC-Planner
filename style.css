@@ -1472,6 +1472,12 @@ body.dark-mode .board-name {
     text-align: left;
     border-bottom: 1px solid var(--light);
 }
+.bom-table th, .bom-table td {
+    vertical-align: middle;
+}
+.bom-table th:not(:first-child), .bom-table td:not(:first-child) {
+    text-align: center;
+}
 
 .bom-table th {
     background-color: var(--light);
