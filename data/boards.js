@@ -1,0 +1,162 @@
+// --- Board Data ---
+const boardData = {
+    rpi4: {
+        title: 'Raspberry Pi 4 Pinout',
+        name: 'Raspberry Pi 4 Model B',
+        image: 'images/Raspberry_Pi_4_schematics_pins.png',
+        width: 1600,
+        height: 967,
+        pinLayout: { top: '9%', right: '24.3%', gap: '1px 6.9%' },
+        layout: '2col-grid',
+        pins: [
+            { name: '3.3V', type: 'power', title: 'Pin 1: 3.3V Power Rail' },
+            { name: '5V', type: 'power', title: 'Pin 2: 5V Power Rail' },
+            { name: '2', type: 'i2c', title: 'Pin 3: GPIO 2 (I2C1, SDA)' },
+            { name: '5V', type: 'power', title: 'Pin 4: 5V Power Rail' },
+            { name: '3', type: 'i2c', title: 'Pin 5: GPIO 3 (I2C1, SCL)' },
+            { name: 'GND', type: 'ground', title: 'Pin 6: Ground' },
+            { name: '4', type: 'gpio', title: 'Pin 7: GPIO 4 (GPCLK0)' },
+            { name: '14', type: 'uart', title: 'Pin 8: GPIO 14 (UART TXD)' },
+            { name: 'GND', type: 'ground', title: 'Pin 9: Ground' },
+            { name: '15', type: 'uart', title: 'Pin 10: GPIO 15 (UART RXD)' },
+            { name: '17', type: 'gpio', title: 'Pin 11: GPIO 17' },
+            { name: '18', type: 'gpio', title: 'Pin 12: GPIO 18 (PWM0)' },
+            { name: '27', type: 'gpio', title: 'Pin 13: GPIO 27' },
+            { name: 'GND', type: 'ground', title: 'Pin 14: Ground' },
+            { name: '22', type: 'gpio', title: 'Pin 15: GPIO 22' },
+            { name: '23', type: 'gpio', title: 'Pin 16: GPIO 23' },
+            { name: '3.3V', type: 'power', title: 'Pin 17: 3.3V Power Rail' },
+            { name: '24', type: 'gpio', title: 'Pin 18: GPIO 24' },
+            { name: '10', type: 'spi', title: 'Pin 19: GPIO 10 (SPI0, MOSI)' },
+            { name: 'GND', type: 'ground', title: 'Pin 20: Ground' },
+            { name: '9', type: 'spi', title: 'Pin 21: GPIO 9 (SPI0, MISO)' },
+            { name: '25', type: 'gpio', title: 'Pin 22: GPIO 25' },
+            { name: '11', type: 'spi', title: 'Pin 23: GPIO 11 (SPI0, SCLK)' },
+            { name: '8', type: 'spi', title: 'Pin 24: GPIO 8 (SPI0, CE0)' },
+            { name: 'GND', type: 'ground', title: 'Pin 25: Ground' },
+            { name: '7', type: 'spi', title: 'Pin 26: GPIO 7 (SPI0, CE1)' },
+            { name: 'ID_SD', type: 'i2c', title: 'Pin 27: ID_SD (I2C ID EEPROM)' },
+            { name: 'ID_SC', type: 'i2c', title: 'Pin 28: ID_SC (I2C ID EEPROM)' },
+            { name: '5', type: 'gpio', title: 'Pin 29: GPIO 5' },
+            { name: 'GND', type: 'ground', title: 'Pin 30: Ground' },
+            { name: '6', type: 'gpio', title: 'Pin 31: GPIO 6' },
+            { name: '12', type: 'gpio', title: 'Pin 32: GPIO 12 (PWM0)' },
+            { name: '13', type: 'gpio', title: 'Pin 33: GPIO 13 (PWM1)' },
+            { name: 'GND', type: 'ground', title: 'Pin 34: Ground' },
+            { name: '19', type: 'spi', title: 'Pin 35: GPIO 19 (SPI1, MISO)' },
+            { name: '16', type: 'gpio', title: 'Pin 36: GPIO 16' },
+            { name: '26', type: 'gpio', title: 'Pin 37: GPIO 26' },
+            { name: '20', type: 'spi', title: 'Pin 38: GPIO 20 (SPI1, MOSI)' },
+            { name: 'GND', type: 'ground', title: 'Pin 39: Ground' },
+            { name: '21', type: 'spi', title: 'Pin 40: GPIO 21 (SPI1, SCLK)' },
+        ]
+    },
+    uno: {
+        title: 'Arduino Uno Pinout',
+        name: 'Arduino Uno R3',
+        image: 'images/arduino_schematics_pins.png', // <-- Updated Image
+        width: 800,
+        height: 620,
+        layout: '2col-grid', // Changed to 2-column grid
+        pinLayout: { top: '10%', right: '10%', gap: '1.5% 60%' }, // Added for 2-col layout
+        pins: [
+            // This interleaved layout creates two columns (13 left, 18 right).
+            // Placeholders are used to align the longer right column.
+
+            // Left Side (Power & Analog)      // Right Side (Digital)
+            { name: 'IOREF', type: 'power', title: 'Power: I/O Voltage Reference' },
+            { name: 'SCL', type: 'i2c', title: 'Pin SCL (I2C)' },
+
+            { name: 'RESET', type: 'gpio', title: 'System Reset' },
+            { name: 'SDA', type: 'i2c', title: 'Pin SDA (I2C)' },
+
+            { name: '3.3V', type: 'power', title: 'Power: 3.3V Regulated Output' },
+            { name: 'AREF', type: 'gpio', title: 'Power: Analog Reference' },
+
+            { name: '5V', type: 'power', title: 'Power: 5V Regulated Output' },
+            { name: 'GND', type: 'ground', title: 'Power: Ground' },
+
+            { name: 'GND', type: 'ground', title: 'Power: Ground' },
+            { name: '13', type: 'spi', title: 'Pin 13: Digital I/O (SPI SCK, LED)' },
+
+            { name: 'GND', type: 'ground', title: 'Power: Ground' },
+            { name: '12', type: 'spi', title: 'Pin 12: Digital I/O (SPI MISO)' },
+
+            { name: 'VIN', type: 'power', title: 'Power: Voltage In (7-12V)' },
+            { name: '11', type: 'spi', title: 'Pin 11: Digital I/O (SPI MOSI, PWM)' },
+
+            { name: 'A0', type: 'gpio', title: 'Pin A0: Analog In' },
+            { name: '10', type: 'spi', title: 'Pin 10: Digital I/O (SPI SS, PWM)' },
+
+            { name: 'A1', type: 'gpio', title: 'Pin A1: Analog In' },
+            { name: '9', type: 'gpio', title: 'Pin 9: Digital I/O (PWM)' },
+
+            { name: 'A2', type: 'gpio', title: 'Pin A2: Analog In' },
+            { name: '8', type: 'gpio', title: 'Pin 8: Digital I/O' },
+
+            { name: 'A3', type: 'gpio', title: 'Pin A3: Analog In' },
+            { name: '7', type: 'gpio', title: 'Pin 7: Digital I/O' },
+
+            { name: 'A4', type: 'i2c', title: 'Pin A4: Analog In (I2C SDA)' },
+            { name: '6', type: 'gpio', title: 'Pin 6: Digital I/O (PWM)' },
+
+            { name: 'A5', type: 'i2c', title: 'Pin A5: Analog In (I2C SCL)' },
+            { name: '5', type: 'gpio', title: 'Pin 5: Digital I/O (PWM)' },
+
+            // Placeholders for left column to align remaining right column pins
+            { name: '', type: 'placeholder', title: '' },
+            { name: '4', type: 'gpio', title: 'Pin 4: Digital I/O' },
+            { name: '', type: 'placeholder', title: '' },
+            { name: '3', type: 'gpio', title: 'Pin 3: Digital I/O (PWM, Interrupt)' },
+            { name: '', type: 'placeholder', title: '' },
+            { name: '2', type: 'gpio', title: 'Pin 2: Digital I/O (Interrupt)' },
+            { name: '', type: 'placeholder', title: '' },
+            { name: '1', type: 'uart', title: 'Pin 1: Digital I/O (TX1)' },
+            { name: '', type: 'placeholder', title: '' },
+            { name: '0', type: 'uart', title: 'Pin 0: Digital I/O (RX0)' },
+        ]
+    },
+    esp32: {
+        title: 'ESP32 DevKitC Pinout',
+        name: 'ESP32 DevKitC',
+        image: 'images/ESP32_schematics_pins.png', // <-- Updated Image
+        width: 1060,
+        height: 800,
+        pinLayout: { top: '5.5%', right: '11%', gap: '2.2% 42.5%' }, // Adjusted layout for new image
+        layout: '2col-grid',
+        pins: [
+            // Left Side
+            { name: 'EN', type: 'power', title: 'EN: Enable (HIGH for normal operation)' },
+            { name: 'VP', type: 'gpio', title: 'GPIO36 (ADC1_0, SensVP)' },
+            { name: 'VN', type: 'gpio', title: 'GPIO39 (ADC1_3, SensVN)' },
+            { name: '34', 'type': 'gpio', title: 'GPIO34 (ADC1_6)' },
+            { name: '35', 'type': 'gpio', title: 'GPIO35 (ADC1_7)' },
+            { name: '32', type: 'gpio', title: 'GPIO32 (ADC1_4, Touch9)' },
+            { name: '33', type: 'gpio', title: 'GPIO33 (ADC1_5, Touch8)' },
+            { name: '25', type: 'gpio', title: 'GPIO25 (ADC2_8, DAC1)' },
+            { name: '26', type: 'gpio', title: 'GPIO26 (ADC2_9, DAC2)' },
+            { name: '27', type: 'gpio', title: 'GPIO27 (ADC2_7, Touch7)' },
+            { name: '14', type: 'gpio', title: 'GPIO14 (HSPI_CLK, Touch6)' },
+            { name: '12', type: 'gpio', title: 'GPIO12 (HSPI_MISO, Touch5)' },
+            { name: '13', type: 'gpio', title: 'GPIO13 (HSPI_MOSI, Touch4)' },
+            { name: 'GND', type: 'ground', title: 'Ground' },
+            { name: 'VIN', type: 'power', title: '5V Power Input' },
+            // Right Side
+            { name: '23', type: 'spi', title: 'GPIO23 (VSPI_MOSI)' },
+            { name: '22', type: 'i2c', title: 'GPIO22 (I2C SCL)' },
+            { name: '1', type: 'uart', title: 'GPIO1 (U0_TXD)' },
+            { name: '3', type: 'uart', title: 'GPIO3 (U0_RXD)' },
+            { name: '21', type: 'i2c', title: 'GPIO21 (I2C SDA)' },
+            { name: '19', type: 'spi', title: 'GPIO19 (VSPI_MISO)' },
+            { name: '18', type: 'spi', title: 'GPIO18 (VSPI_SCK)' },
+            { name: '5', type: 'spi', title: 'GPIO5 (VSPI_CS)' },
+            { name: '17', type: 'uart', title: 'GPIO17 (U2_TXD)' },
+            { name: '16', type: 'uart', title: 'GPIO16 (U2_RXD)' },
+            { name: '4', type: 'gpio', title: 'GPIO4 (ADC2_0, Touch0)' },
+            { name: '2', type: 'gpio', title: 'GPIO2 (ADC2_2, Touch2)' },
+            { name: '15', type: 'gpio', title: 'GPIO15 (ADC2_3, Touch3)' },
+            { name: 'GND', type: 'ground', title: 'Ground' },
+            { name: '3.3V', type: 'power', title: '3.3V Power Output' },
+        ]
+    }
+};
