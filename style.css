@@ -100,6 +100,10 @@ header {
     gap: 8px;
 }
 
+.btn-text {
+    transition: var(--transition);
+}
+
 .btn-primary {
     background-color: var(--primary);
     color: white;
@@ -380,6 +384,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 15px;
     margin-bottom: 20px;
 }
 
@@ -847,23 +852,56 @@ pre[class*="language-"] {
 @media (max-width: 1200px) {
     .container {
         grid-template-columns: 200px 1fr;
+        grid-template-columns: 250px 1fr;
         grid-template-areas:
             "header header"
             "sidebar main"
             "properties properties";
         grid-template-rows: 60px 1fr auto;
+        grid-template-rows: auto 1fr auto;
         height: auto;
         min-height: 100vh;
     }
     
+    header {
+        padding: 10px 20px;
+    }
+
+    .header-actions {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
     .properties-panel {
         height: 400px;
+        height: auto;
+        min-height: 250px;
+    }
+}
+
+@media (max-width: 992px) {
+    .container {
+        grid-template-columns: 200px 1fr;
+    }
+
+    .logo span {
+        display: none;
+    }
+
+    .btn-text {
+        display: none;
+    }
+
+    .btn {
+        padding: 8px 12px;
     }
 }
 
 @media (max-width: 768px) {
     .container {
         grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto auto;
         grid-template-areas:
             "header"
             "main"
@@ -871,7 +909,41 @@ pre[class*="language-"] {
             "properties";
     }
     
+
     .sidebar {
         height: 300px;
+        height: auto;
+        min-height: 200px;
+        padding: 15px;
+    }
+
+    .properties-panel {
+        padding: 15px;
+    }
+
+    .main {
+        padding: 10px;
+    }
+
+    .planner-header {
+        flex-wrap: wrap;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-actions {
+        gap: 5px;
+    }
+    .btn {
+        padding: 6px 10px;
+        font-size: 0.9rem;
+    }
+    .logo {
+        font-size: 1.2rem;
     }
 }
