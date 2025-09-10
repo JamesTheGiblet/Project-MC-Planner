@@ -166,6 +166,98 @@ const componentData = {
         notes: 'More advanced than MPU6050. Includes magnetometer for compass heading.',
         i2cAddress: '0x68 or 0x69'
     },
+    photoresistor: {
+        name: 'Photoresistor (LDR)',
+        icon: 'far fa-lightbulb',
+        tip: 'Light-Dependent Resistor for detecting ambient light levels.',
+        voltage: '3.3V-5V',
+        complexity: 'simple',
+        requires: { data: ['gpio'], power: 1, ground: 1 }, // Needs an ADC pin
+        dependencies: [{
+            type: 'resistor',
+            value: '10kΩ',
+            purpose: 'voltage_divider',
+            description: 'Pull-down resistor for voltage divider',
+            reason: 'An LDR needs to be in a voltage divider to produce a variable voltage.',
+            required: true
+        }],
+        notes: 'Requires an Analog (ADC) pin to read values.'
+    },
+    soil_moisture: {
+        name: 'Soil Moisture Sensor',
+        icon: 'fas fa-leaf',
+        tip: 'Detects moisture level in soil. Has both analog and digital outputs.',
+        voltage: '3.3V-5V',
+        complexity: 'simple',
+        requires: { data: ['gpio'], power: 1, ground: 1 },
+        dependencies: [],
+        notes: 'Use the Analog Output (AO) pin for variable moisture levels. The Digital Output (DO) is a simple threshold.'
+    },
+    sound_sensor: {
+        name: 'Sound Detection Sensor',
+        icon: 'fas fa-microphone-alt',
+        tip: 'Detects sound levels. Has both analog and digital outputs.',
+        voltage: '3.3V-5V',
+        complexity: 'simple',
+        requires: { data: ['gpio'], power: 1, ground: 1 },
+        dependencies: [],
+        notes: 'Useful for detecting claps or loud noises. Analog output gives sound intensity.'
+    },
+    mq2_gas_sensor: {
+        name: 'MQ-2 Gas Sensor',
+        icon: 'fas fa-smog',
+        tip: 'Detects smoke, LPG, and other combustible gases.',
+        voltage: '5V',
+        complexity: 'moderate',
+        requires: { data: ['gpio'], power: 1, ground: 1 },
+        dependencies: [],
+        warnings: ['Sensor can get hot during operation.', 'Requires a warm-up period for accurate readings.'],
+        notes: 'Provides both analog and digital outputs.'
+    },
+    hall_effect_sensor: {
+        name: 'Hall Effect Sensor',
+        icon: 'fas fa-magnet',
+        tip: 'Detects the presence of a magnetic field.',
+        voltage: '3.3V-5V',
+        complexity: 'simple',
+        requires: { data: ['gpio'], power: 1, ground: 1 },
+        dependencies: [],
+        notes: 'Digital output switches when a magnet is near. Useful for RPM counters or non-contact switches.'
+    },
+    flex_sensor: {
+        name: 'Flex Sensor',
+        icon: 'fas fa-band-aid',
+        tip: 'A variable resistor that changes resistance when bent.',
+        voltage: '3.3V-5V',
+        complexity: 'moderate',
+        requires: { data: ['gpio'], power: 1, ground: 1 }, // Needs ADC
+        dependencies: [{
+            type: 'resistor',
+            value: '10kΩ-47kΩ',
+            purpose: 'voltage_divider',
+            description: 'Fixed resistor for voltage divider',
+            reason: 'Flex sensor needs to be in a voltage divider to read values.',
+            required: true
+        }],
+        notes: 'Requires an Analog (ADC) pin. Resistance increases as it bends.'
+    },
+    fsr: {
+        name: 'Force Sensitive Resistor (FSR)',
+        icon: 'fas fa-compress-arrows-alt',
+        tip: 'Detects physical pressure, squeeze, and weight.',
+        voltage: '3.3V-5V',
+        complexity: 'moderate',
+        requires: { data: ['gpio'], power: 1, ground: 1 }, // Needs ADC
+        dependencies: [{
+            type: 'resistor',
+            value: '10kΩ',
+            purpose: 'voltage_divider',
+            description: 'Pull-down resistor for voltage divider',
+            reason: 'FSRs are variable resistors and need a voltage divider circuit.',
+            required: true
+        }],
+        notes: 'Requires an Analog (ADC) pin. Resistance decreases as pressure increases.'
+    },
 
     // --- DISPLAYS ---
     oled_128x64: {
@@ -211,6 +303,29 @@ const componentData = {
         dependencies: [],
         notes: 'Uses custom 2-wire protocol (CLK and DIO). Library available.',
         pins_required: 2
+    },
+    nokia_5110_lcd: {
+        name: 'Nokia 5110 LCD',
+        icon: 'fas fa-mobile-alt',
+        tip: 'Classic 84x48 pixel monochrome LCD.',
+        voltage: '3.3V',
+        complexity: 'moderate',
+        requires: { data: ['spi'], power: 1, ground: 1 },
+        dependencies: [],
+        notes: 'Requires 5 GPIO pins for a software SPI-like interface (RST, CE, DC, DIN, CLK).',
+        pins_required: 5
+    },
+    e_ink_display: {
+        name: 'E-Ink/E-Paper Display',
+        icon: 'fas fa-book-open',
+        tip: 'Low-power, high-contrast display that holds an image without power.',
+        voltage: '3.3V',
+        complexity: 'complex',
+        requires: { data: ['spi'], power: 1, ground: 1 },
+        dependencies: [],
+        warnings: ['E-Ink displays have slow refresh rates and are not suitable for animation.'],
+        notes: 'Requires multiple GPIO pins for SPI and control (DIN, CLK, CS, DC, RST, BUSY).',
+        pins_required: 6
     },
 
     // --- INPUT ---
@@ -281,7 +396,47 @@ const componentData = {
         dependencies: [],
         notes: 'Requires ADC pins for X/Y axes and digital pin for button.',
         pins_required: 3,
-        warnings: ['Arduino Uno: Use analog pins A0-A5 for X/Y axes']
+        warnings: ['Arduino Uno: Use analog pins A0-A5 for X/Y axes'],
+    },
+    potentiometer: {
+        name: 'Potentiometer',
+        icon: 'fas fa-sliders-h',
+        tip: 'A variable resistor used as an analog input knob.',
+        voltage: '3.3V-5V',
+        complexity: 'simple',
+        requires: { data: ['gpio'], power: 1, ground: 1 },
+        dependencies: [],
+        notes: 'Connect the middle pin to an Analog (ADC) pin. The other two pins connect to power and ground.'
+    },
+    matrix_keypad_4x4: {
+        name: 'Matrix Keypad (4x4)',
+        icon: 'fas fa-th',
+        tip: '16-button keypad arranged in a 4x4 grid.',
+        voltage: '3.3V-5V',
+        complexity: 'moderate',
+        requires: { data: ['gpio'], power: 0, ground: 0 },
+        dependencies: [],
+        notes: 'Requires 8 GPIO pins (4 for rows, 4 for columns). No external power needed.',
+        pins_required: 8
+    },
+    dip_switch: {
+        name: 'DIP Switch',
+        icon: 'fas fa-toggle-off',
+        tip: 'A set of manual electric switches in a small package.',
+        voltage: '3.3V-5V',
+        complexity: 'simple',
+        requires: { data: ['gpio'], power: 0, ground: 1 },
+        dependencies: [{
+            type: 'resistor',
+            value: '10kΩ',
+            purpose: 'pull_up_down',
+            description: 'Pull-up or pull-down resistors for each switch',
+            reason: 'Prevents floating inputs for each switch pin.',
+            required: true,
+            quantity: 'per_switch',
+            alternative: 'Use internal pull-ups on the microcontroller.'
+        }],
+        notes: 'Each switch requires one GPIO pin. Useful for setting configuration modes.'
     },
 
     // --- OUTPUT ---
@@ -368,6 +523,36 @@ const componentData = {
         notes: 'Most modules include optocoupler isolation and flyback diode.',
         warnings: ['Never control mains voltage without proper safety measures']
     },
+    rgb_led_cc: {
+        name: 'RGB LED (Common Cathode)',
+        icon: 'fas fa-lightbulb',
+        tip: 'A single LED that can produce multiple colors.',
+        voltage: '3.3V-5V',
+        complexity: 'moderate',
+        requires: { data: ['gpio'], power: 0, ground: 1 },
+        dependencies: [{
+            type: 'resistor',
+            value: '220Ω-330Ω',
+            purpose: 'current_limiting',
+            description: 'Current limiting resistor for each color channel (R, G, B)',
+            reason: 'Prevents LED burnout by limiting current to each channel.',
+            required: true,
+            quantity: 3
+        }],
+        notes: 'Requires 3 GPIO pins (one for each color). The common pin connects to Ground.',
+        pins_required: 3
+    },
+    laser_module: {
+        name: 'Laser Diode Module',
+        icon: 'fas fa-crosshairs',
+        tip: 'Emits a small laser beam.',
+        voltage: '5V',
+        complexity: 'simple',
+        requires: { data: ['gpio'], power: 1, ground: 1 },
+        dependencies: [],
+        warnings: ['Never point a laser at eyes. Can cause permanent damage.'],
+        notes: 'Can be turned on and off with a simple digital HIGH/LOW signal.'
+    },
 
     // --- COMMUNICATION ---
     esp01: {
@@ -429,6 +614,40 @@ const componentData = {
         }],
         notes: 'AT command interface for configuration. Pairs with smartphones easily.'
     },
+    nrf24l01: {
+        name: 'NRF24L01+ RF Transceiver',
+        icon: 'fas fa-broadcast-tower',
+        tip: '2.4GHz wireless communication module.',
+        voltage: '3.3V',
+        complexity: 'complex',
+        requires: { data: ['spi'], power: 1, ground: 1 },
+        dependencies: [],
+        warnings: ['Module is strictly 3.3V. 5V on data pins can damage it.'],
+        notes: 'Requires SPI plus 2 additional GPIO pins (CE, CSN).',
+        pins_required: 5
+    },
+    rfid_mfrc522: {
+        name: 'RFID Reader (MFRC522)',
+        icon: 'fas fa-id-card',
+        tip: 'Reads 13.56MHz RFID tags and cards.',
+        voltage: '3.3V',
+        complexity: 'complex',
+        requires: { data: ['spi'], power: 1, ground: 1 },
+        dependencies: [],
+        warnings: ['Module is strictly 3.3V. 5V on data pins can damage it.'],
+        notes: 'Requires SPI plus 2 additional GPIO pins (SDA/CS, RST).',
+        pins_required: 5
+    },
+    gps_neo6m: {
+        name: 'GPS Module (NEO-6M)',
+        icon: 'fas fa-map-marker-alt',
+        tip: 'Receives satellite signals to determine geographic location.',
+        voltage: '3.3V-5V',
+        complexity: 'complex',
+        requires: { data: ['uart'], power: 1, ground: 1 },
+        dependencies: [],
+        notes: 'Connect the module\'s TX pin to the microcontroller\'s RX pin, and vice-versa.'
+    },
 
     // --- MOTORS ---
     stepper_28byj: {
@@ -474,6 +693,42 @@ const componentData = {
         notes: 'Can control 2 DC motors or 1 stepper. Always connect grounds together.',
         pins_required: 6,
         warnings: ['Always connect board GND to driver GND']
+    },
+    dc_motor: {
+        name: 'DC Motor',
+        icon: 'fas fa-fan',
+        tip: 'A simple motor that spins when power is applied.',
+        voltage: '3V-12V',
+        complexity: 'moderate',
+        requires: { data: [], power: 1, ground: 1 },
+        dependencies: [{
+            type: 'driver_board',
+            description: 'Motor Driver (e.g., L298N, Transistor)',
+            purpose: 'motor_control',
+            reason: 'Motors require more current than GPIO pins can supply and can create damaging back-EMF.',
+            required: true
+        }],
+        warnings: ['Never connect a motor directly to a microcontroller GPIO pin.'],
+        notes: 'Speed can be controlled with PWM from the microcontroller to the driver.'
+    },
+    a4988_driver: {
+        name: 'A4988 Stepper Driver',
+        icon: 'fas fa-microchip',
+        tip: 'Driver for controlling bipolar stepper motors (like NEMA 17).',
+        voltage: '3.3V-5V (Logic), 8V-35V (Motor)',
+        complexity: 'complex',
+        requires: { data: ['gpio'], power: 2, ground: 2 },
+        dependencies: [{
+            type: 'capacitor',
+            value: '100µF',
+            purpose: 'power_smoothing',
+            description: 'Decoupling capacitor for motor power supply',
+            reason: 'Protects the driver from voltage spikes.',
+            required: true,
+            connection: 'across_motor_power'
+        }],
+        notes: 'Requires 2 GPIO pins (STEP, DIR) for basic control. Microstepping pins can be tied to GND/VCC or controlled by GPIO.',
+        pins_required: 2
     },
 
     // --- ADVANCED & MISC ---
@@ -584,5 +839,48 @@ const componentData = {
         notes: 'Requires ESP32-CAM board or compatible. Uses dedicated camera interface.',
         boardSpecific: ['esp32'],
         pins_required: 8
+    },
+    shift_register_74hc595: {
+        name: '74HC595 Shift Register',
+        icon: 'fas fa-expand-arrows-alt',
+        tip: 'Serial-in, parallel-out shift register for expanding GPIO outputs.',
+        voltage: '2V-6V',
+        complexity: 'moderate',
+        requires: { data: ['gpio'], power: 1, ground: 1 },
+        dependencies: [],
+        notes: 'Control 8 outputs with just 3 GPIO pins (Data, Clock, Latch). Can be daisy-chained.',
+        pins_required: 3
+    },
+
+    // --- POWER MANAGEMENT ---
+    breadboard_psu: {
+        name: 'Breadboard Power Supply',
+        icon: 'fas fa-plug',
+        tip: 'Provides 3.3V and 5V rails directly to a breadboard.',
+        voltage: '6.5V-12V (Input)',
+        complexity: 'simple',
+        requires: { data: [], power: 0, ground: 0 },
+        dependencies: [],
+        notes: 'Plugs directly into a standard breadboard. Powered by a barrel jack or USB.'
+    },
+    tp4056_charger: {
+        name: 'TP4056 LiPo Charger',
+        icon: 'fas fa-battery-three-quarters',
+        tip: 'A module for charging single-cell Lithium-Ion/Polymer batteries.',
+        voltage: '5V (Input)',
+        complexity: 'simple',
+        requires: { data: [], power: 0, ground: 0 },
+        dependencies: [],
+        notes: 'Charges a 3.7V LiPo battery from a 5V source like USB. Some versions include battery protection.'
+    },
+    buck_boost_converter: {
+        name: 'Buck/Boost Converter',
+        icon: 'fas fa-level-down-alt',
+        tip: 'Steps voltage up (boost) or down (buck) to a stable output.',
+        voltage: 'Variable',
+        complexity: 'moderate',
+        requires: { data: [], power: 0, ground: 0 },
+        dependencies: [],
+        notes: 'Essential for providing a stable voltage to your project from a variable source like a battery.'
     }
 };
