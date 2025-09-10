@@ -1518,6 +1518,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load custom components from localStorage and merge with base data
     loadCustomComponents();
 
+    // Update component counter to reflect the actual number of components
+    const componentCounter = document.querySelector('.component-counter');
+    if (componentCounter) {
+        const count = Object.keys(componentData).length;
+        componentCounter.innerHTML = `<i class="fas fa-boxes"></i> ${count} components available`;
+    }
+
     // Render the component list from data
     renderAndAttachComponentListeners();
 
