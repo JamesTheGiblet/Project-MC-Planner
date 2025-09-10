@@ -1,3 +1,192 @@
+// --- UTILITY CLASSES & FUNCTIONS (Moved from data files) ---
+
+/**
+ * Resolves component dependencies based on the board type.
+ */
+class DependencyResolver {
+    constructor(componentData) {
+        this.componentData = componentData;
+    }
+
+    isDependencyRequired(dependency, boardType) {
+        // Check board-specific overrides first
+        if (dependency.boardSpecific && dependency.boardSpecific[boardType]) {
+            const boardSpec = dependency.boardSpecific[boardType];
+            if (typeof boardSpec.required === 'boolean') {
+                return boardSpec.required;
+            }
+        }
+
+        // Check for optional conditions (e.g. for larger servos)
+        if (dependency.condition && dependency.required === false) {
+            return 'optional';
+        }
+
+        // Default to the base 'required' property
+        return dependency.required;
+    }
+
+    // Get all dependencies for a component assignment
+    getComponentDependencies(componentId, boardType = 'rpi4') {
+        const component = this.componentData[componentId];
+        if (!component || !component.dependencies) return [];
+
+        return component.dependencies.map(dep => {
+            const requiredStatus = this.isDependencyRequired(dep, boardType);
+            let boardReason = null;
+            if (dep.boardSpecific && dep.boardSpecific[boardType]) {
+                boardReason = dep.boardSpecific[boardType].reason || null;
+            }
+
+            return {
+                ...dep,
+                componentId,
+                componentName: component.name,
+                requiredStatus: requiredStatus, // true, false, or 'optional'
+                boardReason: boardReason
+            };
+        });
+    }
+
+    // Generate enhanced BOM including dependencies
+    generateEnhancedBOM(assignments, boardType = 'rpi4') {
+        const bom = {
+            mainComponents: [],
+            dependencies: {
+                resistors: new Map(),
+                capacitors: new Map(),
+                powerSupplies: [],
+                breakoutBoards: [],
+                other: []
+            },
+            warnings: [],
+            notes: []
+        };
+
+        // Count main components
+        const componentCounts = {};
+        assignments.forEach(assignment => {
+            componentCounts[assignment.componentId] = (componentCounts[assignment.componentId] || 0) + 1;
+        });
+
+        // Add main components to BOM
+        for (const [componentId, count] of Object.entries(componentCounts)) {
+            const component = this.componentData[componentId];
+            bom.mainComponents.push({
+                name: component.name,
+                quantity: count,
+                voltage: component.voltage,
+                notes: component.tip
+            });
+
+            // Collect warnings
+            if (component.warnings) {
+                bom.warnings.push(...component.warnings);
+            }
+
+            // Process dependencies
+            const dependencies = this.getComponentDependencies(componentId, boardType);
+            dependencies.forEach(dep => {
+                // Only add required or optional dependencies to the BOM
+                if (dep.requiredStatus === false) {
+                    // If not needed, check if there's an alternative to mention
+                    if (dep.alternative) {
+                        bom.notes.push(`${component.name}: ${dep.alternative}`);
+                    }
+                    if (dep.boardReason) {
+                        bom.notes.push(`${component.name} (${dep.description}): ${dep.boardReason}`);
+                    }
+                    return;
+                }
+
+                const quantity = (dep.quantity || 1) * count;
+
+                switch (dep.type) {
+                    case 'resistor':
+                        const resistorKey = `${dep.value} (${dep.purpose})`;
+                        const currentCount = bom.dependencies.resistors.get(resistorKey) || 0;
+                        bom.dependencies.resistors.set(resistorKey, currentCount + quantity);
+                        break;
+
+                    case 'capacitor':
+                        const capacitorKey = `${dep.value} (${dep.purpose})`;
+                        const currentCapCount = bom.dependencies.capacitors.get(capacitorKey) || 0;
+                        bom.dependencies.capacitors.set(capacitorKey, currentCapCount + quantity);
+                        break;
+
+                    case 'power_supply':
+                        bom.dependencies.powerSupplies.push({
+                            specification: dep.value,
+                            purpose: dep.description,
+                            quantity: count
+                        });
+                        break;
+
+                    case 'level_shifter':
+                    case 'i2c_backpack':
+                    case 'breakout_board':
+                        bom.dependencies.breakoutBoards.push({
+                            name: dep.description,
+                            purpose: dep.purpose,
+                            quantity: count,
+                            required: dep.required
+                        });
+                        break;
+
+                    default:
+                        bom.dependencies.other.push({
+                            name: dep.description,
+                            type: dep.type,
+                            quantity: quantity,
+                            required: dep.required
+                        });
+                }
+            });
+        }
+
+        return bom;
+    }
+}
+
+/**
+ * Filters the global componentData object for components compatible with a given board.
+ * @param {string} boardId - The ID of the board (e.g., 'rpi4', 'uno').
+ * @returns {Object} A new object containing only compatible components.
+ */
+function getCompatibleComponents(boardId) {
+    const compatibleComponents = {};
+    for (const [id, component] of Object.entries(componentData)) {
+        // If component specifies board compatibility, check it
+        if (component.boardSpecific && Array.isArray(component.boardSpecific)) {
+            if (component.boardSpecific.includes(boardId)) {
+                compatibleComponents[id] = component;
+            }
+        } else {
+            // If no board restriction, it's compatible with all boards
+            compatibleComponents[id] = component;
+        }
+    }
+    return compatibleComponents;
+}
+
+/**
+ * Returns a structured object that categorizes components by their type.
+ * @returns {Object} An object where keys are category names and values are arrays of component IDs.
+ */
+function getComponentsByCategory() {
+    const categories = {
+        'Sensors': ['dht22', 'bmp280', 'bme680', 'ds18b20', 'pir', 'ultrasonic_hcsr04', 'mpu6050', 'mpu9250'],
+        'Displays': ['oled_128x64', 'lcd', 'tm1637'],
+        'Input': ['pushButton', 'rotary_encoder', 'joystick'],
+        'Output': ['led', 'servo', 'buzzer', 'relay'],
+        'Communication': ['esp01', 'hc05'],
+        'Motors': ['stepper_28byj', 'l298n'],
+        'Advanced': ['ws2812_strip', 'sd_card', 'rtc_ds3231', 'camera_ov2640'],
+    };
+    return categories;
+}
+
+
 document.addEventListener('DOMContentLoaded', function() {
     // --- Element Selections ---
     const boardOptions = document.querySelectorAll('.board-option');
@@ -398,24 +587,39 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Helper Functions ---
 
-    function renderAndAttachComponentListeners() {
-        addComponentsList.innerHTML = ''; // Clear existing components
+    function toggleCategory(e) {
+        const header = e.currentTarget;
+        header.classList.toggle('collapsed');
     
-        for (const [id, data] of Object.entries(componentData)) {
+        let nextEl = header.nextElementSibling;
+        while (nextEl && !nextEl.classList.contains('component-category-title')) {
+            // This simply toggles visibility. The search function will respect this.
+            nextEl.classList.toggle('hidden');
+            nextEl = nextEl.nextElementSibling;
+        }
+    }
+
+    function renderAndAttachComponentListeners() {
+        addComponentsList.innerHTML = ''; // Clear existing list
+        const categories = getComponentsByCategory();
+        const renderedIds = new Set();
+
+        // Helper to create a single component DOM element
+        const createComponentElement = (id, data) => {
             const componentEl = document.createElement('div');
             componentEl.className = 'component-item';
             componentEl.dataset.component = id;
             componentEl.draggable = true;
-            componentEl.title = data.tip || `Drag to add ${data.name} to the board`; // Add tooltip
-    
+            componentEl.title = data.tip || `Drag to add ${data.name} to the board`;
+
             const iconEl = document.createElement('i');
             iconEl.className = `${data.icon} component-icon`;
-    
+
             const nameWrapper = document.createElement('div');
             nameWrapper.appendChild(iconEl);
             nameWrapper.appendChild(document.createTextNode(` ${data.name}`));
             componentEl.appendChild(nameWrapper);
-            
+
             if (id.startsWith('custom-')) {
                 const actionsWrapper = document.createElement('div');
                 actionsWrapper.className = 'component-actions';
@@ -433,27 +637,77 @@ document.addEventListener('DOMContentLoaded', function() {
                 actionsWrapper.appendChild(deleteBtn);
                 componentEl.appendChild(actionsWrapper);
             }
-    
-            addComponentsList.appendChild(componentEl);
+            return componentEl;
+        };
+
+        // Render components based on the defined categories
+        for (const [categoryName, componentIds] of Object.entries(categories)) {
+            const categoryFragment = document.createDocumentFragment();
+            componentIds.forEach(id => {
+                if (componentData[id] && !renderedIds.has(id)) {
+                    const componentEl = createComponentElement(id, componentData[id]);
+                    categoryFragment.appendChild(componentEl);
+                    renderedIds.add(id);
+                }
+            });
+
+            if (categoryFragment.children.length > 0) {
+                const categoryHeader = document.createElement('h4');
+                categoryHeader.className = 'component-category-title';
+                categoryHeader.innerHTML = `<span>${categoryName}</span><i class="fas fa-chevron-down category-toggle-icon"></i>`;
+                categoryHeader.addEventListener('click', toggleCategory);
+                addComponentsList.appendChild(categoryHeader);
+                addComponentsList.appendChild(categoryFragment);
+            }
         }
-    
+
+        // Find and render any uncategorized components (including custom ones)
+        const customFragment = document.createDocumentFragment();
+        const otherFragment = document.createDocumentFragment();
+
+        for (const id of Object.keys(componentData)) {
+            if (!renderedIds.has(id)) {
+                const componentEl = createComponentElement(id, componentData[id]);
+                if (id.startsWith('custom-')) {
+                    customFragment.appendChild(componentEl);
+                } else {
+                    otherFragment.appendChild(componentEl);
+                }
+                renderedIds.add(id);
+            }
+        }
+
+        if (customFragment.children.length > 0) {
+            const categoryHeader = document.createElement('h4');
+            categoryHeader.className = 'component-category-title';
+            categoryHeader.innerHTML = `<span>Custom</span><i class="fas fa-chevron-down category-toggle-icon"></i>`;
+            categoryHeader.addEventListener('click', toggleCategory);
+            addComponentsList.appendChild(categoryHeader);
+            addComponentsList.appendChild(customFragment);
+        }
+
+        if (otherFragment.children.length > 0) {
+            const categoryHeader = document.createElement('h4');
+            categoryHeader.className = 'component-category-title';
+            categoryHeader.innerHTML = `<span>Other</span><i class="fas fa-chevron-down category-toggle-icon"></i>`;
+            categoryHeader.addEventListener('click', toggleCategory);
+            addComponentsList.appendChild(categoryHeader);
+            addComponentsList.appendChild(otherFragment);
+        }
+
         // Re-query the components and attach listeners
         components = addComponentsList.querySelectorAll('.component-item[draggable="true"]');
         components.forEach(component => {
             component.addEventListener('dragstart', (e) => {
                 const componentId = component.dataset.component;
                 const data = componentData[componentId];
-                if (!data) {
-                    console.error(`No data found for component: ${componentId}`);
-                    e.preventDefault();
-                    return;
-                }
+                if (!data) return e.preventDefault();
                 draggedComponent = { id: componentId, name: data.name, icon: component.querySelector('i').outerHTML, requires: data.requires };
                 e.dataTransfer.setData('text/plain', draggedComponent.name);
                 e.dataTransfer.effectAllowed = 'move';
                 component.classList.add('dragging');
             });
-    
+
             component.addEventListener('dragend', () => {
                 component.classList.remove('dragging');
                 draggedComponent = null;
@@ -463,12 +717,41 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function handleComponentSearch(e) {
         const searchTerm = e.target.value.toLowerCase();
-        components.forEach(component => {
+        const allComponents = addComponentsList.querySelectorAll('.component-item');
+        const allCategories = addComponentsList.querySelectorAll('.component-category-title');
+
+        // First, filter the individual components based on search term
+        allComponents.forEach(component => {
             const componentName = component.textContent.trim().toLowerCase();
-            if (componentName.includes(searchTerm)) {
-                component.classList.remove('hidden');
+            const isVisible = componentName.includes(searchTerm);
+            component.classList.toggle('hidden', !isVisible);
+        });
+
+        // Then, re-apply collapsed state and hide empty categories
+        allCategories.forEach(categoryTitle => {
+            const isCollapsed = categoryTitle.classList.contains('collapsed');
+            let nextEl = categoryTitle.nextElementSibling;
+            let hasVisibleComponentAfterSearch = false;
+
+            while (nextEl && !nextEl.classList.contains('component-category-title')) {
+                if (isCollapsed) {
+                    // If category is collapsed, ensure all its items are hidden, overriding search results
+                    nextEl.classList.add('hidden');
+                } else {
+                    // If not collapsed, check if any items are visible (left visible by the search)
+                    if (nextEl.classList.contains('component-item') && !nextEl.classList.contains('hidden')) {
+                        hasVisibleComponentAfterSearch = true;
+                    }
+                }
+                nextEl = nextEl.nextElementSibling;
+            }
+
+            // Hide category title if it's not collapsed and has no visible children after search
+            if (!isCollapsed) {
+                categoryTitle.classList.toggle('hidden', !hasVisibleComponentAfterSearch);
             } else {
-                component.classList.add('hidden');
+                // A collapsed category title should always be visible itself
+                categoryTitle.classList.remove('hidden');
             }
         });
     }
@@ -805,56 +1088,93 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function generateBOM() {
-        const assignedBadges = projectComponentsList.querySelectorAll('.component-badge');
-        if (assignedBadges.length === 0) {
+        const projectData = getProjectDataObject();
+        if (!projectData) {
             showValidationError("Cannot generate a Bill of Materials for an empty board.");
             return;
         }
 
+        const resolver = new DependencyResolver(componentData);
+        const bom = resolver.generateEnhancedBOM(projectData.assignments, projectData.boardId);
+
         const bomContent = document.getElementById('bom-modal-content');
-        bomContent.innerHTML = ''; // Clear previous content
+        let html = '';
 
-        const componentCounts = {};
-        assignedBadges.forEach(badge => {
-            const componentId = badge.dataset.componentId;
-            componentCounts[componentId] = (componentCounts[componentId] || 0) + 1;
-        });
-
-        let tableHTML = `<table class="bom-table">
-            <thead>
-                <tr>
-                    <th>Quantity</th>
-                    <th>Component</th>
-                    <th>Notes / Tip</th>
-                </tr>
-            </thead>
-            <tbody>`;
-
-        for (const [id, count] of Object.entries(componentCounts)) {
-            const component = componentData[id];
-            tableHTML += `<tr><td>${count}</td><td>${component.name}</td><td>${component.tip || component.notes || ''}</td></tr>`;
+        // Main Components
+        if (bom.mainComponents.length > 0) {
+            html += '<h4>Main Components</h4>';
+            html += '<table class="bom-table"><thead><tr><th>Quantity</th><th>Component</th><th>Voltage</th></tr></thead><tbody>';
+            bom.mainComponents.forEach(item => {
+                html += `<tr><td>${item.quantity}</td><td>${item.name}</td><td>${item.voltage || 'N/A'}</td></tr>`;
+            });
+            html += '</tbody></table>';
         }
 
-        tableHTML += `</tbody></table>`;
-        bomContent.innerHTML = tableHTML;
+        // Dependencies
+        const dependenciesCount = bom.dependencies.resistors.size + bom.dependencies.capacitors.size + bom.dependencies.powerSupplies.length + bom.dependencies.breakoutBoards.length + bom.dependencies.other.length;
+        if (dependenciesCount > 0) {
+            html += '<h4>Required Dependencies</h4>';
+            html += '<table class="bom-table"><thead><tr><th>Quantity</th><th>Item</th><th>Purpose / Value</th></tr></thead><tbody>';
+
+            bom.dependencies.resistors.forEach((quantity, key) => {
+                html += `<tr><td>${quantity}</td><td>Resistor</td><td>${key}</td></tr>`;
+            });
+
+            bom.dependencies.capacitors.forEach((quantity, key) => {
+                html += `<tr><td>${quantity}</td><td>Capacitor</td><td>${key}</td></tr>`;
+            });
+
+            bom.dependencies.powerSupplies.forEach(item => {
+                html += `<tr><td>${item.quantity}</td><td>Power Supply</td><td>${item.specification} (${item.purpose})</td></tr>`;
+            });
+
+            bom.dependencies.breakoutBoards.forEach(item => {
+                html += `<tr><td>${item.quantity}</td><td>${item.name}</td><td>${item.purpose}</td></tr>`;
+            });
+
+            bom.dependencies.other.forEach(item => {
+                html += `<tr><td>${item.quantity}</td><td>${item.name}</td><td>${item.type}</td></tr>`;
+            });
+
+            html += '</tbody></table>';
+        }
+
+        // Notes
+        if (bom.notes.length > 0) {
+            html += '<h4>Notes & Alternatives</h4>';
+            html += '<ul class="wiring-list">'; // Re-using wiring-list style for simplicity
+            bom.notes.forEach(note => {
+                html += `<li><i class="fas fa-info-circle" style="color: var(--primary);"></i> ${note}</li>`;
+            });
+            html += '</ul>';
+        }
+
+        // Warnings
+        if (bom.warnings.length > 0) {
+            html += '<h4>Warnings</h4>';
+            html += '<ul class="wiring-list">';
+            bom.warnings.forEach(warning => {
+                html += `<li><i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i> ${warning}</li>`;
+            });
+            html += '</ul>';
+        }
+
+        bomContent.innerHTML = html || '<p class="no-items-message">No components or dependencies to list.</p>';
         bomModal.classList.remove('hidden');
     }
 
     function generateBomCSV() {
-        const assignedBadges = projectComponentsList.querySelectorAll('.component-badge');
-        if (assignedBadges.length === 0) {
+        const projectData = getProjectDataObject();
+        if (!projectData) {
             showValidationError("Cannot export an empty BOM.");
             return;
         }
 
-        const componentCounts = {};
-        assignedBadges.forEach(badge => {
-            const componentId = badge.dataset.componentId;
-            componentCounts[componentId] = (componentCounts[componentId] || 0) + 1;
-        });
+        const resolver = new DependencyResolver(componentData);
+        const bom = resolver.generateEnhancedBOM(projectData.assignments, projectData.boardId);
 
-        const headers = ['Quantity', 'Component', 'Notes / Tip'];
-        const rows = [headers.join(',')]; // Start with the header row
+        const headers = ['Category', 'Quantity', 'Item', 'Details'];
+        const rows = [headers.join(',')];
 
         const escapeCsvField = (field) => {
             if (field === null || field === undefined) return '';
@@ -866,15 +1186,38 @@ document.addEventListener('DOMContentLoaded', function() {
             return str;
         };
 
-        for (const [id, count] of Object.entries(componentCounts)) {
-            const component = componentData[id];
-            const notes = component.tip || component.notes || '';
-            const row = [count, component.name, notes].map(escapeCsvField).join(',');
-            rows.push(row);
-        }
+        // Main Components
+        bom.mainComponents.forEach(item => {
+            rows.push(['Main Component', item.quantity, item.name, `Voltage: ${item.voltage}`].map(escapeCsvField).join(','));
+        });
+
+        // Dependencies
+        bom.dependencies.resistors.forEach((quantity, key) => {
+            rows.push(['Dependency', quantity, 'Resistor', key].map(escapeCsvField).join(','));
+        });
+        bom.dependencies.capacitors.forEach((quantity, key) => {
+            rows.push(['Dependency', quantity, 'Capacitor', key].map(escapeCsvField).join(','));
+        });
+        bom.dependencies.powerSupplies.forEach(item => {
+            rows.push(['Dependency', item.quantity, 'Power Supply', `${item.specification} (${item.purpose})`].map(escapeCsvField).join(','));
+        });
+        bom.dependencies.breakoutBoards.forEach(item => {
+            rows.push(['Dependency', item.quantity, item.name, item.purpose].map(escapeCsvField).join(','));
+        });
+        bom.dependencies.other.forEach(item => {
+            rows.push(['Dependency', item.quantity, item.name, item.type].map(escapeCsvField).join(','));
+        });
+
+        // Notes and Warnings
+        bom.notes.forEach(note => {
+            rows.push(['Note', '', '', note].map(escapeCsvField).join(','));
+        });
+        bom.warnings.forEach(warning => {
+            rows.push(['Warning', '', '', warning].map(escapeCsvField).join(','));
+        });
 
         const csvContent = rows.join('\n');
-        const filename = `${boardName.textContent.toLowerCase().replace(/\s+/g, '-')}-bom.csv`;
+        const filename = `${projectData.boardName.toLowerCase().replace(/\s+/g, '-')}-bom.csv`;
         downloadFile(csvContent, filename, 'text/csv;charset=utf-8;');
     }
 
@@ -885,16 +1228,20 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        const resolver = new DependencyResolver(componentData);
         wiringDiagramContent.innerHTML = ''; // Clear previous content
 
-        let html = `<ul class="wiring-list">`;
+        let html = '';
 
         projectData.assignments.forEach(assignment => {
             const component = componentData[assignment.componentId];
             if (!component) return;
 
-            // Data connection
-            html += `<li>Connect <code>${assignment.componentName} (DATA)</code> to <code>${projectData.boardName} (${assignment.pin})</code></li>`;
+            html += `<h4>${component.icon || '<i class="fas fa-microchip"></i>'} ${component.name} on Pin ${assignment.pin}</h4>`;
+            html += `<ul class="wiring-list">`;
+
+            // Main data connection
+            html += `<li>Connect <code>${component.name} (DATA)</code> to <code>${projectData.boardName} (Pin ${assignment.pin})</code>.</li>`;
 
             // Power and Ground connections from the stored aux pins
             const badge = projectComponentsList.querySelector(`[data-pin-number="${assignment.pin}"]`);
@@ -902,17 +1249,70 @@ document.addEventListener('DOMContentLoaded', function() {
                 const auxPins = JSON.parse(badge.dataset.auxPins);
                 auxPins.forEach(pinName => {
                     const pinEl = Array.from(pins).find(p => p.textContent.trim() === pinName);
-                    if (pinEl && pinEl.classList.contains('power')) {
-                        html += `<li>Connect <code>${assignment.componentName} (VCC/VIN)</code> to <code>${projectData.boardName} (${pinName})</code></li>`;
-                    } else if (pinEl && pinEl.classList.contains('ground')) {
-                        html += `<li>Connect <code>${assignment.componentName} (GND)</code> to <code>${projectData.boardName} (${pinName})</code></li>`;
+                    if (pinEl) {
+                        if (pinEl.classList.contains('power')) {
+                            html += `<li>Connect <code>${component.name} (VCC/VIN)</code> to <code>${projectData.boardName} (Pin ${pinName})</code>.</li>`;
+                        } else if (pinEl.classList.contains('ground')) {
+                            html += `<li>Connect <code>${component.name} (GND)</code> to <code>${projectData.boardName} (Pin ${pinName})</code>.</li>`;
+                        }
                     }
                 });
             }
+
+            // Process and display dependencies
+            const dependencies = resolver.getComponentDependencies(assignment.componentId, projectData.boardId);
+            const requiredDependencies = dependencies.filter(dep => dep.requiredStatus === true);
+
+            if (requiredDependencies.length > 0) {
+                requiredDependencies.forEach(dep => {
+                    let dep_html = `<li><i class="fas fa-puzzle-piece" style="color: var(--secondary);"></i> <strong>Dependency:</strong> `;
+                    switch (dep.type) {
+                        case 'resistor':
+                            if (dep.connection === 'series_with_data') {
+                                dep_html += `Place a <code>${dep.value}</code> resistor in series between <code>Pin ${assignment.pin}</code> and the component's data line.`;
+                            } else if (dep.connection === 'gpio_to_power') {
+                                dep_html += `Connect a <code>${dep.value}</code> pull-up resistor from <code>Pin ${assignment.pin}</code> to a <code>3.3V</code> pin.`;
+                            } else if (dep.connection === 'sda_scl_to_power') {
+                                dep_html += `Connect <code>${dep.value}</code> pull-up resistors to the I2C lines (SDA and SCL). <em>Note: ${dep.alternative}</em>`;
+                            } else {
+                                dep_html += `A <code>${dep.value}</code> resistor is required. Purpose: ${dep.description}.`;
+                            }
+                            break;
+                        case 'level_shifter':
+                            dep_html += `Use a <code>${dep.description}</code>. Connect <code>Pin ${assignment.pin}</code> to the low-voltage side, and the component's data line to the high-voltage side.`;
+                            break;
+                        case 'power_supply':
+                            dep_html += `Use an <strong>external power supply</strong> (<code>${dep.value}</code>). Do not power this component from the board's pins.`;
+                            break;
+                        case 'capacitor':
+                            if (dep.connection === 'across_power_supply') {
+                                dep_html += `Place a <code>${dep.value}</code> capacitor across the external power supply's VCC and GND lines, close to the component.`;
+                            } else {
+                                dep_html += `A <code>${dep.value}</code> capacitor is required. Purpose: ${dep.description}.`;
+                            }
+                            break;
+                        case 'driver_board':
+                            dep_html += `This component requires a <code>${dep.description}</code> to function.`;
+                            break;
+                        default:
+                            dep_html += `Requires a <code>${dep.description}</code>.`;
+                    }
+                    dep_html += `</li>`;
+                    html += dep_html;
+                });
+            }
+
+            // Add warnings
+            if (component.warnings) {
+                component.warnings.forEach(warning => {
+                    html += `<li><i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i> <strong>Warning:</strong> ${warning}</li>`;
+                });
+            }
+
+            html += `</ul>`;
         });
 
-        html += `</ul>`;
-        wiringDiagramContent.innerHTML = html;
+        wiringDiagramContent.innerHTML = html || '<p class="no-items-message">No components assigned.</p>';
         wiringModal.classList.remove('hidden');
     }
 
