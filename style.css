@@ -409,6 +409,11 @@ header {
     position: relative; /* Establish positioning context */
 }
 
+.board.board-id-uno {
+    background-color: white;
+    border: 1px solid var(--light-gray);
+}
+
 .board-image,
 .board-name,
 .pins-container {

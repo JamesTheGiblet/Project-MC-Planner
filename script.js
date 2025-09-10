@@ -505,8 +505,9 @@ document.addEventListener('DOMContentLoaded', function() {
         pinsContainer.style.gap = board.pinLayout?.gap || '8px';
 
         // Update board layout class
-        boardEl.className = 'board'; // Reset classes
-        if (board.layout) {
+        boardEl.className = 'board'; // Reset classes first
+        boardEl.classList.add(`board-id-${boardId}`); // Add board-specific class
+        if (board.layout) { // Then add layout class
             boardEl.classList.add(`board-layout-${board.layout}`);
         }
 
