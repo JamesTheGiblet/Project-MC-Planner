@@ -137,7 +137,8 @@ header {
     color: white;
 }
 .btn-danger:hover {
-    background-color: color-mix(in srgb, var(--danger) 85%, black);
+    /* Fallback for color-mix: use a slightly darker shade of var(--danger) */
+    background-color: #c72d2d; /* Approximate to color-mix(in srgb, var(--danger) 85%, black) */
 }
 
 /* Sidebar Styles */
