@@ -174,41 +174,39 @@ function getCompatibleComponents(boardId) {
  * @returns {Object} An object where keys are category names and values are arrays of component IDs.
  */
 function getComponentsByCategory() {
-    const categories = {
-        'Sensors': [
-            'dht22', 'bmp280', 'bme680', 'ds18b20', 'pir', 'ultrasonic_hcsr04',
-            'mpu6050', 'mpu9250', 'photoresistor', 'soil_moisture', 'sound_sensor',
-            'mq2_gas_sensor', 'hall_effect_sensor', 'flex_sensor', 'fsr', 'ir_receiver',
-            'water_level_sensor'
-        ],
-        'Displays': [
-            'oled_128x64', 'lcd', 'tm1637', 'nokia_5110_lcd', 'e_ink_display',
-            'max7219_matrix'
-        ],
-        'Input': [
-            'pushButton', 'rotary_encoder', 'joystick', 'potentiometer',
-            'matrix_keypad_4x4', 'dip_switch', 'capacitive_touch_sensor'
-        ],
-        'Output': [
-            'led', 'rgb_led_cc', 'servo', 'buzzer', 'relay', 'laser_module',
-            'vibration_motor'
-        ],
-        'Communication': [
-            'esp01', 'hc05', 'nrf24l01', 'rfid_mfrc522', 'gps_neo6m', 'can_bus_module',
-            'lora_module'
-        ],
-        'Motors & Drivers': [
-            'stepper_28byj', 'l298n', 'dc_motor', 'a4988_driver', 'stepper_nema17'
-        ],
-        'Advanced & ICs': [
-            'ws2812_strip', 'sd_card', 'rtc_ds3231', 'camera_ov2640',
-            'shift_register_74hc595', 'pcf8574_expander'
-        ],
-        'Power Management': [
-            'breadboard_psu', 'tp4056_charger', 'buck_boost_converter', 'ina219_current_sensor'
-        ]
-    };
-    return categories;
+    const categories = {};
+    // Define a preferred order for categories to appear in the UI
+    const categoryOrder = [
+        'Sensors', 'Displays', 'Input', 'Output', 'Communication',
+        'Motors & Drivers', 'Advanced & ICs', 'Power Management', 'Custom'
+    ];
+
+    // Group all components by their category property
+    for (const [id, component] of Object.entries(componentData)) {
+        // Use the component's category, or 'Custom'/'Other' as fallbacks
+        const categoryName = component.category || (id.startsWith('custom-') ? 'Custom' : 'Other');
+
+        if (!categories[categoryName]) {
+            categories[categoryName] = [];
+        }
+        categories[categoryName].push(id);
+    }
+
+    // Create a new object with sorted categories
+    const sortedCategories = {};
+    for (const categoryName of categoryOrder) {
+        if (categories[categoryName]) {
+            sortedCategories[categoryName] = categories[categoryName];
+            delete categories[categoryName]; // Remove from original to track un-ordered categories
+        }
+    }
+
+    // Add any remaining categories (like 'Other' or new ones from packs) to the end
+    for (const categoryName in categories) {
+        sortedCategories[categoryName] = categories[categoryName];
+    }
+
+    return sortedCategories;
 }
 
 
@@ -568,6 +566,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Populate form
         document.getElementById('component-name-input').value = component.name;
+        document.getElementById('component-category-input').value = component.category || '';
         document.getElementById('component-icon-input').value = component.icon;
         document.getElementById('component-data-select').value = component.requires.data[0];
         document.getElementById('component-power-input').value = component.requires.power || 0;
@@ -626,6 +625,7 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         const editingId = addComponentForm.dataset.editingId;
         const nameInput = document.getElementById('component-name-input');
+        const categoryInput = document.getElementById('component-category-input');
         const iconInput = document.getElementById('component-icon-input');
         const name = nameInput.value;
         const icon = iconInput.value;
@@ -633,6 +633,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const power = parseInt(document.getElementById('component-power-input').value, 10);
         const ground = parseInt(document.getElementById('component-ground-input').value, 10);
     
+        const category = categoryInput.value.trim();
         if (!name.trim() || !icon.trim()) {
             alert("Please fill out Name and Icon fields.");
             return;
@@ -641,6 +642,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const componentDefinition = {
             name: name,
             icon: icon,
+            category: category || 'Custom', // Use 'Custom' as a fallback
             tip: 'Custom user component.', // Add a default tip
             requires: {
                 data: [dataType],
@@ -790,7 +792,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function renderAndAttachComponentListeners() {
         addComponentsList.innerHTML = ''; // Clear existing list
         const categories = getComponentsByCategory();
-        const renderedIds = new Set();
 
         // Helper to create a single component DOM element
         const createComponentElement = (id, data) => {
@@ -832,10 +833,9 @@ document.addEventListener('DOMContentLoaded', function() {
         for (const [categoryName, componentIds] of Object.entries(categories)) {
             const categoryFragment = document.createDocumentFragment();
             componentIds.forEach(id => {
-                if (componentData[id] && !renderedIds.has(id)) {
+                if (componentData[id]) {
                     const componentEl = createComponentElement(id, componentData[id]);
                     categoryFragment.appendChild(componentEl);
-                    renderedIds.add(id);
                 }
             });
 
@@ -847,40 +847,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 addComponentsList.appendChild(categoryHeader);
                 addComponentsList.appendChild(categoryFragment);
             }
-        }
-
-        // Find and render any uncategorized components (including custom ones)
-        const customFragment = document.createDocumentFragment();
-        const otherFragment = document.createDocumentFragment();
-
-        for (const id of Object.keys(componentData)) {
-            if (!renderedIds.has(id)) {
-                const componentEl = createComponentElement(id, componentData[id]);
-                if (id.startsWith('custom-')) {
-                    customFragment.appendChild(componentEl);
-                } else {
-                    otherFragment.appendChild(componentEl);
-                }
-                renderedIds.add(id);
-            }
-        }
-
-        if (customFragment.children.length > 0) {
-            const categoryHeader = document.createElement('h4');
-            categoryHeader.className = 'component-category-title';
-            categoryHeader.innerHTML = `<span>Custom</span><i class="fas fa-chevron-down category-toggle-icon"></i>`;
-            categoryHeader.addEventListener('click', toggleCategory);
-            addComponentsList.appendChild(categoryHeader);
-            addComponentsList.appendChild(customFragment);
-        }
-
-        if (otherFragment.children.length > 0) {
-            const categoryHeader = document.createElement('h4');
-            categoryHeader.className = 'component-category-title';
-            categoryHeader.innerHTML = `<span>Other</span><i class="fas fa-chevron-down category-toggle-icon"></i>`;
-            categoryHeader.addEventListener('click', toggleCategory);
-            addComponentsList.appendChild(categoryHeader);
-            addComponentsList.appendChild(otherFragment);
         }
 
         // Re-query the components and attach listeners

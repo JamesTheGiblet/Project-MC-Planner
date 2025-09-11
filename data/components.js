@@ -4,6 +4,7 @@ const componentData = {
     dht22: {
         name: 'DHT22 Sensor',
         icon: 'fas fa-thermometer-half',
+        category: 'Sensors',
         tip: 'Digital temperature and humidity sensor. Works directly with data pin.',
         voltage: '3.3V-5V',
         complexity: 'simple',
@@ -18,6 +19,7 @@ const componentData = {
     bmp280: {
         name: 'BMP280 Pressure Sensor',
         icon: 'fas fa-tachometer-alt',
+        category: 'Sensors',
         tip: 'Barometric pressure and temperature sensor with I2C interface.',
         voltage: '3.3V',
         complexity: 'simple',
@@ -33,6 +35,7 @@ const componentData = {
     bme680: {
         name: 'BME680 Air Quality Sensor',
         icon: 'fas fa-wind',
+        category: 'Sensors',
         tip: 'Air quality sensor measuring temperature, humidity, pressure, and gas.',
         voltage: '3.3V',
         complexity: 'moderate',
@@ -48,6 +51,7 @@ const componentData = {
     ds18b20: {
         name: 'DS18B20 Temperature Sensor',
         icon: 'fas fa-thermometer-three-quarters',
+        category: 'Sensors',
         tip: 'Waterproof digital temperature sensor using 1-Wire protocol.',
         voltage: '3.3V-5V',
         complexity: 'moderate',
@@ -70,6 +74,7 @@ const componentData = {
     pir: {
         name: 'PIR Motion Sensor',
         icon: 'fas fa-walking',
+        category: 'Sensors',
         tip: 'Passive infrared motion sensor for detecting movement.',
         voltage: '3.3V-5V',
         complexity: 'simple',
@@ -85,6 +90,7 @@ const componentData = {
     ultrasonic_hcsr04: {
         name: 'HC-SR04 Ultrasonic Sensor',
         icon: 'fas fa-broadcast-tower',
+        category: 'Sensors',
         tip: 'Ultrasonic distance sensor for measuring distances 2-400cm.',
         voltage: '5V',
         complexity: 'moderate',
@@ -113,6 +119,7 @@ const componentData = {
     mpu6050: {
         name: 'MPU6050 Gyro/Accel',
         icon: 'fas fa-compass',
+        category: 'Sensors',
         tip: 'MEMS motion tracking device. Usually comes on breakout board.',
         voltage: '3.3V',
         complexity: 'complex',
@@ -146,6 +153,7 @@ const componentData = {
     mpu9250: {
         name: 'MPU9250 9-Axis IMU',
         icon: 'fas fa-cube',
+        category: 'Sensors',
         tip: '9-axis inertial measurement unit with gyroscope, accelerometer, and magnetometer.',
         voltage: '3.3V',
         complexity: 'complex',
@@ -169,6 +177,7 @@ const componentData = {
     photoresistor: {
         name: 'Photoresistor (LDR)',
         icon: 'far fa-lightbulb',
+        category: 'Sensors',
         tip: 'Light-Dependent Resistor for detecting ambient light levels.',
         voltage: '3.3V-5V',
         complexity: 'simple',
@@ -186,6 +195,7 @@ const componentData = {
     soil_moisture: {
         name: 'Soil Moisture Sensor',
         icon: 'fas fa-leaf',
+        category: 'Sensors',
         tip: 'Detects moisture level in soil. Has both analog and digital outputs.',
         voltage: '3.3V-5V',
         complexity: 'simple',
@@ -196,6 +206,7 @@ const componentData = {
     sound_sensor: {
         name: 'Sound Detection Sensor',
         icon: 'fas fa-microphone-alt',
+        category: 'Sensors',
         tip: 'Detects sound levels. Has both analog and digital outputs.',
         voltage: '3.3V-5V',
         complexity: 'simple',
@@ -206,6 +217,7 @@ const componentData = {
     mq2_gas_sensor: {
         name: 'MQ-2 Gas Sensor',
         icon: 'fas fa-smog',
+        category: 'Sensors',
         tip: 'Detects smoke, LPG, and other combustible gases.',
         voltage: '5V',
         complexity: 'moderate',
@@ -217,6 +229,7 @@ const componentData = {
     hall_effect_sensor: {
         name: 'Hall Effect Sensor',
         icon: 'fas fa-magnet',
+        category: 'Sensors',
         tip: 'Detects the presence of a magnetic field.',
         voltage: '3.3V-5V',
         complexity: 'simple',
@@ -227,6 +240,7 @@ const componentData = {
     flex_sensor: {
         name: 'Flex Sensor',
         icon: 'fas fa-band-aid',
+        category: 'Sensors',
         tip: 'A variable resistor that changes resistance when bent.',
         voltage: '3.3V-5V',
         complexity: 'moderate',
@@ -244,6 +258,7 @@ const componentData = {
     fsr: {
         name: 'Force Sensitive Resistor (FSR)',
         icon: 'fas fa-compress-arrows-alt',
+        category: 'Sensors',
         tip: 'Detects physical pressure, squeeze, and weight.',
         voltage: '3.3V-5V',
         complexity: 'moderate',
@@ -262,6 +277,7 @@ const componentData = {
     ir_receiver: {
         name: 'IR Receiver Sensor',
         icon: 'fas fa-satellite-dish',
+        category: 'Sensors',
         tip: 'Receives signals from infrared remote controls.',
         voltage: '3.3V-5V',
         complexity: 'simple',
@@ -273,6 +289,7 @@ const componentData = {
     water_level_sensor: {
         name: 'Water Level Sensor',
         icon: 'fas fa-water',
+        category: 'Sensors',
         tip: 'Detects water level through exposed parallel traces.',
         voltage: '3.3V-5V',
         complexity: 'simple',
@@ -286,6 +303,7 @@ const componentData = {
     oled_128x64: {
         name: 'OLED Display (128x64)',
         icon: 'fas fa-tv',
+        category: 'Displays',
         tip: 'Small OLED display with excellent contrast and I2C interface.',
         voltage: '3.3V',
         complexity: 'simple',
@@ -301,6 +319,7 @@ const componentData = {
     lcd: {
         name: 'LCD Display (16x2)',
         icon: 'fas fa-desktop',
+        category: 'Displays',
         tip: 'Character LCD display. I2C backpack highly recommended.',
         voltage: '5V',
         complexity: 'moderate',
@@ -315,6 +334,7 @@ const componentData = {
     tm1637: {
         name: '7-Segment Display (TM1637)',
         icon: 'fas fa-digital-tachograph',
+        category: 'Displays',
         tip: '4-digit 7-segment LED display with simple 2-wire interface.',
         voltage: '3.3V-5V',
         complexity: 'simple',
@@ -330,6 +350,7 @@ const componentData = {
     nokia_5110_lcd: {
         name: 'Nokia 5110 LCD',
         icon: 'fas fa-mobile-alt',
+        category: 'Displays',
         tip: 'Classic 84x48 pixel monochrome LCD.',
         voltage: '3.3V',
         complexity: 'moderate',
@@ -341,6 +362,7 @@ const componentData = {
     e_ink_display: {
         name: 'E-Ink/E-Paper Display',
         icon: 'fas fa-book-open',
+        category: 'Displays',
         tip: 'Low-power, high-contrast display that holds an image without power.',
         voltage: '3.3V',
         complexity: 'complex',
@@ -354,6 +376,7 @@ const componentData = {
     max7219_matrix: {
         name: '8x8 LED Matrix (MAX7219)',
         icon: 'fas fa-border-all',
+        category: 'Displays',
         tip: '8x8 LED matrix display driven by a MAX7219 chip.',
         voltage: '5V',
         complexity: 'moderate',
@@ -367,6 +390,7 @@ const componentData = {
     pushButton: {
         name: 'Push Button',
         icon: 'fas fa-dot-circle',
+        category: 'Input',
         tip: 'Momentary contact switch for user input.',
         voltage: '3.3V',
         complexity: 'moderate',
@@ -395,6 +419,7 @@ const componentData = {
     rotary_encoder: {
         name: 'Rotary Encoder',
         icon: 'fas fa-redo-alt',
+        category: 'Input',
         tip: 'Rotary encoder for precise directional input with optional push button.',
         voltage: '3.3V-5V',
         complexity: 'moderate',
@@ -420,6 +445,7 @@ const componentData = {
     joystick: {
         name: 'Analog Joystick',
         icon: 'fas fa-gamepad',
+        category: 'Input',
         tip: 'Analog joystick module with X/Y analog outputs and push button.',
         voltage: '3.3V-5V',
         complexity: 'moderate',
@@ -436,6 +462,7 @@ const componentData = {
     potentiometer: {
         name: 'Potentiometer',
         icon: 'fas fa-sliders-h',
+        category: 'Input',
         tip: 'A variable resistor used as an analog input knob.',
         voltage: '3.3V-5V',
         complexity: 'simple',
@@ -446,6 +473,7 @@ const componentData = {
     matrix_keypad_4x4: {
         name: 'Matrix Keypad (4x4)',
         icon: 'fas fa-th',
+        category: 'Input',
         tip: '16-button keypad arranged in a 4x4 grid.',
         voltage: '3.3V-5V',
         complexity: 'moderate',
@@ -457,6 +485,7 @@ const componentData = {
     dip_switch: {
         name: 'DIP Switch',
         icon: 'fas fa-toggle-off',
+        category: 'Input',
         tip: 'A set of manual electric switches in a small package.',
         voltage: '3.3V-5V',
         complexity: 'simple',
@@ -476,6 +505,7 @@ const componentData = {
     capacitive_touch_sensor: {
         name: 'Capacitive Touch Sensor',
         icon: 'fas fa-hand-pointer',
+        category: 'Input',
         tip: 'A simple touch-sensitive switch (TTP223B).',
         voltage: '2V-5.5V',
         complexity: 'simple',
@@ -489,6 +519,7 @@ const componentData = {
     led: {
         name: 'LED',
         icon: 'fas fa-lightbulb',
+        category: 'Output',
         tip: 'Light emitting diode for visual indication.',
         voltage: '2.0V-3.3V',
         complexity: 'moderate',
@@ -510,6 +541,7 @@ const componentData = {
     servo: {
         name: 'Servo Motor',
         icon: 'fas fa-sliders-h',
+        category: 'Output',
         tip: 'Precision motor with position control. Power requirements vary by size.',
         voltage: '4.8V-6V',
         complexity: 'moderate',
@@ -536,6 +568,7 @@ const componentData = {
     buzzer: {
         name: 'Passive Buzzer',
         icon: 'fas fa-volume-up',
+        category: 'Output',
         tip: 'Passive buzzer for generating tones and simple melodies.',
         voltage: '3.3V-5V',
         complexity: 'simple',
@@ -550,6 +583,7 @@ const componentData = {
     relay: {
         name: 'Relay Module',
         icon: 'fas fa-toggle-on',
+        category: 'Output',
         tip: 'Electromagnetic relay for controlling high-power devices.',
         voltage: '3.3V-5V',
         complexity: 'moderate',
@@ -572,6 +606,7 @@ const componentData = {
     rgb_led_cc: {
         name: 'RGB LED (Common Cathode)',
         icon: 'fas fa-lightbulb',
+        category: 'Output',
         tip: 'A single LED that can produce multiple colors.',
         voltage: '3.3V-5V',
         complexity: 'moderate',
@@ -591,6 +626,7 @@ const componentData = {
     laser_module: {
         name: 'Laser Diode Module',
         icon: 'fas fa-crosshairs',
+        category: 'Output',
         tip: 'Emits a small laser beam.',
         voltage: '5V',
         complexity: 'simple',
@@ -602,6 +638,7 @@ const componentData = {
     vibration_motor: {
         name: 'Vibration Motor',
         icon: 'fas fa-vibrator',
+        category: 'Output',
         tip: 'A small motor for haptic feedback, like in a phone.',
         voltage: '3V-5V',
         complexity: 'simple',
@@ -620,6 +657,7 @@ const componentData = {
     esp01: {
         name: 'ESP-01 WiFi Module',
         icon: 'fas fa-wifi',
+        category: 'Communication',
         tip: 'WiFi module for adding wireless connectivity to projects.',
         voltage: '3.3V',
         complexity: 'complex',
@@ -658,6 +696,7 @@ const componentData = {
     hc05: {
         name: 'HC-05 Bluetooth Module',
         icon: 'fas fa-bluetooth-b',
+        category: 'Communication',
         tip: 'Classic Bluetooth module for wireless communication.',
         voltage: '3.3V-6V',
         complexity: 'moderate',
@@ -679,6 +718,7 @@ const componentData = {
     nrf24l01: {
         name: 'NRF24L01+ RF Transceiver',
         icon: 'fas fa-broadcast-tower',
+        category: 'Communication',
         tip: '2.4GHz wireless communication module.',
         voltage: '3.3V',
         complexity: 'complex',
@@ -691,6 +731,7 @@ const componentData = {
     rfid_mfrc522: {
         name: 'RFID Reader (MFRC522)',
         icon: 'fas fa-id-card',
+        category: 'Communication',
         tip: 'Reads 13.56MHz RFID tags and cards.',
         voltage: '3.3V',
         complexity: 'complex',
@@ -703,6 +744,7 @@ const componentData = {
     gps_neo6m: {
         name: 'GPS Module (NEO-6M)',
         icon: 'fas fa-map-marker-alt',
+        category: 'Communication',
         tip: 'Receives satellite signals to determine geographic location.',
         voltage: '3.3V-5V',
         complexity: 'complex',
@@ -713,6 +755,7 @@ const componentData = {
     can_bus_module: {
         name: 'CAN Bus Module (MCP2515)',
         icon: 'fas fa-bus',
+        category: 'Communication',
         tip: 'Allows communication on a CAN bus, common in automotive applications.',
         voltage: '5V',
         complexity: 'complex',
@@ -724,6 +767,7 @@ const componentData = {
     lora_module: {
         name: 'LoRa Module (RFM95/SX127x)',
         icon: 'fas fa-wifi',
+        category: 'Communication',
         tip: 'Long-range, low-power radio transceiver.',
         voltage: '3.3V',
         complexity: 'complex',
@@ -738,6 +782,7 @@ const componentData = {
     stepper_28byj: {
         name: '28BYJ-48 Stepper Motor',
         icon: 'fas fa-cog',
+        category: 'Motors & Drivers',
         tip: 'Small stepper motor with ULN2003 driver board.',
         voltage: '5V',
         complexity: 'moderate',
@@ -759,6 +804,7 @@ const componentData = {
     l298n: {
         name: 'L298N Motor Driver',
         icon: 'fas fa-car-side',
+        category: 'Motors & Drivers',
         tip: 'Dual H-bridge motor driver for DC motors or single stepper motor.',
         voltage: '5V-35V',
         complexity: 'complex',
@@ -782,6 +828,7 @@ const componentData = {
     dc_motor: {
         name: 'DC Motor',
         icon: 'fas fa-fan',
+        category: 'Motors & Drivers',
         tip: 'A simple motor that spins when power is applied.',
         voltage: '3V-12V',
         complexity: 'moderate',
@@ -799,6 +846,7 @@ const componentData = {
     a4988_driver: {
         name: 'A4988 Stepper Driver',
         icon: 'fas fa-microchip',
+        category: 'Motors & Drivers',
         tip: 'Driver for controlling bipolar stepper motors (like NEMA 17).',
         voltage: '3.3V-5V (Logic), 8V-35V (Motor)',
         complexity: 'complex',
@@ -818,6 +866,7 @@ const componentData = {
     stepper_nema17: {
         name: 'NEMA 17 Stepper Motor',
         icon: 'fas fa-cogs',
+        category: 'Motors & Drivers',
         tip: 'A standard bipolar stepper motor for CNC and 3D printers.',
         voltage: '12V-24V',
         complexity: 'complex',
@@ -837,6 +886,7 @@ const componentData = {
     ws2812_strip: {
         name: 'WS2812 LED Strip (NeoPixel)',
         icon: 'fas fa-rainbow',
+        category: 'Advanced & ICs',
         tip: 'Addressable RGB LED strip. Complex setup with multiple dependencies.',
         voltage: '5V',
         complexity: 'complex',
@@ -885,6 +935,7 @@ const componentData = {
     sd_card: {
         name: 'SD Card Module',
         icon: 'fas fa-save',
+        category: 'Advanced & ICs',
         tip: 'SD card reader for data logging and storage.',
         voltage: '3.3V-5V',
         complexity: 'moderate',
@@ -907,6 +958,7 @@ const componentData = {
     rtc_ds3231: {
         name: 'DS3231 RTC Module',
         icon: 'fas fa-clock',
+        category: 'Advanced & ICs',
         tip: 'Precision real-time clock module with temperature compensation.',
         voltage: '3.3V-5V',
         complexity: 'simple',
@@ -922,6 +974,7 @@ const componentData = {
     camera_ov2640: {
         name: 'OV2640 Camera Module',
         icon: 'fas fa-camera',
+        category: 'Advanced & ICs',
         tip: 'Camera module for ESP32-CAM projects.',
         voltage: '3.3V',
         complexity: 'complex',
@@ -945,6 +998,7 @@ const componentData = {
     shift_register_74hc595: {
         name: '74HC595 Shift Register',
         icon: 'fas fa-expand-arrows-alt',
+        category: 'Advanced & ICs',
         tip: 'Serial-in, parallel-out shift register for expanding GPIO outputs.',
         voltage: '2V-6V',
         complexity: 'moderate',
@@ -956,6 +1010,7 @@ const componentData = {
     pcf8574_expander: {
         name: 'I2C GPIO Expander (PCF8574)',
         icon: 'fas fa-project-diagram',
+        category: 'Advanced & ICs',
         tip: 'Adds 8 extra GPIO pins using the I2C bus.',
         voltage: '2.5V-6V',
         complexity: 'moderate',
@@ -969,6 +1024,7 @@ const componentData = {
     breadboard_psu: {
         name: 'Breadboard Power Supply',
         icon: 'fas fa-plug',
+        category: 'Power Management',
         tip: 'Provides 3.3V and 5V rails directly to a breadboard.',
         voltage: '6.5V-12V (Input)',
         complexity: 'simple',
@@ -979,6 +1035,7 @@ const componentData = {
     tp4056_charger: {
         name: 'TP4056 LiPo Charger',
         icon: 'fas fa-battery-three-quarters',
+        category: 'Power Management',
         tip: 'A module for charging single-cell Lithium-Ion/Polymer batteries.',
         voltage: '5V (Input)',
         complexity: 'simple',
@@ -989,6 +1046,7 @@ const componentData = {
     buck_boost_converter: {
         name: 'Buck/Boost Converter',
         icon: 'fas fa-level-down-alt',
+        category: 'Power Management',
         tip: 'Steps voltage up (boost) or down (buck) to a stable output.',
         voltage: 'Variable',
         complexity: 'moderate',
@@ -999,6 +1057,7 @@ const componentData = {
     ina219_current_sensor: {
         name: 'INA219 Current Sensor',
         icon: 'fas fa-bolt',
+        category: 'Power Management',
         tip: 'High-side DC current and power sensor with I2C interface.',
         voltage: '3.3V-5V',
         complexity: 'moderate',

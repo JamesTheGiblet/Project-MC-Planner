@@ -1,0 +1,58 @@
+{
+    "rain_sensor": {
+        "name": "Rain Drop Sensor",
+        "icon": "fas fa-cloud-showers-heavy",
+        "category": "Sensors",
+        "tip": "Detects rain drops. Has both analog and digital outputs.",
+        "voltage": "3.3V-5V",
+        "complexity": "simple",
+        "requires": {
+            "data": ["gpio"],
+            "power": 1,
+            "ground": 1
+        },
+        "dependencies": [],
+        "notes": "Use the Analog Output (AO) pin for variable rain detection. The Digital Output (DO) is a simple threshold.",
+        "warnings": ["Sensor traces will corrode over time. Power it from a GPIO pin only when reading to extend its life."]
+    },
+    "lcd_i2c": {
+        "name": "LCD 16x2 (I2C)",
+        "icon": "fas fa-desktop",
+        "category": "Displays",
+        "tip": "16x2 Character LCD with a pre-soldered I2C backpack.",
+        "voltage": "5V",
+        "complexity": "simple",
+        "requires": {
+            "data": ["i2c"],
+            "power": 1,
+            "ground": 1
+        },
+        "dependencies": [],
+        "notes": "The I2C backpack makes wiring much simpler than parallel LCDs. Default address is usually 0x27 or 0x3F.",
+        "i2cAddress": "0x27 or 0x3F"
+    },
+    "drv8825_driver": {
+        "name": "DRV8825 Stepper Driver",
+        "icon": "fas fa-microchip",
+        "category": "Motors & Drivers",
+        "tip": "Driver for bipolar stepper motors, an upgrade to the A4988.",
+        "voltage": "3.3V-5V (Logic), 8.2V-45V (Motor)",
+        "complexity": "complex",
+        "requires": {
+            "data": ["gpio"],
+            "power": 2,
+            "ground": 2
+        },
+        "dependencies": [{
+            "type": "capacitor",
+            "value": "100µF",
+            "purpose": "power_smoothing",
+            "description": "Decoupling capacitor for motor power supply",
+            "reason": "Protects the driver from voltage spikes.",
+            "required": true,
+            "connection": "across_motor_power"
+        }],
+        "notes": "Requires 2 GPIO pins (STEP, DIR). Can achieve 1/32 microstepping. Remember to set the current limit before use.",
+        "pins_required": 2
+    }
+}
