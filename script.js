@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const wiringDiagramBtn = document.getElementById('wiring-diagram-btn');
     const generateBomBtn = document.getElementById('generate-bom-btn');
     const generateCodeBtn = document.getElementById('generate-code-btn');
-    const docsBtn = document.getElementById('docs-btn');
+    const documentationBtn = document.getElementById('documentation-btn');
     const planMyBoardBtn = document.getElementById('plan-my-board-btn');
     const upgradeProBtn = document.getElementById('upgrade-pro-btn');
     const wiringModal = document.getElementById('wiring-modal');
@@ -251,14 +251,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const copyBomBtn = document.getElementById('copy-bom-btn');
     const importPackBtn = document.getElementById('import-pack-btn');
     const importPackInput = document.getElementById('import-pack-input');
+    const copyWiringBtn = document.getElementById('copy-wiring-btn');
     const addComponentModal = document.getElementById('add-component-modal');
     const modalCloseBtn = document.getElementById('modal-close-btn');
     const bomModalCloseBtn = document.getElementById('bom-modal-close-btn');
     const exportBomCsvBtn = document.getElementById('export-bom-csv-btn');
     const codeModalCloseBtn = document.getElementById('code-modal-close-btn');
-    const docsModalCloseBtn = document.getElementById('docs-modal-close-btn');
-    const docsModalTitle = document.getElementById('docs-modal-title');
-    const docsModalContent = document.getElementById('docs-modal-content');
+    const documentationModal = document.getElementById('documentation-modal');
     const copyCodeBtn = document.getElementById('copy-code-btn');
     const addComponentModalCloseBtn = document.getElementById('add-component-modal-close-btn');
     const componentSearch = document.getElementById('component-search');
@@ -368,16 +367,30 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Wiring Diagram Button
-    wiringDiagramBtn.addEventListener('click', () => showUpgradeModal());
+    wiringDiagramBtn.addEventListener('click', generateWiringDiagram);
 
     // Generate BOM Button
     generateBomBtn.addEventListener('click', generateBOM);
 
     // Generate Code Button
-    generateCodeBtn.addEventListener('click', () => showUpgradeModal());
+    generateCodeBtn.addEventListener('click', () => {
+        const projectData = getProjectDataObject();
+        if (!projectData) {
+            showValidationError("Cannot generate code for an empty board. Please assign some components first.");
+            return;
+        }
+        const { language, code } = codeGenerator.generate(projectData);
+
+        const codeBlock = document.getElementById('code-block');
+        codeBlock.textContent = code;
+        codeBlock.className = `language-${language}`;
+        Prism.highlightElement(codeBlock);
+
+        codeModal.classList.remove('hidden');
+    });
 
     // Docs Button
-    docsBtn.addEventListener('click', showBoardDocumentation);
+    documentationBtn.addEventListener('click', openDocumentationModal);
 
     // Code Modal Listeners
     codeModalCloseBtn.addEventListener('click', () => codeModal.classList.add('hidden'));
@@ -386,14 +399,19 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     copyCodeBtn.addEventListener('click', copyGeneratedCode);
 
-    // Docs Modal Listeners
-    docsModalCloseBtn.addEventListener('click', () => docsModal.classList.add('hidden'));
-    docsModal.addEventListener('click', (e) => {
-        if (e.target === docsModal) {
-            docsModal.classList.add('hidden');
-        }
-    });
-
+    // Documentation Modal Listeners
+    const documentationModalCloseBtn = document.getElementById('documentation-modal-close-btn');
+    if (documentationModalCloseBtn) {
+        documentationModalCloseBtn.addEventListener('click', () => documentationModal.classList.add('hidden'));
+    }
+    if (documentationModal) {
+        documentationModal.addEventListener('click', (e) => {
+            if (e.target === documentationModal) {
+                documentationModal.classList.add('hidden');
+            }
+        });
+    }
+    
     // BOM Modal Listeners
     bomModalCloseBtn.addEventListener('click', () => bomModal.classList.add('hidden'));
     bomModal.addEventListener('click', (e) => {
@@ -402,11 +420,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     exportBomCsvBtn.addEventListener('click', () => showUpgradeModal());
-    copyBomBtn.addEventListener('click', () => showUpgradeModal());
+    copyBomBtn.addEventListener('click', copyBomToClipboard);
 
     // Modal Close Listeners
     modalCloseBtn.addEventListener('click', () => wiringModal.classList.add('hidden'));
     wiringModal.addEventListener('click', (e) => {
+        copyWiringBtn.addEventListener('click', copyWiringDiagramToClipboard);
         // Close modal if the overlay (the background) is clicked
         if (e.target === wiringModal) {
             wiringModal.classList.add('hidden');
@@ -1172,13 +1191,64 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function copyDocsToClipboard() {
+        const docsContentEl = document.getElementById('docs-modal-content');
+        if (!docsContentEl.children.length) {
+            alert("There is no documentation content to copy.");
+            return;
+        }
+    
+        let text = "";
+        const title = document.getElementById('docs-modal-title').textContent;
+        text += `${title}\n`;
+        text += "========================================\n\n";
+    
+        const nodes = docsContentEl.childNodes;
+        nodes.forEach(node => {
+            if (node.nodeType !== Node.ELEMENT_NODE) return;
+    
+            switch (node.tagName) {
+                case 'H4':
+                    text += `\n${node.textContent.toUpperCase()}\n--------------------\n`;
+                    break;
+                case 'P':
+                    const pClone = node.cloneNode(true);
+                    const link = pClone.querySelector('a');
+                    if (link) {
+                        link.textContent = `${link.textContent} (${link.href})`;
+                    }
+                    text += `${pClone.textContent}\n\n`;
+                    break;
+                case 'UL':
+                    const items = node.querySelectorAll('li');
+                    items.forEach(item => {
+                        text += `  - ${item.textContent.trim()}\n`;
+                    });
+                    text += '\n';
+                    break;
+            }
+        });
+    
+        navigator.clipboard.writeText(text.trim()).then(() => {
+            copyDocsBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            setTimeout(() => {
+                copyDocsBtn.innerHTML = '<i class="fas fa-copy"></i> Copy Text';
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy documentation: ', err);
+            alert('Failed to copy documentation to clipboard.');
+        });
+    }
+
     function copyGeneratedCode() {
         const code = document.getElementById('code-block').textContent;
         navigator.clipboard.writeText(code).then(() => {
             const originalText = copyCodeBtn.innerHTML;
+            copyCodeBtn.disabled = true;
             copyCodeBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
             setTimeout(() => {
                 copyCodeBtn.innerHTML = originalText;
+                copyCodeBtn.disabled = false;
             }, 2000);
         }).catch(err => {
             console.error('Failed to copy code: ', err);
@@ -1394,6 +1464,103 @@ document.addEventListener('DOMContentLoaded', function() {
         const csvContent = rows.join('\n');
         const filename = `${projectData.boardName.toLowerCase().replace(/\s+/g, '-')}-bom.csv`;
         downloadFile(csvContent, filename, 'text/csv;charset=utf-8;');
+    }
+
+    function copyBomToClipboard() {
+        const bomContentEl = document.getElementById('bom-modal-content');
+        if (!bomContentEl.children.length || bomContentEl.querySelector('.no-items-message')) {
+            alert("There is no BOM content to copy.");
+            return;
+        }
+    
+        let text = "Bill of Materials\n";
+        text += "=================\n";
+    
+        const nodes = bomContentEl.childNodes;
+        nodes.forEach(node => {
+            if (node.nodeType !== Node.ELEMENT_NODE) return; // Skip text nodes etc.
+    
+            if (node.tagName === 'H4') {
+                text += `\n--- ${node.textContent.toUpperCase()} ---\n`;
+            } else if (node.tagName === 'TABLE') {
+                const rows = node.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('th, td');
+                    // A simple tab-separated format
+                    const rowText = Array.from(cells).map(cell => cell.textContent.trim()).join('\t\t');
+                    text += rowText + '\n';
+                });
+            } else if (node.tagName === 'UL') {
+                const items = node.querySelectorAll('li');
+                items.forEach(item => {
+                    const itemClone = item.cloneNode(true);
+                    const icon = itemClone.querySelector('i');
+                    if (icon) icon.remove(); // Remove icon from the clone
+                    text += `- ${itemClone.textContent.trim()}\n`;
+                });
+            }
+        });
+    
+        navigator.clipboard.writeText(text.trim()).then(() => {
+            const originalHTML = copyBomBtn.innerHTML;
+            copyBomBtn.disabled = true;
+            copyBomBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            setTimeout(() => {
+                copyBomBtn.innerHTML = originalHTML;
+                copyBomBtn.disabled = false;
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy BOM: ', err);
+            alert('Failed to copy BOM to clipboard.');
+        });
+    }
+
+    function copyWiringDiagramToClipboard() {
+        const wiringContentEl = document.getElementById('wiring-diagram-content');
+        if (!wiringContentEl.children.length || wiringContentEl.querySelector('.no-items-message')) {
+            alert("There is no wiring diagram content to copy.");
+            return;
+        }
+    
+        let text = "Wiring Diagram\n";
+        text += "==============\n\n";
+    
+        const nodes = wiringContentEl.childNodes;
+        nodes.forEach(node => {
+            if (node.nodeType !== Node.ELEMENT_NODE) return;
+    
+            if (node.tagName === 'H4') {
+                const h4Clone = node.cloneNode(true);
+                const icon = h4Clone.querySelector('i');
+                if (icon) icon.remove();
+                text += `--- ${h4Clone.textContent.trim()} ---\n`;
+            } else if (node.tagName === 'UL') {
+                const items = node.querySelectorAll('li');
+                items.forEach(item => {
+                    const itemClone = item.cloneNode(true);
+                    const icon = itemClone.querySelector('i');
+                    if (icon) icon.remove(); // Remove icon
+                    
+                    const codeElements = itemClone.querySelectorAll('code');
+                    codeElements.forEach(code => {
+                        code.outerHTML = `\`${code.innerHTML}\``;
+                    });
+    
+                    text += `- ${itemClone.textContent.replace(/\s+/g, ' ').trim()}\n`;
+                });
+                text += '\n';
+            }
+        });
+    
+        navigator.clipboard.writeText(text.trim()).then(() => {
+            copyWiringBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            setTimeout(() => {
+                copyWiringBtn.innerHTML = '<i class="fas fa-copy"></i> Copy Text';
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy wiring diagram: ', err);
+            alert('Failed to copy wiring diagram to clipboard.');
+        });
     }
 
     function generateWiringDiagram() {

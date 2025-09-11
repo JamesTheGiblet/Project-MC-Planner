@@ -50,7 +50,7 @@
                 <button class="btn btn-outline" id="generate-code-btn" title="Generate Starter Code">
                     <i class="fas fa-code"></i> Code
                 </button>
-                <button class="btn btn-outline" id="docs-btn" title="View Board Documentation">
+                <button class="btn btn-outline" id="documentation-btn" title="View Documentation">
                     <i class="fas fa-book-open"></i> Docs
                 </button>
                 <button class="btn btn-primary" id="plan-my-board-btn">
@@ -232,6 +232,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Wiring Diagram</h3>
+                <button id="copy-wiring-btn" class="btn btn-outline" title="Copy as Text"><i class="fas fa-copy"></i> Copy Text</button>
                 <button id="modal-close-btn" class="modal-close-btn">&times;</button>
             </div>
             <div id="wiring-diagram-content" class="modal-body">
@@ -294,14 +295,22 @@
         </div>
     </div>
 
-    <div id="docs-modal" class="modal-overlay hidden">
-        <div class="modal-content">
+    <div id="documentation-modal" class="modal-overlay hidden">
+        <div class="modal-content modal-lg">
             <div class="modal-header">
-                <h3 id="docs-modal-title">Board Documentation</h3>
-                <button id="docs-modal-close-btn" class="modal-close-btn">&times;</button>
+                <div class="doc-tabs">
+                    <button class="doc-tab-btn active" data-tab="boards-doc-tab">Boards</button>
+                    <button class="doc-tab-btn" data-tab="components-doc-tab">Components</button>
+                </div>
+                <button id="documentation-modal-close-btn" class="modal-close-btn">&times;</button>
             </div>
-            <div id="docs-modal-content" class="modal-body">
-                <!-- Documentation will be generated here -->
+            <div class="modal-body no-padding-top">
+                <div id="boards-doc-tab" class="doc-tab-content active">
+                    <!-- Board documentation will be rendered here -->
+                </div>
+                <div id="components-doc-tab" class="doc-tab-content hidden">
+                    <!-- Component explorer will be rendered here -->
+                </div>
             </div>
         </div>
     </div>
@@ -310,7 +319,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Bill of Materials (BOM)</h3>
-                <button id="copy-bom-btn" class="btn btn-primary" title="Copy as Text (Pro)"><i class="fas fa-copy"></i> Copy Text</button>
+                <button id="copy-bom-btn" class="btn btn-outline" title="Copy as Text (Free Feature)"><i class="fas fa-copy"></i> Copy Text</button>
                 <button id="export-bom-csv-btn" class="btn btn-primary" title="Export as CSV (Pro)"><i class="fas fa-file-csv"></i> Export CSV</button>
                 <button id="bom-modal-close-btn" class="modal-close-btn">&times;</button>
             </div>

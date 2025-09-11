@@ -137,8 +137,7 @@ header {
     color: white;
 }
 .btn-danger:hover {
-    /* Fallback for color-mix: use a slightly darker shade of var(--danger) */
-    background-color: #c72d2d; /* Approximate to color-mix(in srgb, var(--danger) 85%, black) */
+    background-color: #c72d2d; /* Approximate a darker shade of var(--danger) */
 }
 
 /* Sidebar Styles */
@@ -561,6 +560,11 @@ body.dark-mode .board-name {
 .pin.spi { background-color: #8338ec; }
 .pin.uart { background-color: #38b000; }
 
+.pin.placeholder {
+    /* Hide placeholder pins used for layout, but keep them in the grid */
+    visibility: hidden;
+}
+
 .board-layout-2col-grid .pins-container {
     display: grid;
     grid-template-columns: repeat(2, auto);
@@ -764,6 +768,14 @@ body.dark-mode .board-name {
     box-shadow: var(--shadow);
 }
 
+.modal-content-narrow {
+    max-width: 450px;
+}
+
+.modal-lg {
+    max-width: 1200px;
+}
+
 .modal-header {
     display: flex;
     justify-content: space-between;
@@ -796,6 +808,322 @@ body.dark-mode .board-name {
 
 .modal-body {
     line-height: 1.8;
+}
+
+.doc-tabs {
+    display: flex;
+    gap: 10px;
+    flex-grow: 1;
+}
+
+.doc-tab-btn {
+    background: none;
+    border: none;
+    padding: 15px 20px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--gray);
+    border-bottom: 3px solid transparent;
+    transition: var(--transition);
+    margin-bottom: -1px; /* Align with header border */
+}
+
+.doc-tab-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+.doc-tab-content {
+    padding-top: 20px;
+}
+
+/* Component Explorer Styles (within modal) */
+.component-explorer-container {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+    min-height: 60vh;
+    max-height: 70vh;
+}
+
+#explorer-list-panel,
+#explorer-details-panel {
+    height: 70vh;
+    overflow-y: auto;
+    padding: 15px;
+    background-color: var(--bg-color);
+    border-radius: var(--border-radius);
+}
+
+.explorer-panel {
+    background: var(--light);
+    border-radius: var(--border-radius);
+    padding: 20px;
+}
+
+.explorer-panel h2, .explorer-panel h3 {
+    margin-top: 0;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#components-doc-tab .component-item {
+    padding: 15px;
+    background: var(--surface-color);
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--primary);
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    margin-bottom: 10px;
+}
+
+#components-doc-tab .component-item:hover {
+    background: var(--light-gray);
+    transform: translateX(4px);
+}
+
+#components-doc-tab .component-item.selected {
+    background: color-mix(in srgb, var(--primary) 10%, var(--surface-color));
+    border-left-color: var(--accent);
+}
+
+.component-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.component-name {
+    font-weight: 600;
+    flex-grow: 1;
+}
+
+.voltage-badge {
+    background: var(--success);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.component-tip {
+    font-size: 0.9rem;
+    color: var(--gray);
+    margin-bottom: 10px;
+}
+
+.dependency-indicator {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.85rem;
+    color: var(--secondary);
+}
+
+.complexity-badge {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.complexity-simple { background: #d4edda; color: #155724; }
+.complexity-moderate { background: #fff3cd; color: #856404; }
+.complexity-complex { background: #f8d7da; color: #721c24; }
+
+.detail-section {
+    margin-bottom: 25px;
+}
+
+.detail-section h3 {
+    color: var(--secondary);
+    margin-bottom: 15px;
+}
+
+.pin-requirements {
+    background: var(--light);
+    padding: 15px;
+    border-radius: var(--border-radius);
+    margin-bottom: 15px;
+}
+
+.pin-req-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.pin-req-item:last-child {
+    margin-bottom: 0;
+}
+
+.dependencies-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.dependency-item {
+    border: 1px solid var(--light-gray);
+    border-radius: var(--border-radius);
+    padding: 15px;
+    position: relative;
+}
+
+.dependency-required {
+    border-left: 4px solid var(--danger);
+}
+
+.dependency-optional {
+    border-left: 4px solid var(--warning);
+}
+
+.dependency-not-needed {
+    border-left: 4px solid var(--success);
+    opacity: 0.7;
+}
+
+.dependency-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    gap: 10px;
+}
+
+.dependency-type {
+    font-weight: 600;
+    flex-grow: 1;
+}
+
+.dependency-value {
+    background: var(--primary);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-family: monospace;
+}
+
+.required-badge, .optional-badge, .not-needed-badge {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.required-badge { background: #f8d7da; color: #721c24; }
+.optional-badge { background: #fff3cd; color: #856404; }
+.not-needed-badge { background: #d4edda; color: #155724; }
+
+.dependency-reason {
+    font-size: 0.9rem;
+    color: var(--gray);
+    margin-bottom: 8px;
+}
+
+.dependency-alternative {
+    font-size: 0.85rem;
+    color: var(--secondary);
+    font-style: italic;
+    background: color-mix(in srgb, var(--secondary) 10%, transparent);
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.warnings-section {
+    background: color-mix(in srgb, var(--danger) 10%, transparent);
+    border: 1px solid #f9a3a3; /* fallback for color-mix(in srgb, var(--danger) 30%, transparent) */
+    border-radius: var(--border-radius);
+    padding: 15px;
+}
+
+.warning-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.warning-item:last-child {
+    margin-bottom: 0;
+}
+
+.warning-icon {
+    color: var(--danger);
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.code-hints {
+    background: var(--light);
+    border-radius: var(--border-radius);
+    padding: 15px;
+}
+
+.code-hint-item {
+    margin-bottom: 10px;
+}
+
+.code-hint-item:last-child {
+    margin-bottom: 0;
+}
+
+.platform-name {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.code-snippet {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    overflow-x: auto;
+}
+
+.board-selector {
+    background: var(--light);
+    padding: 10px;
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+}
+
+.board-selector .board-option {
+    display: inline-block;
+    padding: 8px 15px;
+    margin: 5px;
+    background: var(--surface-color);
+    border: 2px solid var(--light-gray);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.board-selector .board-option.selected {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: white;
+}
+
+.select-prompt {
+    text-align: center;
+    color: var(--gray);
+    margin-top: 50px;
+}
+
+.select-prompt-arrow {
+    font-size: 2rem;
+    margin-bottom: 10px;
 }
 
 /* Wiring Diagram Specific Styles */

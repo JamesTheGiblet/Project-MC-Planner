@@ -76,8 +76,9 @@ PinPoint Planner offers two levels of assistance:
 | Core Planner           | ✅                    | ✅                                    | ✅                                             |
 | Intelligence           | Pin Validator         | ⭐ AI Smart Planner                   | ⭐ AI Smart Planner                            |
 | Documentation          | Markdown Export       | PDF & JSON Export                    | Custom Templates                              |
-| Wiring Diagrams        | ❌                    | ✅ Fritzing-style Diagrams            | ✅ Advanced Diagrams                          |
-| Code Generation        | ❌                    | ✅ Arduino/Python Starter Code        | ✅ Custom Code Templates                      |
+| Wiring Diagrams        | ✅ Text-based Instructions | ✅ Fritzing-style Diagrams            | ✅ Advanced Diagrams                          |
+| Code Generation        | ✅ Arduino/Python Starter Code | ✅ Arduino/Python Starter Code        | ✅ Custom Code Templates                      |
+| Bill of Materials (BOM)  | ✅ Copy as Text       | ✅ Export to CSV                       | ✅ Export to CSV                               |
 | Custom Components      | ❌                    | ✅ Add Custom Components              | ✅ Shared Team Library                        |
 | Collaboration          | ❌                    | ❌                                   | ✅ Real-time Editing                          |
 
@@ -93,8 +94,9 @@ PinPoint Planner offers two levels of assistance:
 | **Basic Export** | Download or copy your project plan as a clean Markdown file. | ✅ | ✅ | ✅ |
 | **AI Smart Planner** | Automatically generate an optimized, conflict-free pin layout. | ❌ | ⭐ | ⭐ |
 | **Advanced Exports** | Export to JSON for data interchange and professional PDF documents. | ❌ | ✅ | ✅ |
-| **Wiring Diagrams** | Generate step-by-step wiring instructions for your project. | ❌ | ✅ | ✅ (Advanced) |
-| **Code Generation** | Get starter code in Arduino (C++) and Python. | ❌ | ✅ | ✅ (Custom) |
+| **Wiring Diagrams** | Generate and copy text-based wiring instructions. | ✅ | ✅ (Graphical) | ✅ (Advanced) |
+| **Bill of Materials** | Generate a shopping list and copy it as text. | ✅ | ✅ (CSV Export) | ✅ (CSV Export) |
+| **Code Generation** | Get starter code in Arduino (C++) and Python. | ✅ | ✅ | ✅ (Custom) |
 | **Custom Components** | Create and save your own components to a personal library. | ❌ | ✅ | ✅ (Shared) |
 | **Real-time Collaboration** | Work on projects with your team simultaneously. | ❌ | ❌ | ✅ |
 
