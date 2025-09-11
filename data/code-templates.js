@@ -106,6 +106,42 @@ const codeGenerator = {
                     loopCode.add('print(f"Temperature: {bmp280.temperature:.2f} C")');
                     loopCode.add('print(f"Pressure: {bmp280.pressure:.2f} hPa")');
                     break;
+                case 'ina219_current_sensor':
+                    imports.add('import board');
+                    imports.add('import adafruit_ina219');
+                    setupCode.add('i2c = board.I2C()');
+                    setupCode.add('ina219 = adafruit_ina219.INA219(i2c)');
+                    loopCode.add('print("--- INA219 Current Sensor ---")');
+                    loopCode.add('print(f"Bus Voltage:   {ina219.bus_voltage:.2f} V")');
+                    loopCode.add('print(f"Shunt Voltage: {ina219.shunt_voltage / 1000:.2f} mV")');
+                    loopCode.add('print(f"Current:       {ina219.current:.2f} mA")');
+                    loopCode.add('print(f"Power:         {ina219.power:.2f} mW")');
+                    break;
+                case 'capacitive_touch_sensor':
+                    imports.add('import RPi.GPIO as GPIO');
+                    pinDefs.add(`TOUCH_PIN_${a.pin} = ${a.pin}`);
+                    setupCode.add('GPIO.setmode(GPIO.BCM)');
+                    setupCode.add(`GPIO.setup(TOUCH_PIN_${a.pin}, GPIO.IN)`);
+                    loopCode.add(`if GPIO.input(TOUCH_PIN_${a.pin}): print("Touch sensor on pin ${a.pin} was touched!")`);
+                    break;
+                case 'rgb_led_cc':
+                    imports.add('import RPi.GPIO as GPIO');
+                    pinDefs.add(`RED_PIN_${a.pin} = ${a.pin} # Assumes sequential pins for RGB`);
+                    pinDefs.add(`GREEN_PIN_${a.pin} = ${parseInt(a.pin) + 1}`);
+                    pinDefs.add(`BLUE_PIN_${a.pin} = ${parseInt(a.pin) + 2}`);
+                    setupCode.add('GPIO.setmode(GPIO.BCM)');
+                    setupCode.add(`pins_to_setup = [RED_PIN_${a.pin}, GREEN_PIN_${a.pin}, BLUE_PIN_${a.pin}]`);
+                    setupCode.add('GPIO.setup(pins_to_setup, GPIO.OUT)');
+                    loopCode.add(`print("Setting RGB LED on pin group ${a.pin} to RED")`);
+                    loopCode.add(`GPIO.output([RED_PIN_${a.pin}, GREEN_PIN_${a.pin}, BLUE_PIN_${a.pin}], (GPIO.HIGH, GPIO.LOW, GPIO.LOW))`);
+                    loopCode.add('time.sleep(1)');
+                    loopCode.add(`print("Setting RGB LED on pin group ${a.pin} to GREEN")`);
+                    loopCode.add(`GPIO.output([RED_PIN_${a.pin}, GREEN_PIN_${a.pin}, BLUE_PIN_${a.pin}], (GPIO.LOW, GPIO.HIGH, GPIO.LOW))`);
+                    loopCode.add('time.sleep(1)');
+                    loopCode.add(`print("Setting RGB LED on pin group ${a.pin} to BLUE")`);
+                    loopCode.add(`GPIO.output([RED_PIN_${a.pin}, GREEN_PIN_${a.pin}, BLUE_PIN_${a.pin}], (GPIO.LOW, GPIO.LOW, GPIO.HIGH))`);
+                    loopCode.add('time.sleep(1)');
+                    break;
                 case 'oled_128x64':
                     imports.add('import board');
                     imports.add('import adafruit_ssd1306');
@@ -224,6 +260,35 @@ finally:
                     setupCode.add('if (!bmp.begin(0x76)) { Serial.println(F("Could not find a valid BMP280 sensor, check wiring!")); while (1); }');
                     loopCode.add('Serial.print(F("BMP280 - Temp: ")); Serial.print(bmp.readTemperature()); Serial.print(" *C, ");');
                     loopCode.add('Serial.print(F("Pressure: ")); Serial.print(bmp.readPressure() / 100.0F); Serial.println(" hPa");');
+                    break;
+                case 'ina219_current_sensor':
+                    includes.add('#include <Wire.h>');
+                    includes.add('#include <Adafruit_INA219.h>');
+                    globals.add('Adafruit_INA219 ina219;');
+                    setupCode.add('if (!ina219.begin()) { Serial.println("Failed to find INA219 chip"); while (1) { delay(10); } }');
+                    loopCode.add('Serial.println("--- INA219 ---");');
+                    loopCode.add('Serial.print("Bus Voltage:   "); Serial.print(ina219.getBusVoltage_V()); Serial.println(" V");');
+                    loopCode.add('Serial.print("Current:       "); Serial.print(ina219.getCurrent_mA()); Serial.println(" mA");');
+                    break;
+                case 'capacitive_touch_sensor':
+                    pinDefs.add(`#define TOUCH_PIN_${a.pin} ${a.pin}`);
+                    setupCode.add(`pinMode(TOUCH_PIN_${a.pin}, INPUT);`);
+                    loopCode.add(`if (digitalRead(TOUCH_PIN_${a.pin}) == HIGH) { Serial.println("Touch sensor on pin ${a.pin} was touched!"); }`);
+                    break;
+                case 'potentiometer':
+                    pinDefs.add(`#define POT_PIN_${a.pin} ${a.pin}`);
+                    loopCode.add(`int potValue = analogRead(POT_PIN_${a.pin});`);
+                    loopCode.add(`Serial.print("Potentiometer on pin ${a.pin}: "); Serial.println(potValue);`);
+                    break;
+                case 'rgb_led_cc':
+                    pinDefs.add(`#define RED_PIN_${a.pin} ${a.pin} // Assumes sequential PWM pins for RGB`);
+                    pinDefs.add(`#define GREEN_PIN_${a.pin} ${parseInt(a.pin) + 1}`);
+                    pinDefs.add(`#define BLUE_PIN_${a.pin} ${parseInt(a.pin) + 2}`);
+                    setupCode.add(`pinMode(RED_PIN_${a.pin}, OUTPUT); pinMode(GREEN_PIN_${a.pin}, OUTPUT); pinMode(BLUE_PIN_${a.pin}, OUTPUT);`);
+                    loopCode.add(`Serial.println("Cycling RGB LED on pin group ${a.pin}");`);
+                    loopCode.add(`analogWrite(RED_PIN_${a.pin}, 255); analogWrite(GREEN_PIN_${a.pin}, 0); analogWrite(BLUE_PIN_${a.pin}, 0); delay(500);`);
+                    loopCode.add(`analogWrite(RED_PIN_${a.pin}, 0); analogWrite(GREEN_PIN_${a.pin}, 255); analogWrite(BLUE_PIN_${a.pin}, 0); delay(500);`);
+                    loopCode.add(`analogWrite(RED_PIN_${a.pin}, 0); analogWrite(GREEN_PIN_${a.pin}, 0); analogWrite(BLUE_PIN_${a.pin}, 255); delay(500);`);
                     break;
                 case 'oled_128x64':
                     includes.add('#include <Wire.h>');
