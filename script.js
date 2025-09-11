@@ -984,6 +984,66 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
+     * Collects all validation errors for a potential component assignment.
+     * Instead of returning on the first error, it gathers all of them.
+     * @param {object} componentInfo - The component being assigned.
+     * @param {HTMLElement} pinEl - The target pin element.
+     * @returns {string[]} An array of error messages. An empty array means the assignment is valid.
+     */
+    function getAssignmentValidationErrors(componentInfo, pinEl) {
+        const errors = [];
+
+        // --- Pre-checks for fundamental assignment issues ---
+        if (pinEl.classList.contains('assigned')) {
+            errors.push(`Pin ${pinEl.textContent.trim()} is already assigned.`);
+            return errors; // This is a hard stop, no need to check further.
+        }
+        if (pinEl.classList.contains('power') || pinEl.classList.contains('ground')) {
+            errors.push(`Cannot assign a component to a Power or Ground pin.`);
+            return errors; // Also a hard stop.
+        }
+
+        // --- Compatibility and Resource Checks ---
+        // Compatibility Check (with corrected logic)
+        const pinTypes = ['gpio', 'i2c', 'spi', 'uart'];
+        const pinType = Array.from(pinEl.classList).find(cls => pinTypes.includes(cls));
+        const dataPinReqs = componentInfo.requires.data;
+        const pinCompatibility = {
+            gpio: ['gpio'],
+            i2c: ['gpio', 'i2c'],
+            spi: ['gpio', 'spi'],
+            uart: ['gpio', 'uart']
+        };
+        const fulfilledReqsByPin = pinType ? pinCompatibility[pinType] : [];
+        const isCompatible = dataPinReqs.some(req => fulfilledReqsByPin.includes(req));
+
+        if (!pinType || !isCompatible) {
+            errors.push(`Compatibility Error: ${componentInfo.name} requires a ${dataPinReqs.join(' or ')} data pin, but this is a ${pinType || 'special'} pin.`);
+        }
+
+        // Resource Availability Check (Power & Ground)
+        const requiredPower = componentInfo.requires.power || 0;
+        const requiredGround = componentInfo.requires.ground || 0;
+        let availablePower = 0;
+        let availableGround = 0;
+        document.querySelectorAll('.pin').forEach(p => {
+            if (!p.classList.contains('assigned')) {
+                if (p.classList.contains('power')) availablePower++;
+                if (p.classList.contains('ground')) availableGround++;
+            }
+        });
+
+        if (availablePower < requiredPower) {
+            errors.push(`Resource Error: ${componentInfo.name} requires ${requiredPower} power pin(s), but only ${availablePower} are available.`);
+        }
+        if (availableGround < requiredGround) {
+            errors.push(`Resource Error: ${componentInfo.name} requires ${requiredGround} ground pin(s), but only ${availableGround} are available.`);
+        }
+
+        return errors;
+    }
+
+    /**
      * Validates if a component can be assigned to a specific pin.
      * @param {object} componentInfo - The component being assigned.
      * @param {HTMLElement} pinEl - The target pin element.
@@ -1007,7 +1067,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const pinType = Array.from(pinEl.classList).find(cls => pinTypes.includes(cls));
         const dataPinReqs = componentInfo.requires.data;
 
-        if (!pinType || !dataPinReqs.includes(pinType)) {
+        // This logic correctly models that special function pins (i2c, spi) can also act as generic GPIOs,
+        // while components that need a special bus can only go on corresponding pins.
+        const pinCompatibility = {
+            gpio: ['gpio'],
+            i2c: ['gpio', 'i2c'],
+            spi: ['gpio', 'spi'],
+            uart: ['gpio', 'uart']
+        };
+
+        const fulfilledReqsByPin = pinType ? pinCompatibility[pinType] : [];
+        const isCompatible = dataPinReqs.some(req => fulfilledReqsByPin.includes(req));
+
+        if (!pinType || !isCompatible) {
             showValidationError(`Compatibility Error: ${componentInfo.name} requires a ${dataPinReqs.join(' or ')} data pin, but this is a ${pinType || 'special'} pin.`);
             return false;
         }
@@ -1053,12 +1125,14 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             pin.classList.remove('drag-over');
 
+            clearValidation(); // Clear previous errors
+
             if (!draggedComponent) return;
 
-            // Replace all the old validation logic with a single call
-            // to the new function.
-            if (isAssignmentValid(draggedComponent, pin)) {
-                // --- Update UI on successful drop ---
+            const validationErrors = getAssignmentValidationErrors(draggedComponent, pin);
+            if (validationErrors.length > 0) {
+                showValidationErrors(validationErrors);
+            } else {
                 assignComponentToPin(draggedComponent, pin);
             }
         });
@@ -1135,16 +1209,28 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 
-    function showValidationError(message) {
+    function showValidationErrors(messages, title = "Validation Errors") {
         validationFeedback.innerHTML = `
             <div class="feedback-header feedback-error">
-                <i class="fas fa-exclamation-circle"></i> Validation Error
+                <i class="fas fa-exclamation-circle"></i> ${title}
             </div>
-            <p>${message}</p>`;
+        `;
+        
+        const list = document.createElement('ul');
+        list.style.paddingLeft = '20px';
+        list.style.marginTop = '10px';
+        messages.forEach(msg => {
+            const item = document.createElement('li');
+            item.textContent = msg;
+            list.appendChild(item);
+        });
+        validationFeedback.appendChild(list);
+
         validationFeedback.classList.remove('hidden');
     }
 
     function clearValidation() {
+        validationFeedback.innerHTML = ''; // Clear content
         validationFeedback.classList.add('hidden');
     }
 
@@ -1962,6 +2048,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadProjectData(projectToLoad) {
         if (!projectToLoad) return;
 
+        clearValidation(); // Clear previous errors before loading
+
         // Use a more reliable way to clear the board without confirmation for loading
         pins.forEach(pin => {
             pin.classList.remove('assigned', 'conflict');
@@ -1970,7 +2058,6 @@ document.addEventListener('DOMContentLoaded', function() {
             delete pin.dataset.assignedFor;
         });
         projectComponentsList.innerHTML = '';
-        clearValidation();
         pinDetailsPanel.classList.add('hidden');
 
         const boardOption = document.querySelector(`.board-option[data-board="${projectToLoad.boardId}"]`);
@@ -1983,12 +2070,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (pinEl && componentConfig && componentItem) {
                 const componentInfo = { id: assignment.componentId, name: componentConfig.name, icon: componentItem.querySelector('i').outerHTML, requires: componentConfig.requires };
                 
-                // Add the validation check before assigning the component
-                if (isAssignmentValid(componentInfo, pinEl)) {
+                const validationErrors = getAssignmentValidationErrors(componentInfo, pinEl);
+                if (validationErrors.length === 0) {
                     assignComponentToPin(componentInfo, pinEl);
                 } else {
                     // Optional: Log an error to the console if an invalid assignment is found in the project file
                     console.warn(`Skipping invalid assignment from imported project: ${componentInfo.name} to pin ${pinEl.textContent.trim()}`);
+                    console.warn('Reasons:', validationErrors.join(', '));
                 }
             }
         });

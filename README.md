@@ -203,6 +203,13 @@ To add new boards, extend the `boardData` object with new board definitions, inc
 - **Images not loading:** Verify image paths and file existence.
 - **Export not working:** Check browser permissions for file downloads.
 
+### Testing
+
+This project uses QUnit for unit testing. To run the tests:
+
+1. Make sure you are running the project from a local web server (like VS Code's Live Server).
+2. Navigate to the `/tests/tests.html` file in your browser.
+
 **Browser Requirements:**
 
 - Modern browser with ES6 support
