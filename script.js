@@ -294,7 +294,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Image Loading Optimization ---
     boardImageEl.onload = function() {
         this.classList.add('loaded');
+        console.log('Board image loaded successfully.'); // Add this line
     };
+
+    boardImageEl.onerror = function() {
+        console.error('Error loading board image.');
+    };
+
+
 
     // Dark Mode Toggle
     darkModeToggle.addEventListener('click', () => {
@@ -943,6 +950,9 @@ document.addEventListener('DOMContentLoaded', function() {
             boardImageEl.classList.remove('loaded'); // Prepare for fade-in
             boardImageEl.src = board.image;
             boardImageEl.classList.remove('hidden');
+
+            boardImageEl.src = board.image + '?v=' + Date.now(); //Bust the cache
+
             // If image is already cached by the browser, onload might not fire, so check 'complete' property
             if (boardImageEl.complete) {
                 boardImageEl.classList.add('loaded');
