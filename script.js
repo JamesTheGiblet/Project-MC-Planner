@@ -259,7 +259,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const codeModalCloseBtn = document.getElementById('code-modal-close-btn');
     const documentationModal = document.getElementById('documentation-modal'); // This is the modal overlay
     const docsModalTitle = document.getElementById('docs-modal-title');
+    const docTabsContainer = document.querySelector('.doc-tabs');
     const boardsDocTab = document.getElementById('boards-doc-tab');
+    const componentsDocTab = document.getElementById('components-doc-tab');
     const copyDocsBtn = document.getElementById('copy-docs-btn');
     const copyCodeBtn = document.getElementById('copy-code-btn');
     const addComponentModalCloseBtn = document.getElementById('add-component-modal-close-btn');
@@ -423,6 +425,10 @@ document.addEventListener('DOMContentLoaded', function() {
         documentationModalCloseBtn.addEventListener('click', () => documentationModal.classList.add('hidden'));
     }
     copyDocsBtn.addEventListener('click', copyDocsToClipboard);
+
+    if (docTabsContainer) {
+        docTabsContainer.addEventListener('click', handleDocTabSwitch);
+    }
     
     // BOM Modal Listeners
     bomModalCloseBtn.addEventListener('click', () => bomModal.classList.add('hidden'));
@@ -1187,6 +1193,83 @@ document.addEventListener('DOMContentLoaded', function() {
         pinDetailsPanel.classList.remove('hidden');
     }
 
+    function handleDocTabSwitch(e) {
+        const clickedTab = e.target.closest('.doc-tab-btn');
+        if (!clickedTab || clickedTab.classList.contains('active')) {
+            return;
+        }
+
+        // Deactivate all tabs and hide all content
+        const allTabs = docTabsContainer.querySelectorAll('.doc-tab-btn');
+        const allContent = documentationModal.querySelectorAll('.doc-tab-content');
+
+        allTabs.forEach(tab => tab.classList.remove('active'));
+        allContent.forEach(content => content.classList.add('hidden'));
+
+        // Activate the clicked tab and show its content
+        clickedTab.classList.add('active');
+        const tabContentId = clickedTab.dataset.tab;
+        const contentToShow = document.getElementById(tabContentId);
+        if (contentToShow) {
+            contentToShow.classList.remove('hidden');
+        }
+
+        // If switching to components tab for the first time, render its content
+        if (tabContentId === 'components-doc-tab' && componentsDocTab.children.length === 0) {
+            renderComponentDocumentation();
+        }
+    }
+
+    function renderComponentDocumentation() {
+        let html = '<h2>Component Reference</h2><p>A quick reference for all available components in the planner.</p>';
+        const categories = getComponentsByCategory();
+        const renderedIds = new Set();
+
+        const generateComponentHTML = (id) => {
+            const component = componentData[id];
+            if (!component) return '';
+            renderedIds.add(id);
+
+            let depHtml = '';
+            if (component.dependencies && component.dependencies.length > 0) {
+                depHtml += '<h5>Dependencies:</h5><ul>';
+                component.dependencies.forEach(dep => {
+                    depHtml += `<li><strong>${dep.description}</strong> (${dep.value || dep.type}): ${dep.reason}</li>`;
+                });
+                depHtml += '</ul>';
+            }
+
+            let notesHtml = component.notes ? `<p><strong>Note:</strong> ${component.notes}</p>` : '';
+
+            return `
+                <div class="component-doc-item">
+                    <h4><i class="${component.icon}"></i> ${component.name}</h4>
+                    <p>${component.tip || ''}</p>
+                    <div class="component-doc-details">
+                        <div><strong>Voltage:</strong> ${component.voltage || 'N/A'}</div>
+                        <div><strong>Data Pins:</strong> ${component.requires.data.join(', ').toUpperCase()}</div>
+                    </div>
+                    ${notesHtml}
+                    ${depHtml}
+                </div>
+            `;
+        };
+
+        for (const [categoryName, componentIds] of Object.entries(categories)) {
+            const categoryHtml = componentIds.map(id => componentData[id] ? generateComponentHTML(id) : '').join('');
+            if (categoryHtml) {
+                html += `<div class="component-doc-category"><h3>${categoryName}</h3>${categoryHtml}</div>`;
+            }
+        }
+
+        // Render uncategorized components
+        const otherHtml = Object.keys(componentData).filter(id => !renderedIds.has(id)).map(generateComponentHTML).join('');
+        if (otherHtml) {
+            html += `<div class="component-doc-category"><h3>Other</h3>${otherHtml}</div>`;
+        }
+        componentsDocTab.innerHTML = html;
+    }
+
     function openDocumentationModal() {
         const activeBoardOption = document.querySelector('.board-option.active');
         if (!activeBoardOption) {
@@ -1199,6 +1282,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (docData) {
             docsModalTitle.textContent = docData.title;
             boardsDocTab.innerHTML = docData.content;
+
+            // Reset to the board tab every time the modal is opened
+            handleDocTabSwitch({ target: docTabsContainer.querySelector('[data-tab="boards-doc-tab"]') });
+
             documentationModal.classList.remove('hidden');
         } else {
             alert(`Sorry, no documentation is available for the selected board (${boardId}) yet.`);
@@ -1206,43 +1293,73 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function copyDocsToClipboard() {
-        const docsContentEl = boardsDocTab;
-        if (!docsContentEl.children.length) {
+        const activeTabContent = documentationModal.querySelector('.doc-tab-content:not(.hidden)');
+        if (!activeTabContent || !activeTabContent.children.length) {
             alert("There is no documentation content to copy.");
             return;
         }
-    
+
         let text = "";
         const title = docsModalTitle.textContent;
-        text += `${title}\n`;
-        text += "========================================\n\n";
-    
-        const nodes = docsContentEl.childNodes;
-        nodes.forEach(node => {
-            if (node.nodeType !== Node.ELEMENT_NODE) return;
-    
-            switch (node.tagName) {
-                case 'H4':
-                    text += `\n${node.textContent.toUpperCase()}\n--------------------\n`;
-                    break;
-                case 'P':
-                    const pClone = node.cloneNode(true);
-                    const link = pClone.querySelector('a');
-                    if (link) {
-                        link.textContent = `${link.textContent} (${link.href})`;
-                    }
-                    text += `${pClone.textContent}\n\n`;
-                    break;
-                case 'UL':
-                    const items = node.querySelectorAll('li');
-                    items.forEach(item => {
-                        text += `  - ${item.textContent.trim()}\n`;
+
+        if (activeTabContent.id === 'boards-doc-tab') {
+            text += `${title}\n`;
+            text += "========================================\n\n";
+
+            const nodes = activeTabContent.childNodes;
+            nodes.forEach(node => {
+                if (node.nodeType !== Node.ELEMENT_NODE) return;
+
+                switch (node.tagName) {
+                    case 'H4':
+                        text += `\n${node.textContent.toUpperCase()}\n--------------------\n`;
+                        break;
+                    case 'P':
+                        const pClone = node.cloneNode(true);
+                        const link = pClone.querySelector('a');
+                        if (link) {
+                            link.textContent = `${link.textContent} (${link.href})`;
+                        }
+                        text += `${pClone.textContent}\n\n`;
+                        break;
+                    case 'UL':
+                        const items = node.querySelectorAll('li');
+                        items.forEach(item => {
+                            text += `  - ${item.textContent.trim()}\n`;
+                        });
+                        text += '\n';
+                        break;
+                }
+            });
+        } else if (activeTabContent.id === 'components-doc-tab') {
+            text += "Component Reference\n";
+            text += "=====================\n\n";
+
+            const categories = activeTabContent.querySelectorAll('.component-doc-category');
+            categories.forEach(category => {
+                const categoryTitle = category.querySelector('h3').textContent;
+                text += `\n--- ${categoryTitle.toUpperCase()} ---\n\n`;
+
+                const components = category.querySelectorAll('.component-doc-item');
+                components.forEach(component => {
+                    const name = component.querySelector('h4').textContent.trim();
+                    text += `## ${name}\n`;
+
+                    // Get all relevant text content, preserving some structure
+                    const contentNodes = component.childNodes;
+                    contentNodes.forEach(node => {
+                        if (node.nodeType === Node.ELEMENT_NODE && node.tagName !== 'H4') {
+                            const cleanText = node.textContent.replace(/\s+/g, ' ').trim();
+                            if (cleanText) {
+                                text += `- ${cleanText}\n`;
+                            }
+                        }
                     });
                     text += '\n';
-                    break;
-            }
-        });
-    
+                });
+            });
+        }
+
         navigator.clipboard.writeText(text.trim()).then(() => {
             copyDocsBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
             setTimeout(() => {
