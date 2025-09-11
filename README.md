@@ -160,11 +160,20 @@ Open `index.html`:
 
 ## Adding More Components
 
-To expand your component library, add new component definitions to the `componentData` object in `data/rulebook.js`. This file is the single source of truth for all component data.
+You can expand your component library in two ways:
+
+### 1. Manually Add a Component
+
+To add a single new component, you can add its definition directly to the `componentData` object in `data/components.js`.
+
+### 2. Import a Component Pack
+
+You can import a JSON file containing multiple component definitions. In the "Add Components" section of the sidebar, click the "Import" icon (📁) and select your component pack file. The new components will be added and saved in your browser for future sessions.
 
 **Component Template:**
 
 ```javascript
+// This is the structure for a single component inside a pack file or data/components.js
 new_component_id: {
   name: 'Component Name',
   icon: 'fas fa-icon-name', // FontAwesome icon

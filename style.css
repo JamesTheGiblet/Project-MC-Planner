@@ -175,20 +175,25 @@ header {
     margin-bottom: 0;
 }
 
+.sidebar-actions {
+    display: flex;
+    gap: 8px;
+}
+
 .sidebar-action-btn {
     background: var(--light-gray);
     color: var(--dark);
     border: none;
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
-    font-size: 1.2rem;
-    font-weight: bold;
+    font-size: 0.9rem;
     cursor: pointer;
     transition: var(--transition);
     display: flex;
     justify-content: center;
     align-items: center;
+    line-height: 1;
 }
 
 .sidebar-action-btn:hover {

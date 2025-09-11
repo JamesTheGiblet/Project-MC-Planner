@@ -259,6 +259,29 @@ const componentData = {
         notes: 'Requires an Analog (ADC) pin. Resistance decreases as pressure increases.'
     },
 
+    ir_receiver: {
+        name: 'IR Receiver Sensor',
+        icon: 'fas fa-satellite-dish',
+        tip: 'Receives signals from infrared remote controls.',
+        voltage: '3.3V-5V',
+        complexity: 'simple',
+        requires: { data: ['gpio'], power: 1, ground: 1 },
+        dependencies: [],
+        notes: 'Outputs a demodulated signal. Best used with a dedicated IR library.'
+    },
+
+    water_level_sensor: {
+        name: 'Water Level Sensor',
+        icon: 'fas fa-water',
+        tip: 'Detects water level through exposed parallel traces.',
+        voltage: '3.3V-5V',
+        complexity: 'simple',
+        requires: { data: ['gpio'], power: 1, ground: 1 }, // ADC
+        dependencies: [],
+        warnings: ['Sensor traces will corrode over time with DC current. Power it from a GPIO pin only when reading to extend its life.'],
+        notes: 'Provides an analog value corresponding to the water level. Requires an ADC pin.'
+    },
+
     // --- DISPLAYS ---
     oled_128x64: {
         name: 'OLED Display (128x64)',
@@ -326,6 +349,18 @@ const componentData = {
         warnings: ['E-Ink displays have slow refresh rates and are not suitable for animation.'],
         notes: 'Requires multiple GPIO pins for SPI and control (DIN, CLK, CS, DC, RST, BUSY).',
         pins_required: 6
+    },
+
+    max7219_matrix: {
+        name: '8x8 LED Matrix (MAX7219)',
+        icon: 'fas fa-border-all',
+        tip: '8x8 LED matrix display driven by a MAX7219 chip.',
+        voltage: '5V',
+        complexity: 'moderate',
+        requires: { data: ['spi'], power: 1, ground: 1 },
+        dependencies: [],
+        notes: 'Requires 3 GPIO pins for SPI (Data, Clock, CS). Can be daisy-chained.',
+        pins_required: 3
     },
 
     // --- INPUT ---
@@ -438,6 +473,17 @@ const componentData = {
         }],
         notes: 'Each switch requires one GPIO pin. Useful for setting configuration modes.'
     },
+    capacitive_touch_sensor: {
+        name: 'Capacitive Touch Sensor',
+        icon: 'fas fa-hand-pointer',
+        tip: 'A simple touch-sensitive switch (TTP223B).',
+        voltage: '2V-5.5V',
+        complexity: 'simple',
+        requires: { data: ['gpio'], power: 1, ground: 1 },
+        dependencies: [],
+        notes: 'Outputs a digital HIGH signal when touched.'
+    },
+
 
     // --- OUTPUT ---
     led: {
@@ -553,6 +599,22 @@ const componentData = {
         warnings: ['Never point a laser at eyes. Can cause permanent damage.'],
         notes: 'Can be turned on and off with a simple digital HIGH/LOW signal.'
     },
+    vibration_motor: {
+        name: 'Vibration Motor',
+        icon: 'fas fa-vibrator',
+        tip: 'A small motor for haptic feedback, like in a phone.',
+        voltage: '3V-5V',
+        complexity: 'simple',
+        requires: { data: ['gpio'], power: 0, ground: 1 },
+        dependencies: [{
+            type: 'transistor',
+            description: 'Transistor (e.g., PN2222) and Diode',
+            purpose: 'motor_control',
+            reason: 'A transistor is needed to handle the motor\'s current, and a flyback diode protects the GPIO pin.',
+            required: true
+        }],
+        notes: 'Can be driven by a simple digital HIGH/LOW signal through a transistor.'
+    },
 
     // --- COMMUNICATION ---
     esp01: {
@@ -648,6 +710,29 @@ const componentData = {
         dependencies: [],
         notes: 'Connect the module\'s TX pin to the microcontroller\'s RX pin, and vice-versa.'
     },
+    can_bus_module: {
+        name: 'CAN Bus Module (MCP2515)',
+        icon: 'fas fa-bus',
+        tip: 'Allows communication on a CAN bus, common in automotive applications.',
+        voltage: '5V',
+        complexity: 'complex',
+        requires: { data: ['spi'], power: 1, ground: 1 },
+        dependencies: [],
+        notes: 'Requires SPI plus an interrupt pin (INT) for efficient operation.',
+        pins_required: 4
+    },
+    lora_module: {
+        name: 'LoRa Module (RFM95/SX127x)',
+        icon: 'fas fa-wifi',
+        tip: 'Long-range, low-power radio transceiver.',
+        voltage: '3.3V',
+        complexity: 'complex',
+        requires: { data: ['spi'], power: 1, ground: 1 },
+        dependencies: [],
+        warnings: ['Module is strictly 3.3V. 5V on data pins will damage it.'],
+        notes: 'Requires SPI plus GPIO pins for RESET and DIO0 (Interrupt).',
+        pins_required: 5
+    },
 
     // --- MOTORS ---
     stepper_28byj: {
@@ -729,6 +814,23 @@ const componentData = {
         }],
         notes: 'Requires 2 GPIO pins (STEP, DIR) for basic control. Microstepping pins can be tied to GND/VCC or controlled by GPIO.',
         pins_required: 2
+    },
+    stepper_nema17: {
+        name: 'NEMA 17 Stepper Motor',
+        icon: 'fas fa-cogs',
+        tip: 'A standard bipolar stepper motor for CNC and 3D printers.',
+        voltage: '12V-24V',
+        complexity: 'complex',
+        requires: { data: [], power: 0, ground: 0 },
+        dependencies: [{
+            type: 'driver_board',
+            description: 'Stepper Motor Driver (e.g., A4988, DRV8825)',
+            purpose: 'motor_control',
+            reason: 'Bipolar stepper motors require a specialized driver to energize coils in sequence.',
+            required: true
+        }],
+        warnings: ['Requires a separate power supply capable of handling the motor\'s current draw.'],
+        notes: 'Typically has 4 or 6 wires. Must be connected to a stepper driver, not directly to a microcontroller.'
     },
 
     // --- ADVANCED & MISC ---
@@ -851,6 +953,17 @@ const componentData = {
         notes: 'Control 8 outputs with just 3 GPIO pins (Data, Clock, Latch). Can be daisy-chained.',
         pins_required: 3
     },
+    pcf8574_expander: {
+        name: 'I2C GPIO Expander (PCF8574)',
+        icon: 'fas fa-project-diagram',
+        tip: 'Adds 8 extra GPIO pins using the I2C bus.',
+        voltage: '2.5V-6V',
+        complexity: 'moderate',
+        requires: { data: ['i2c'], power: 1, ground: 1 },
+        dependencies: [],
+        notes: 'Address can be changed with A0-A2 pins, allowing multiple expanders on one bus.',
+        i2cAddress: '0x20-0x27'
+    },
 
     // --- POWER MANAGEMENT ---
     breadboard_psu: {
@@ -882,5 +995,16 @@ const componentData = {
         requires: { data: [], power: 0, ground: 0 },
         dependencies: [],
         notes: 'Essential for providing a stable voltage to your project from a variable source like a battery.'
+    },
+    ina219_current_sensor: {
+        name: 'INA219 Current Sensor',
+        icon: 'fas fa-bolt',
+        tip: 'High-side DC current and power sensor with I2C interface.',
+        voltage: '3.3V-5V',
+        complexity: 'moderate',
+        requires: { data: ['i2c'], power: 1, ground: 1 },
+        dependencies: [],
+        notes: 'Measures voltage and current on a separate power rail up to 26V.',
+        i2cAddress: '0x40-0x4F'
     }
 };

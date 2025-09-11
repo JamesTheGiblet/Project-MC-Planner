@@ -176,31 +176,36 @@ function getCompatibleComponents(boardId) {
 function getComponentsByCategory() {
     const categories = {
         'Sensors': [
-            'dht22', 'bmp280', 'bme680', 'ds18b20', 'pir', 'ultrasonic_hcsr04', 
-            'mpu6050', 'mpu9250', 'photoresistor', 'soil_moisture', 'sound_sensor', 
-            'mq2_gas_sensor', 'hall_effect_sensor', 'flex_sensor', 'fsr'
+            'dht22', 'bmp280', 'bme680', 'ds18b20', 'pir', 'ultrasonic_hcsr04',
+            'mpu6050', 'mpu9250', 'photoresistor', 'soil_moisture', 'sound_sensor',
+            'mq2_gas_sensor', 'hall_effect_sensor', 'flex_sensor', 'fsr', 'ir_receiver',
+            'water_level_sensor'
         ],
         'Displays': [
-            'oled_128x64', 'lcd', 'tm1637', 'nokia_5110_lcd', 'e_ink_display'
+            'oled_128x64', 'lcd', 'tm1637', 'nokia_5110_lcd', 'e_ink_display',
+            'max7219_matrix'
         ],
         'Input': [
-            'pushButton', 'rotary_encoder', 'joystick', 'potentiometer', 
-            'matrix_keypad_4x4', 'dip_switch'
+            'pushButton', 'rotary_encoder', 'joystick', 'potentiometer',
+            'matrix_keypad_4x4', 'dip_switch', 'capacitive_touch_sensor'
         ],
         'Output': [
-            'led', 'rgb_led_cc', 'servo', 'buzzer', 'relay', 'laser_module'
+            'led', 'rgb_led_cc', 'servo', 'buzzer', 'relay', 'laser_module',
+            'vibration_motor'
         ],
         'Communication': [
-            'esp01', 'hc05', 'nrf24l01', 'rfid_mfrc522', 'gps_neo6m'
+            'esp01', 'hc05', 'nrf24l01', 'rfid_mfrc522', 'gps_neo6m', 'can_bus_module',
+            'lora_module'
         ],
         'Motors & Drivers': [
-            'stepper_28byj', 'l298n', 'dc_motor', 'a4988_driver'
+            'stepper_28byj', 'l298n', 'dc_motor', 'a4988_driver', 'stepper_nema17'
         ],
         'Advanced & ICs': [
-            'ws2812_strip', 'sd_card', 'rtc_ds3231', 'camera_ov2640', 'shift_register_74hc595'
+            'ws2812_strip', 'sd_card', 'rtc_ds3231', 'camera_ov2640',
+            'shift_register_74hc595', 'pcf8574_expander'
         ],
         'Power Management': [
-            'breadboard_psu', 'tp4056_charger', 'buck_boost_converter'
+            'breadboard_psu', 'tp4056_charger', 'buck_boost_converter', 'ina219_current_sensor'
         ]
     };
     return categories;
@@ -241,6 +246,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const confirmationModalCloseBtn = document.getElementById('confirmation-modal-close-btn');
     const confirmationCancelBtn = document.getElementById('confirmation-cancel-btn');
     const confirmationConfirmBtn = document.getElementById('confirmation-confirm-btn');
+    const importPackBtn = document.getElementById('import-pack-btn');
+    const importPackInput = document.getElementById('import-pack-input');
     const addComponentModal = document.getElementById('add-component-modal');
     const modalCloseBtn = document.getElementById('modal-close-btn');
     const bomModalCloseBtn = document.getElementById('bom-modal-close-btn');
@@ -303,6 +310,10 @@ document.addEventListener('DOMContentLoaded', function() {
     importJsonBtn.addEventListener('click', () => {
         importJsonInput.click();
     });
+
+    // Import Component Pack
+    importPackBtn.addEventListener('click', () => importPackInput.click());
+    importPackInput.addEventListener('change', handlePackImport);
     importJsonInput.addEventListener('change', handleJsonImport);
 
     // Placeholder button listeners
@@ -638,6 +649,68 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Helper Functions ---
 
+    function handlePackImport(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            try {
+                const packData = JSON.parse(event.target.result);
+
+                // Basic validation
+                if (typeof packData !== 'object' || packData === null || Array.isArray(packData)) {
+                    throw new Error("Component pack must be a JSON object.");
+                }
+
+                // More detailed validation
+                for (const [id, component] of Object.entries(packData)) {
+                    if (!component.name || !component.icon || !component.requires) {
+                        throw new Error(`Component '${id}' is missing required properties (name, icon, requires).`);
+                    }
+                    if (componentData[id]) {
+                        console.warn(`Component pack is overwriting existing component with ID: ${id}`);
+                    }
+                }
+
+                // Merge and save
+                Object.assign(componentData, packData);
+                saveImportedPack(packData); // Persist to localStorage
+
+                // Update UI
+                renderAndAttachComponentListeners();
+                updateComponentCounter();
+                alert(`Successfully imported ${Object.keys(packData).length} components!`);
+
+            } catch (error) {
+                alert(`Error importing component pack: ${error.message}`);
+                console.error("Error parsing component pack:", error);
+            } finally {
+                importPackInput.value = ''; // Reset input
+            }
+        };
+        reader.onerror = function() {
+            alert("Error reading the component pack file.");
+            importPackInput.value = '';
+        };
+        reader.readAsText(file);
+    }
+
+    function getImportedComponents() {
+        return JSON.parse(localStorage.getItem('pinpoint-imported-components') || '{}');
+    }
+
+    function saveImportedPack(packData) {
+        const importedComponents = getImportedComponents();
+        Object.assign(importedComponents, packData); // Add new components to the existing ones
+        localStorage.setItem('pinpoint-imported-components', JSON.stringify(importedComponents));
+    }
+
+    function loadImportedComponents() {
+        const importedComponents = getImportedComponents();
+        Object.assign(componentData, importedComponents);
+    }
+
     function showUpgradeModal() {
         upgradeModal.classList.remove('hidden');
     }
@@ -647,6 +720,14 @@ document.addEventListener('DOMContentLoaded', function() {
         confirmationModalMessage.textContent = message;
         onConfirmCallback = onConfirm;
         confirmationModal.classList.remove('hidden');
+    }
+
+    function updateComponentCounter() {
+        const componentCounter = document.querySelector('.component-counter');
+        if (componentCounter) {
+            const count = Object.keys(componentData).length;
+            componentCounter.innerHTML = `<i class="fas fa-boxes"></i> ${count} components available`;
+        }
     }
 
     function toggleCategory(e) {
@@ -1580,12 +1661,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load custom components from localStorage and merge with base data
     loadCustomComponents();
 
+    loadImportedComponents(); // Load components from packs
+
     // Update component counter to reflect the actual number of components
-    const componentCounter = document.querySelector('.component-counter');
-    if (componentCounter) {
-        const count = Object.keys(componentData).length;
-        componentCounter.innerHTML = `<i class="fas fa-boxes"></i> ${count} components available`;
-    }
+    updateComponentCounter();
 
     // Render the component list from data
     renderAndAttachComponentListeners();

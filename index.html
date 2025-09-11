@@ -74,7 +74,10 @@
             <div class="sidebar-section">
                 <div class="sidebar-title-container">
                     <h3 class="sidebar-title"><i class="fas fa-plus-circle"></i> Add Components</h3>
-                    <button id="add-component-btn" class="sidebar-action-btn" title="Add Custom Component">+</button>
+                    <div class="sidebar-actions">
+                        <button id="import-pack-btn" class="sidebar-action-btn" title="Import Component Pack"><i class="fas fa-file-import"></i></button>
+                        <button id="add-component-btn" class="sidebar-action-btn" title="Add Custom Component"><i class="fas fa-plus"></i></button>
+                    </div>
                 </div>
                 <p class="component-counter">
                     <i class="fas fa-boxes"></i> 150+ components and counting!
@@ -327,6 +330,7 @@
     </div>
 
     <input type="file" id="import-json-input" class="hidden" accept=".json,application/json" title="Import Project JSON File">
+    <input type="file" id="import-pack-input" class="hidden" accept=".json,application/json" title="Import Component Pack File">
 
     <script src="data/components.js"></script>
     <script src="data/boards.js"></script>
