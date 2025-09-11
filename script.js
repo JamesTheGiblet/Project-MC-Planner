@@ -257,7 +257,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const bomModalCloseBtn = document.getElementById('bom-modal-close-btn');
     const exportBomCsvBtn = document.getElementById('export-bom-csv-btn');
     const codeModalCloseBtn = document.getElementById('code-modal-close-btn');
-    const documentationModal = document.getElementById('documentation-modal');
+    const documentationModal = document.getElementById('documentation-modal'); // This is the modal overlay
+    const docsModalTitle = document.getElementById('docs-modal-title');
+    const boardsDocTab = document.getElementById('boards-doc-tab');
+    const copyDocsBtn = document.getElementById('copy-docs-btn');
     const copyCodeBtn = document.getElementById('copy-code-btn');
     const addComponentModalCloseBtn = document.getElementById('add-component-modal-close-btn');
     const componentSearch = document.getElementById('component-search');
@@ -397,7 +400,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Docs Button
-    documentationBtn.addEventListener('click', openDocumentationModal);
+    documentationBtn.addEventListener('click', openDocumentationModal); // This will now call the correct function
 
     if (documentationModal) {
         documentationModal.addEventListener('click', (e) => {
@@ -419,6 +422,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (documentationModalCloseBtn) {
         documentationModalCloseBtn.addEventListener('click', () => documentationModal.classList.add('hidden'));
     }
+    copyDocsBtn.addEventListener('click', copyDocsToClipboard);
     
     // BOM Modal Listeners
     bomModalCloseBtn.addEventListener('click', () => bomModal.classList.add('hidden'));
@@ -1183,7 +1187,7 @@ document.addEventListener('DOMContentLoaded', function() {
         pinDetailsPanel.classList.remove('hidden');
     }
 
-    function showBoardDocumentation() {
+    function openDocumentationModal() {
         const activeBoardOption = document.querySelector('.board-option.active');
         if (!activeBoardOption) {
             alert("Please select a board first.");
@@ -1194,22 +1198,22 @@ document.addEventListener('DOMContentLoaded', function() {
     
         if (docData) {
             docsModalTitle.textContent = docData.title;
-            docsModalContent.innerHTML = docData.content;
-            docsModal.classList.remove('hidden');
+            boardsDocTab.innerHTML = docData.content;
+            documentationModal.classList.remove('hidden');
         } else {
             alert(`Sorry, no documentation is available for the selected board (${boardId}) yet.`);
         }
     }
 
     function copyDocsToClipboard() {
-        const docsContentEl = document.getElementById('docs-modal-content');
+        const docsContentEl = boardsDocTab;
         if (!docsContentEl.children.length) {
             alert("There is no documentation content to copy.");
             return;
         }
     
         let text = "";
-        const title = document.getElementById('docs-modal-title').textContent;
+        const title = docsModalTitle.textContent;
         text += `${title}\n`;
         text += "========================================\n\n";
     
