@@ -90,7 +90,7 @@ PinPoint Planner offers two levels of assistance:
 | **Core Visual Planner** | Drag-and-drop components onto interactive board diagrams. | ✅ | ✅ | ✅ |
 | **Pin Validator** | Get real-time feedback on pin compatibility and conflicts. | ✅ | ✅ | ✅ |
 | **Project Management** | Save projects locally in your browser. | ✅ (3) | ✅ (Unlimited) | ✅ (Team) |
-| **Basic Export** | Export your project plan as a clean Markdown file. | ✅ | ✅ | ✅ |
+| **Basic Export** | Download or copy your project plan as a clean Markdown file. | ✅ | ✅ | ✅ |
 | **AI Smart Planner** | Automatically generate an optimized, conflict-free pin layout. | ❌ | ⭐ | ⭐ |
 | **Advanced Exports** | Export to JSON for data interchange and professional PDF documents. | ❌ | ✅ | ✅ |
 | **Wiring Diagrams** | Generate step-by-step wiring instructions for your project. | ❌ | ✅ | ✅ (Advanced) |

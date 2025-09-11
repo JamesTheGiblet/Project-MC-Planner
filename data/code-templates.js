@@ -106,6 +106,85 @@ const codeGenerator = {
                     loopCode.add('print(f"Temperature: {bmp280.temperature:.2f} C")');
                     loopCode.add('print(f"Pressure: {bmp280.pressure:.2f} hPa")');
                     break;
+                case 'bme680':
+                    imports.add('import board');
+                    imports.add('import adafruit_bme680');
+                    setupCode.add('i2c = board.I2C()');
+                    setupCode.add('bme680 = adafruit_bme680.Adafruit_BME680_I2C(i2c)');
+                    setupCode.add('bme680.sea_level_pressure = 1013.25');
+                    loopCode.add('print("\\n--- BME680 Sensor ---")');
+                    loopCode.add('print(f"Temperature: {bme680.temperature:.1f} C")');
+                    loopCode.add('print(f"Gas: {bme680.gas:.1f} ohm")');
+                    loopCode.add('print(f"Humidity: {bme680.humidity:.1f} %")');
+                    loopCode.add('print(f"Pressure: {bme680.pressure:.1f} hPa")');
+                    loopCode.add('print(f"Altitude: {bme680.altitude:.1f} meters")');
+                    break;
+                case 'pir':
+                    imports.add('import RPi.GPIO as GPIO');
+                    pinDefs.add(`PIR_PIN_${a.pin} = ${a.pin}`);
+                    setupCode.add('GPIO.setmode(GPIO.BCM)');
+                    setupCode.add(`GPIO.setup(PIR_PIN_${a.pin}, GPIO.IN)`);
+                    loopCode.add(`if GPIO.input(PIR_PIN_${a.pin}): print("PIR on pin ${a.pin} detected motion!")`);
+                    break;
+                case 'relay':
+                case 'laser_module':
+                    imports.add('import RPi.GPIO as GPIO');
+                    pinDefs.add(`RELAY_PIN_${a.pin} = ${a.pin}`);
+                    setupCode.add('GPIO.setmode(GPIO.BCM)');
+                    setupCode.add(`GPIO.setup(RELAY_PIN_${a.pin}, GPIO.OUT)`);
+                    loopCode.add(`print("Toggling relay/laser on pin ${a.pin}")`);
+                    loopCode.add(`GPIO.output(RELAY_PIN_${a.pin}, GPIO.HIGH)`);
+                    loopCode.add('time.sleep(1)');
+                    loopCode.add(`GPIO.output(RELAY_PIN_${a.pin}, GPIO.LOW)`);
+                    break;
+                case 'hall_effect_sensor':
+                    imports.add('import RPi.GPIO as GPIO');
+                    pinDefs.add(`HALL_PIN_${a.pin} = ${a.pin}`);
+                    setupCode.add('GPIO.setmode(GPIO.BCM)');
+                    setupCode.add(`GPIO.setup(HALL_PIN_${a.pin}, GPIO.IN, pull_up_down=GPIO.PUD_UP)`);
+                    loopCode.add(`if GPIO.input(HALL_PIN_${a.pin}) == GPIO.LOW: print("Hall effect sensor on pin ${a.pin} detected a magnet!")`);
+                    break;
+                case 'mpu6050':
+                    imports.add('import board');
+                    imports.add('import adafruit_mpu6050');
+                    setupCode.add('i2c = board.I2C()');
+                    setupCode.add('mpu = adafruit_mpu6050.MPU6050(i2c)');
+                    loopCode.add('print("\\n--- MPU6050 Sensor ---")');
+                    loopCode.add('print(f"Acceleration: X: {mpu.acceleration[0]:.2f}, Y: {mpu.acceleration[1]:.2f}, Z: {mpu.acceleration[2]:.2f} m/s^2")');
+                    loopCode.add('print(f"Gyro: X: {mpu.gyro[0]:.2f}, Y: {mpu.gyro[1]:.2f}, Z: {mpu.gyro[2]:.2f} dps")');
+                    loopCode.add('print(f"Temperature: {mpu.temperature:.2f} C")');
+                    break;
+                case 'rtc_ds3231':
+                    imports.add('import board');
+                    imports.add('import adafruit_ds3231');
+                    setupCode.add('i2c = board.I2C()');
+                    setupCode.add('ds3231 = adafruit_ds3231.DS3231(i2c)');
+                    loopCode.add('t = ds3231.datetime');
+                    loopCode.add('print(f"DS3231 RTC: {t.tm_year}/{t.tm_mon}/{t.tm_mday} {t.tm_hour}:{t.tm_min:02}:{t.tm_sec:02}")');
+                    break;
+                case 'ws2812_strip':
+                    imports.add('import board');
+                    imports.add('import neopixel');
+                    pinDefs.add('NUM_PIXELS = 10 # Change to the number of LEDs in your strip');
+                    pinDefs.add(`PIXEL_PIN = board.D${a.pin}`);
+                    setupCode.add('pixels = neopixel.NeoPixel(PIXEL_PIN, NUM_PIXELS, brightness=0.2, auto_write=False)');
+                    loopCode.add('print("Cycling NeoPixels...")');
+                    loopCode.add('pixels.fill((255, 0, 0)); pixels.show(); time.sleep(0.5)');
+                    loopCode.add('pixels.fill((0, 255, 0)); pixels.show(); time.sleep(0.5)');
+                    loopCode.add('pixels.fill((0, 0, 255)); pixels.show(); time.sleep(0.5)');
+                    break;
+                case 'photoresistor':
+                case 'soil_moisture':
+                case 'sound_sensor':
+                case 'mq2_gas_sensor':
+                case 'flex_sensor':
+                case 'fsr':
+                case 'water_level_sensor':
+                case 'potentiometer':
+                case 'joystick':
+                    loopCode.add(`# Reading analog sensor '${componentId}' on a Raspberry Pi requires an external ADC (e.g., MCP3008).`);
+                    loopCode.add(`# Please see Adafruit's guide on using an ADC with Raspberry Pi.`);
+                    break;
                 case 'ina219_current_sensor':
                     imports.add('import board');
                     imports.add('import adafruit_ina219');
@@ -216,50 +295,6 @@ finally:
                     loopCode.add(`float t = dht_${a.pin}.readTemperature();`);
                     loopCode.add(`if (isnan(h) || isnan(t)) { Serial.println("Failed to read from DHT sensor on pin ${a.pin}!"); return; }`);
                     loopCode.add(`Serial.print("DHT22 on pin ${a.pin} - Humidity: "); Serial.print(h); Serial.print(" %, Temp: "); Serial.print(t); Serial.println(" *C");`);
-                    break;
-                case 'pushButton':
-                    pinDefs.add(`#define BUTTON_PIN_${a.pin} ${a.pin}`);
-                    setupCode.add(`pinMode(BUTTON_PIN_${a.pin}, INPUT_PULLUP);`);
-                    loopCode.add(`if (digitalRead(BUTTON_PIN_${a.pin}) == LOW) { Serial.println("Button on pin ${a.pin} pressed!"); }`);
-                    break;
-                case 'servo':
-                    includes.add('#include <Servo.h>');
-                    pinDefs.add(`#define SERVO_PIN_${a.pin} ${a.pin}`);
-                    globals.add(`Servo servo_${a.pin};`);
-                    setupCode.add(`servo_${a.pin}.attach(SERVO_PIN_${a.pin});`);
-                    loopCode.add(`Serial.println("Moving servo on pin ${a.pin} to 0 degrees"); servo_${a.pin}.write(0); delay(1000);`);
-                    loopCode.add(`Serial.println("Moving servo on pin ${a.pin} to 90 degrees"); servo_${a.pin}.write(90); delay(1000);`);
-                    loopCode.add(`Serial.println("Moving servo on pin ${a.pin} to 180 degrees"); servo_${a.pin}.write(180); delay(1000);`);
-                    break;
-                case 'ultrasonic_hcsr04':
-                    pinDefs.add(`#define TRIG_PIN_${a.pin} ${a.pin}`);
-                    pinDefs.add(`#define ECHO_PIN_${a.pin} ${parseInt(a.pin) + 1} // IMPORTANT: Define your echo pin!`);
-                    globals.add(`long duration_${a.pin};`);
-                    globals.add(`int distance_${a.pin};`);
-                    setupCode.add(`pinMode(TRIG_PIN_${a.pin}, OUTPUT);`);
-                    setupCode.add(`pinMode(ECHO_PIN_${a.pin}, INPUT);`);
-                    loopCode.add(`digitalWrite(TRIG_PIN_${a.pin}, LOW); delayMicroseconds(2);`);
-                    loopCode.add(`digitalWrite(TRIG_PIN_${a.pin}, HIGH); delayMicroseconds(10);`);
-                    loopCode.add(`digitalWrite(TRIG_PIN_${a.pin}, LOW);`);
-                    loopCode.add(`duration_${a.pin} = pulseIn(ECHO_PIN_${a.pin}, HIGH);`);
-                    loopCode.add(`distance_${a.pin} = duration_${a.pin} * 0.034 / 2;`);
-                    loopCode.add(`Serial.print("HC-SR04 on pin ${a.pin} - Distance: "); Serial.print(distance_${a.pin}); Serial.println(" cm");`);
-                    break;
-                case 'buzzer':
-                    pinDefs.add(`#define BUZZER_PIN_${a.pin} ${a.pin}`);
-                    setupCode.add(`pinMode(BUZZER_PIN_${a.pin}, OUTPUT);`);
-                    loopCode.add(`Serial.println("Buzzer on pin ${a.pin}: Beep!");`);
-                    loopCode.add(`tone(BUZZER_PIN_${a.pin}, 1000); delay(500);`);
-                    loopCode.add(`noTone(BUZZER_PIN_${a.pin}); delay(500);`);
-                    break;
-                case 'bmp280':
-                    includes.add('#include <Wire.h>');
-                    includes.add('#include <Adafruit_Sensor.h>');
-                    includes.add('#include <Adafruit_BMP280.h>');
-                    globals.add('Adafruit_BMP280 bmp; // I2C');
-                    setupCode.add('if (!bmp.begin(0x76)) { Serial.println(F("Could not find a valid BMP280 sensor, check wiring!")); while (1); }');
-                    loopCode.add('Serial.print(F("BMP280 - Temp: ")); Serial.print(bmp.readTemperature()); Serial.print(" *C, ");');
-                    loopCode.add('Serial.print(F("Pressure: ")); Serial.print(bmp.readPressure() / 100.0F); Serial.println(" hPa");');
                     break;
                 case 'ina219_current_sensor':
                     includes.add('#include <Wire.h>');
