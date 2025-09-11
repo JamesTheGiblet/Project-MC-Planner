@@ -948,10 +948,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update board image
         if (board.image) {
             boardImageEl.classList.remove('loaded'); // Prepare for fade-in
-            boardImageEl.src = board.image;
+            // Set the src ONCE with a cache-busting parameter. This triggers the 'onload' handler.
+            boardImageEl.src = board.image + '?v=' + new Date().getTime();
             boardImageEl.classList.remove('hidden');
-
-            boardImageEl.src = board.image + '?v=' + Date.now(); //Bust the cache
 
             // If image is already cached by the browser, onload might not fire, so check 'complete' property
             if (boardImageEl.complete) {
