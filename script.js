@@ -175,13 +175,33 @@ function getCompatibleComponents(boardId) {
  */
 function getComponentsByCategory() {
     const categories = {
-        'Sensors': ['dht22', 'bmp280', 'bme680', 'ds18b20', 'pir', 'ultrasonic_hcsr04', 'mpu6050', 'mpu9250'],
-        'Displays': ['oled_128x64', 'lcd', 'tm1637'],
-        'Input': ['pushButton', 'rotary_encoder', 'joystick'],
-        'Output': ['led', 'servo', 'buzzer', 'relay'],
-        'Communication': ['esp01', 'hc05'],
-        'Motors': ['stepper_28byj', 'l298n'],
-        'Advanced': ['ws2812_strip', 'sd_card', 'rtc_ds3231', 'camera_ov2640'],
+        'Sensors': [
+            'dht22', 'bmp280', 'bme680', 'ds18b20', 'pir', 'ultrasonic_hcsr04', 
+            'mpu6050', 'mpu9250', 'photoresistor', 'soil_moisture', 'sound_sensor', 
+            'mq2_gas_sensor', 'hall_effect_sensor', 'flex_sensor', 'fsr'
+        ],
+        'Displays': [
+            'oled_128x64', 'lcd', 'tm1637', 'nokia_5110_lcd', 'e_ink_display'
+        ],
+        'Input': [
+            'pushButton', 'rotary_encoder', 'joystick', 'potentiometer', 
+            'matrix_keypad_4x4', 'dip_switch'
+        ],
+        'Output': [
+            'led', 'rgb_led_cc', 'servo', 'buzzer', 'relay', 'laser_module'
+        ],
+        'Communication': [
+            'esp01', 'hc05', 'nrf24l01', 'rfid_mfrc522', 'gps_neo6m'
+        ],
+        'Motors & Drivers': [
+            'stepper_28byj', 'l298n', 'dc_motor', 'a4988_driver'
+        ],
+        'Advanced & ICs': [
+            'ws2812_strip', 'sd_card', 'rtc_ds3231', 'camera_ov2640', 'shift_register_74hc595'
+        ],
+        'Power Management': [
+            'breadboard_psu', 'tp4056_charger', 'buck_boost_converter'
+        ]
     };
     return categories;
 }

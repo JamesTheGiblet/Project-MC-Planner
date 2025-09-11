@@ -1200,6 +1200,11 @@ body.dark-mode .board-name {
 .pin.spi { background-color: #8338ec; }
 .pin.uart { background-color: #38b000; }
 
+.pin.placeholder {
+    /* Hide placeholder pins used for layout, but keep them in the grid */
+    visibility: hidden;
+}
+
 .board-layout-2col-grid .pins-container {
     display: grid;
     grid-template-columns: repeat(2, auto);
