@@ -235,6 +235,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const upgradeModal = document.getElementById('upgrade-modal');
     const upgradeModalCloseBtn = document.getElementById('upgrade-modal-close-btn');
     const upgradeNowBtn = document.getElementById('upgrade-now-btn');
+    const confirmationModal = document.getElementById('confirmation-modal');
+    const confirmationModalTitle = document.getElementById('confirmation-modal-title');
+    const confirmationModalMessage = document.getElementById('confirmation-modal-message');
+    const confirmationModalCloseBtn = document.getElementById('confirmation-modal-close-btn');
+    const confirmationCancelBtn = document.getElementById('confirmation-cancel-btn');
+    const confirmationConfirmBtn = document.getElementById('confirmation-confirm-btn');
     const addComponentModal = document.getElementById('add-component-modal');
     const modalCloseBtn = document.getElementById('modal-close-btn');
     const bomModalCloseBtn = document.getElementById('bom-modal-close-btn');
@@ -328,13 +334,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Component Search
     componentSearch.addEventListener('input', handleComponentSearch);
 
-    // Projects List (Load and Delete)
-    projectsList.addEventListener('click', handleProjectsListClick);
-
     // Export to Markdown
     exportMdBtn.addEventListener('click', () => {
         generateMarkdownExport();
     });
+
+    // Projects List (Load and Delete)
+    projectsList.addEventListener('click', handleProjectsListClick);
 
     // Export to JSON
     exportJsonBtn.addEventListener('click', () => {
@@ -407,6 +413,23 @@ document.addEventListener('DOMContentLoaded', function() {
         handleAddComponent(e);
     });
 
+    // Confirmation Modal
+    let onConfirmCallback = null;
+    confirmationModalCloseBtn.addEventListener('click', () => confirmationModal.classList.add('hidden'));
+    confirmationCancelBtn.addEventListener('click', () => confirmationModal.classList.add('hidden'));
+    confirmationModal.addEventListener('click', (e) => {
+        if (e.target === confirmationModal) {
+            confirmationModal.classList.add('hidden');
+        }
+    });
+    confirmationConfirmBtn.addEventListener('click', () => {
+        if (typeof onConfirmCallback === 'function') {
+            onConfirmCallback();
+        }
+        confirmationModal.classList.add('hidden');
+        onConfirmCallback = null; // Reset callback
+    });
+
     // Upgrade Modal Listeners
     upgradeModalCloseBtn.addEventListener('click', () => upgradeModal.classList.add('hidden'));
     upgradeModal.addEventListener('click', (e) => {
@@ -464,8 +487,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (pinToClear) {
             unassignComponentFromPin(pinToClear);
-            clickedBadge.remove();
 
+            // Animate out and then remove the badge
+            clickedBadge.classList.add('removing');
+            clickedBadge.addEventListener('animationend', () => {
+                clickedBadge.remove();
+            }, { once: true });
+            
             // If the details of the cleared pin were open, close them
             if (!pinDetailsPanel.classList.contains('hidden')) {
                 const detailsTitle = pinDetailsPanel.querySelector('.pin-details-title');
@@ -612,6 +640,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function showUpgradeModal() {
         upgradeModal.classList.remove('hidden');
+    }
+
+    function showConfirmationModal(title, message, onConfirm) {
+        confirmationModalTitle.textContent = title;
+        confirmationModalMessage.textContent = message;
+        onConfirmCallback = onConfirm;
+        confirmationModal.classList.remove('hidden');
     }
 
     function toggleCategory(e) {
@@ -1411,13 +1446,20 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleProjectsListClick(e) {
         const deleteBtn = e.target.closest('.delete-project-btn');
         if (deleteBtn) {
-            const projectId = deleteBtn.closest('.component-item').dataset.projectId;
-            if (confirm("Are you sure you want to delete this project?")) {
-                let projects = getProjects();
-                projects = projects.filter(p => p.id !== projectId);
-                saveProjects(projects);
-                loadAndRenderProjects();
-            }
+            const projectItem = deleteBtn.closest('.component-item');
+            const projectId = projectItem.dataset.projectId;
+            const projectName = projectItem.querySelector('.project-item span').textContent;
+
+            showConfirmationModal(
+                'Delete Project',
+                `Are you sure you want to permanently delete the project "${projectName}"? This action cannot be undone.`,
+                () => {
+                    let projects = getProjects();
+                    projects = projects.filter(p => p.id !== projectId);
+                    saveProjects(projects);
+                    loadAndRenderProjects();
+                }
+            );
             return;
         }
 

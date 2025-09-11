@@ -310,6 +310,22 @@
         </div>
     </div>
 
+    <div id="confirmation-modal" class="modal-overlay hidden">
+        <div class="modal-content modal-content-narrow">
+            <div class="modal-header">
+                <h3 id="confirmation-modal-title">Confirm Action</h3>
+                <button id="confirmation-modal-close-btn" class="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmation-modal-message">Are you sure you want to proceed?</p>
+                <div class="form-actions">
+                    <button class="btn btn-outline" id="confirmation-cancel-btn">Cancel</button>
+                    <button class="btn btn-danger" id="confirmation-confirm-btn">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <input type="file" id="import-json-input" class="hidden" accept=".json,application/json" title="Import Project JSON File">
 
     <script src="data/components.js"></script>

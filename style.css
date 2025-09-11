@@ -123,6 +123,23 @@ header {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
+.modal-body .btn-outline {
+    border-color: var(--gray);
+    color: var(--dark);
+}
+
+.modal-body .btn-outline:hover {
+    background-color: var(--light-gray);
+}
+
+.btn-danger {
+    background-color: var(--danger);
+    color: white;
+}
+.btn-danger:hover {
+    background-color: color-mix(in srgb, var(--danger) 85%, black);
+}
+
 /* Sidebar Styles */
 .sidebar {
     grid-area: sidebar;
@@ -1252,6 +1269,13 @@ body.dark-mode .board-name {
     }
 }
 
+@keyframes badge-out {
+    to {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+
 .component-badge {
     padding: 10px 15px;
     background-color: var(--light);
@@ -1262,6 +1286,10 @@ body.dark-mode .board-name {
     transition: var(--transition);
     cursor: pointer;
     animation: badge-in 0.3s ease-out forwards;
+}
+
+.component-badge.removing {
+    animation: badge-out 0.3s ease-in forwards;
 }
 
 .component-badge:hover {
