@@ -278,6 +278,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let draggedComponent = null;
     let components = []; // This will be populated dynamically
     let pins = []; // This will be populated dynamically
+    let newlyImportedComponentIds = []; // To track new components for highlighting
 
     // --- Event Listeners ---
 
@@ -720,14 +721,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
 
+                // Store the IDs of the new components for highlighting
+                newlyImportedComponentIds = Object.keys(packData);
+
                 // Merge and save
                 Object.assign(componentData, packData);
                 saveImportedPack(packData); // Persist to localStorage
 
                 // Update UI
-                renderAndAttachComponentListeners();
+                renderAndAttachComponentListeners(); // This will now use the newlyImportedComponentIds
                 updateComponentCounter();
                 alert(`Successfully imported ${Object.keys(packData).length} components!`);
+
+                // Clear the temporary list after rendering. The CSS animation will handle the visual effect.
+                newlyImportedComponentIds = [];
 
             } catch (error) {
                 alert(`Error importing component pack: ${error.message}`);
@@ -800,6 +807,11 @@ document.addEventListener('DOMContentLoaded', function() {
             componentEl.dataset.component = id;
             componentEl.draggable = true;
             componentEl.title = data.tip || `Drag to add ${data.name} to the board`;
+
+            // If the component was just imported, add a class to highlight it
+            if (newlyImportedComponentIds.includes(id)) {
+                componentEl.classList.add('newly-imported');
+            }
 
             const iconEl = document.createElement('i');
             iconEl.className = `${data.icon} component-icon`;
@@ -971,6 +983,62 @@ document.addEventListener('DOMContentLoaded', function() {
         pins = document.querySelectorAll('.pin');
     }
 
+    /**
+     * Validates if a component can be assigned to a specific pin.
+     * @param {object} componentInfo - The component being assigned.
+     * @param {HTMLElement} pinEl - The target pin element.
+     * @returns {boolean} - True if the assignment is valid, false otherwise.
+     */
+    function isAssignmentValid(componentInfo, pinEl) {
+        // Check if the pin is already assigned
+        if (pinEl.classList.contains('assigned')) {
+            showValidationError(`Pin ${pinEl.textContent.trim()} is already assigned.`);
+            return false;
+        }
+
+        // Check if the pin is a power or ground pin
+        if (pinEl.classList.contains('power') || pinEl.classList.contains('ground')) {
+            showValidationError(`Cannot assign a component to a Power or Ground pin.`);
+            return false;
+        }
+
+        // Compatibility Check
+        const pinTypes = ['gpio', 'i2c', 'spi', 'uart'];
+        const pinType = Array.from(pinEl.classList).find(cls => pinTypes.includes(cls));
+        const dataPinReqs = componentInfo.requires.data;
+
+        if (!pinType || !dataPinReqs.includes(pinType)) {
+            showValidationError(`Compatibility Error: ${componentInfo.name} requires a ${dataPinReqs.join(' or ')} data pin, but this is a ${pinType || 'special'} pin.`);
+            return false;
+        }
+
+        // Resource Availability Check (Power & Ground)
+        const requiredPower = componentInfo.requires.power || 0;
+        const requiredGround = componentInfo.requires.ground || 0;
+
+        let availablePower = 0;
+        let availableGround = 0;
+
+        document.querySelectorAll('.pin').forEach(p => {
+            if (!p.classList.contains('assigned')) {
+                if (p.classList.contains('power')) availablePower++;
+                if (p.classList.contains('ground')) availableGround++;
+            }
+        });
+
+        if (availablePower < requiredPower) {
+            showValidationError(`Resource Error: ${componentInfo.name} requires ${requiredPower} power pin(s), but only ${availablePower} are available.`);
+            return false;
+        }
+        if (availableGround < requiredGround) {
+            showValidationError(`Resource Error: ${componentInfo.name} requires ${requiredGround} ground pin(s), but only ${availableGround} are available.`);
+            return false;
+        }
+
+        // If all checks pass, the assignment is valid
+        return true;
+    }
+
     function attachPinListeners(pin) {
         pin.addEventListener('dragover', (e) => {
             e.preventDefault(); // Allow drop
@@ -987,51 +1055,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (!draggedComponent) return;
 
-            // --- Validation ---
-            if (pin.classList.contains('assigned')) {
-                showValidationError(`Pin ${pin.textContent.trim()} is already assigned.`);
-                return;
+            // Replace all the old validation logic with a single call
+            // to the new function.
+            if (isAssignmentValid(draggedComponent, pin)) {
+                // --- Update UI on successful drop ---
+                assignComponentToPin(draggedComponent, pin);
             }
-            if (pin.classList.contains('power') || pin.classList.contains('ground')) {
-                showValidationError(`Cannot assign a component to a Power or Ground pin.`);
-                return;
-            }
-
-            // Compatibility Check
-            const pinTypes = ['gpio', 'i2c', 'spi', 'uart'];
-            const pinType = Array.from(pin.classList).find(cls => pinTypes.includes(cls));
-            const dataPinReqs = draggedComponent.requires.data;
-
-            if (!pinType || !dataPinReqs.includes(pinType)) {
-                showValidationError(`Compatibility Error: ${draggedComponent.name} requires a ${dataPinReqs.join(' or ')} data pin, but this is a ${pinType || 'special'} pin.`);
-                return;
-            }
-
-            // Resource Availability Check (Power & Ground)
-            const requiredPower = draggedComponent.requires.power || 0;
-            const requiredGround = draggedComponent.requires.ground || 0;
-
-            let availablePower = 0;
-            let availableGround = 0;
-
-            document.querySelectorAll('.pin').forEach(p => {
-                if (!p.classList.contains('assigned')) {
-                    if (p.classList.contains('power')) availablePower++;
-                    if (p.classList.contains('ground')) availableGround++;
-                }
-            });
-
-            if (availablePower < requiredPower) {
-                showValidationError(`Resource Error: ${draggedComponent.name} requires ${requiredPower} power pin(s), but only ${availablePower} are available.`);
-                return;
-            }
-            if (availableGround < requiredGround) {
-                showValidationError(`Resource Error: ${draggedComponent.name} requires ${requiredGround} ground pin(s), but only ${availableGround} are available.`);
-                return;
-            }
-
-            // --- Update UI on successful drop ---
-            assignComponentToPin(draggedComponent, pin);
         });
 
         pin.addEventListener('click', () => updatePinDetails(pin));
@@ -1933,7 +1962,16 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadProjectData(projectToLoad) {
         if (!projectToLoad) return;
 
-        clearBoardBtn.click(); // This will handle confirmation and clearing
+        // Use a more reliable way to clear the board without confirmation for loading
+        pins.forEach(pin => {
+            pin.classList.remove('assigned', 'conflict');
+            if (pin.dataset.originalTitle) pin.title = pin.dataset.originalTitle;
+            delete pin.dataset.assignedComponent;
+            delete pin.dataset.assignedFor;
+        });
+        projectComponentsList.innerHTML = '';
+        clearValidation();
+        pinDetailsPanel.classList.add('hidden');
 
         const boardOption = document.querySelector(`.board-option[data-board="${projectToLoad.boardId}"]`);
         if (boardOption) boardOption.click();
@@ -1944,7 +1982,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const componentItem = document.querySelector(`.component-item[data-component="${assignment.componentId}"]`);
             if (pinEl && componentConfig && componentItem) {
                 const componentInfo = { id: assignment.componentId, name: componentConfig.name, icon: componentItem.querySelector('i').outerHTML, requires: componentConfig.requires };
-                assignComponentToPin(componentInfo, pinEl);
+                
+                // Add the validation check before assigning the component
+                if (isAssignmentValid(componentInfo, pinEl)) {
+                    assignComponentToPin(componentInfo, pinEl);
+                } else {
+                    // Optional: Log an error to the console if an invalid assignment is found in the project file
+                    console.warn(`Skipping invalid assignment from imported project: ${componentInfo.name} to pin ${pinEl.textContent.trim()}`);
+                }
             }
         });
     }

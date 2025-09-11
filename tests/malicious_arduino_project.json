@@ -1,0 +1,31 @@
+{
+  "boardId": "uno",
+  "boardName": "Arduino Uno R3",
+  "name": "Malicious Test Project",
+  "assignments": [
+    {
+      "componentId": "dht22",
+      "componentName": "DHT22 Sensor",
+      "pin": "5V",
+      "pinType": "power"
+    },
+    {
+      "componentId": "led",
+      "componentName": "LED",
+      "pin": "13",
+      "pinType": "spi"
+    },
+    {
+      "componentId": "pushButton",
+      "componentName": "Push Button",
+      "pin": "13",
+      "pinType": "spi"
+    },
+    {
+        "componentId": "bme680",
+        "componentName": "BME680 Air Quality Sensor",
+        "pin": "7",
+        "pinType": "gpio"
+    }
+  ]
+}
