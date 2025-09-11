@@ -392,6 +392,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Docs Button
     documentationBtn.addEventListener('click', openDocumentationModal);
 
+    if (documentationModal) {
+        documentationModal.addEventListener('click', (e) => {
+            if (e.target === documentationModal) {
+                documentationModal.classList.add('hidden');
+            }
+        });
+    }
+
     // Code Modal Listeners
     codeModalCloseBtn.addEventListener('click', () => codeModal.classList.add('hidden'));
     codeModal.addEventListener('click', (e) => {
@@ -403,13 +411,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const documentationModalCloseBtn = document.getElementById('documentation-modal-close-btn');
     if (documentationModalCloseBtn) {
         documentationModalCloseBtn.addEventListener('click', () => documentationModal.classList.add('hidden'));
-    }
-    if (documentationModal) {
-        documentationModal.addEventListener('click', (e) => {
-            if (e.target === documentationModal) {
-                documentationModal.classList.add('hidden');
-            }
-        });
     }
     
     // BOM Modal Listeners

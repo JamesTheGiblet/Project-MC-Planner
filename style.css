@@ -137,7 +137,7 @@ header {
     color: white;
 }
 .btn-danger:hover {
-    background-color: #c72d2d; /* Approximate a darker shade of var(--danger) */
+    background-color: #c72b2e; /* Fallback for color-mix(in srgb, var(--danger) 85%, black) */
 }
 
 /* Sidebar Styles */
@@ -810,6 +810,10 @@ body.dark-mode .board-name {
     line-height: 1.8;
 }
 
+.modal-body.no-padding-top {
+    padding-top: 0;
+}
+
 .doc-tabs {
     display: flex;
     gap: 10px;
@@ -1038,8 +1042,8 @@ body.dark-mode .board-name {
 }
 
 .warnings-section {
-    background: color-mix(in srgb, var(--danger) 10%, transparent);
-    border: 1px solid #f9a3a3; /* fallback for color-mix(in srgb, var(--danger) 30%, transparent) */
+    background-color: rgba(249, 65, 68, 0.1);
+    border: 1px solid rgba(249, 65, 68, 0.3);
     border-radius: var(--border-radius);
     padding: 15px;
 }
