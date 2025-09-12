@@ -4,8 +4,8 @@ const boardData = {
         title: 'Raspberry Pi 4 Pinout',
         name: 'Raspberry Pi 4 Model B',
         image: 'images/Raspberry_Pi_4B_schematics_pins.png',
-        width: 1700,
-        height: 1067,
+        width: 2000,
+        height: 1367,
         pinLayout: { top: '9%', right: '24.3%', gap: '1px 6.9%' },
         layout: '2col-grid',
         pins: [
