@@ -4,8 +4,8 @@ const boardData = {
         title: 'Raspberry Pi 4 Pinout',
         name: 'Raspberry Pi 4 Model B',
         image: 'images/Raspberry_Pi_4B_schematics_pins.png',
-        width: 1600,
-        height: 967,
+        width: 1920,
+        height: 1160,
         pinLayout: { top: '9%', right: '30%', gap: '1px 6.9%' },
         layout: '2col-grid',
         pins: [
@@ -55,8 +55,8 @@ const boardData = {
         title: 'Arduino Uno Pinout',
         name: 'Arduino Uno R3',
         image: 'images/arduino_schematics_pins.png', // <-- Updated Image
-        width: 800,
-        height: 620,
+        width: 960,
+        height: 744,
         layout: '2col-grid', // Changed to 2-column grid
         pinLayout: { top: '10%', right: '10%', gap: '1.5% 60%' }, // Added for 2-col layout
         pins: [
@@ -120,8 +120,8 @@ const boardData = {
         title: 'ESP32 DevKitC Pinout',
         name: 'ESP32 DevKitC',
         image: 'images/ESP32_schematics_pins.png', // <-- Updated Image
-        width: 1060,
-        height: 800,
+        width: 1272,
+        height: 960,
         pinLayout: { top: '5.5%', right: '11%', gap: '2.2% 42.5%' }, // Adjusted layout for new image
         layout: '2col-grid',
         pins: [
