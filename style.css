@@ -1467,7 +1467,6 @@ pre[class*="language-"] {
     border-radius: 12px;
     padding: 0;
     overflow: hidden;
-    width: 100%;
     position: relative; /* Establish positioning context */
 }
 
