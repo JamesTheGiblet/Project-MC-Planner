@@ -4,9 +4,9 @@ const boardData = {
         title: 'Raspberry Pi 4 Pinout',
         name: 'Raspberry Pi 4 Model B',
         image: 'images/Raspberry_Pi_4B_schematics_pins.png',
-        width: 2100,
-        height: 1270,
-        pinLayout: { top: '9%', right: '30%', gap: '0.5% 5%' },
+        width: 4200, // doubled
+        height: 2540, // doubled
+        pinLayout: { top: '9%', right: '30%', gap: '1% 10%' }, // scaled up gap
         layout: '2col-grid',
         pins: [
             { name: '3.3V', type: 'power', title: 'Pin 1: 3.3V Power Rail' },
@@ -54,56 +54,38 @@ const boardData = {
     uno: {
         title: 'Arduino Uno Pinout',
         name: 'Arduino Uno R3',
-        image: 'images/arduino_schematics_pins.png', // <-- Updated Image
-        width: 1050,
-        height: 815,
-        layout: '2col-grid', // Changed to 2-column grid
-        pinLayout: { top: '14%', right: '10%', gap: '1.4% 60%' }, // Added for 2-col layout
+        image: 'images/arduino_schematics_pins.png',
+        width: 2100, // doubled
+        height: 1630, // doubled
+        layout: '2col-grid',
+        pinLayout: { top: '28%', right: '20%', gap: '2.8% 120%' }, // scaled up
         pins: [
-            // This interleaved layout creates two columns (13 left, 18 right).
-            // Placeholders are used to align the longer right column.
-
-            // Left Side (Power & Analog)      // Right Side (Digital)
             { name: 'IOREF', type: 'power', title: 'Power: I/O Voltage Reference' },
             { name: 'SCL', type: 'i2c', title: 'Pin SCL (I2C)' },
-
             { name: 'RESET', type: 'gpio', title: 'System Reset' },
             { name: 'SDA', type: 'i2c', title: 'Pin SDA (I2C)' },
-
             { name: '3.3V', type: 'power', title: 'Power: 3.3V Regulated Output' },
             { name: 'AREF', type: 'gpio', title: 'Power: Analog Reference' },
-
             { name: '5V', type: 'power', title: 'Power: 5V Regulated Output' },
             { name: 'GND', type: 'ground', title: 'Power: Ground' },
-
             { name: 'GND', type: 'ground', title: 'Power: Ground' },
             { name: '13', type: 'spi', title: 'Pin 13: Digital I/O (SPI SCK, LED)' },
-
             { name: 'GND', type: 'ground', title: 'Power: Ground' },
             { name: '12', type: 'spi', title: 'Pin 12: Digital I/O (SPI MISO)' },
-
             { name: 'VIN', type: 'power', title: 'Power: Voltage In (7-12V)' },
             { name: '11', type: 'spi', title: 'Pin 11: Digital I/O (SPI MOSI, PWM)' },
-
             { name: 'A0', type: 'gpio', title: 'Pin A0: Analog In' },
             { name: '10', type: 'spi', title: 'Pin 10: Digital I/O (SPI SS, PWM)' },
-
             { name: 'A1', type: 'gpio', title: 'Pin A1: Analog In' },
             { name: '9', type: 'gpio', title: 'Pin 9: Digital I/O (PWM)' },
-
             { name: 'A2', type: 'gpio', title: 'Pin A2: Analog In' },
             { name: '8', type: 'gpio', title: 'Pin 8: Digital I/O' },
-
             { name: 'A3', type: 'gpio', title: 'Pin A3: Analog In' },
             { name: '7', type: 'gpio', title: 'Pin 7: Digital I/O' },
-
             { name: 'A4', type: 'i2c', title: 'Pin A4: Analog In (I2C SDA)' },
             { name: '6', type: 'gpio', title: 'Pin 6: Digital I/O (PWM)' },
-
             { name: 'A5', type: 'i2c', title: 'Pin A5: Analog In (I2C SCL)' },
             { name: '5', type: 'gpio', title: 'Pin 5: Digital I/O (PWM)' },
-
-            // Placeholders for left column to align remaining right column pins
             { name: '', type: 'placeholder', title: '' },
             { name: '4', type: 'gpio', title: 'Pin 4: Digital I/O' },
             { name: '', type: 'placeholder', title: '' },
@@ -111,6 +93,24 @@ const boardData = {
             { name: '', type: 'placeholder', title: '' },
             { name: '2', type: 'gpio', title: 'Pin 2: Digital I/O (Interrupt)' },
             { name: '', type: 'placeholder', title: '' },
+            { name: '1', type: 'uart', title: 'Pin 1: Digital I/O (TX1)' },
+            { name: '', type: 'placeholder', title: '' },
+            { name: '0', type: 'uart', title: 'Pin 0: Digital I/O (RX0)' },
+        ]
+    },
+    esp32: {
+        title: 'ESP32 DevKitC Pinout',
+        name: 'ESP32 DevKitC',
+        image: 'images/ESP32_schematics_pins.png',
+        width: 2800, // doubled
+        height: 2112, // doubled
+        pinLayout: { top: '12%', right: '22%', gap: '8% 85%' }, // scaled up
+        layout: '2col-grid',
+        pins: [
+            { name: 'EN', type: 'power', title: 'EN: Enable (HIGH for normal operation)' },
+            { name: 'VP', type: 'gpio', title: 'GPIO36 (ADC1_0, SensVP)' },
+            { name: 'VN', type: 'gpio', title: 'GPIO39 (ADC1_3, SensVN)' },
+            { name: '34', 'type': 'gpio', title: 'GPIO34 (ADC1_6)' },
             { name: '1', type: 'uart', title: 'Pin 1: Digital I/O (TX1)' },
             { name: '', type: 'placeholder', title: '' },
             { name: '0', type: 'uart', title: 'Pin 0: Digital I/O (RX0)' },
