@@ -211,6 +211,19 @@ function getComponentsByCategory() {
 
 
 document.addEventListener('DOMContentLoaded', function() {
+    // --- HACK: Augment boardData with power specs as boards.js is not in context ---
+    // In a real scenario, this data would be in data/boards.js
+    if (boardData.rpi4) {
+        boardData.rpi4.powerInput = { min: 5, max: 5.1, nominal: 5, type: 'usb-c' };
+    }
+    if (boardData.uno) {
+        boardData.uno.powerInput = { min: 7, max: 12, nominal: 9, type: 'barrel', warning: 'Higher voltages (10-12V) are acceptable but can cause the 5V regulator to get hot.' };
+    }
+    if (boardData.esp32) {
+        boardData.esp32.powerInput = { min: 5, max: 5.1, nominal: 5, type: 'micro-usb' };
+    }
+    // --- END HACK ---
+
     // --- Element Selections ---
     const boardOptions = document.querySelectorAll('.board-option');
     const projectComponentsList = document.querySelector('.components-panel .components-list');
@@ -220,6 +233,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const plannerTitle = document.querySelector('.planner-title');
     const saveProjectBtn = document.getElementById('save-project-btn');
     const importJsonBtn = document.getElementById('import-json-btn');
+    const powerSourceSelect = document.getElementById('power-source-select');
     const exportMdBtn = document.getElementById('export-md-btn');
     const copyMdBtn = document.getElementById('copy-md-btn');
     const exportJsonBtn = document.getElementById('export-json-btn');
@@ -292,12 +306,14 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.add('active');
             const boardId = this.dataset.board;
             renderBoard(boardId);
+            validateBoardPowerSource();
         });
     });
 
     // --- Image Loading Optimization ---
     boardImageEl.onload = function() {
         this.classList.add('loaded');
+        validateBoardPowerSource(); // Also validate when image (and thus board) is fully rendered
         console.log('Board image loaded successfully.'); // Add this line
     };
 
@@ -318,6 +334,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Save Project Button
     saveProjectBtn.addEventListener('click', saveCurrentProject);
+
+    // Power Source Validation
+    powerSourceSelect.addEventListener('change', validateBoardPowerSource);
 
     // Import from JSON
     importJsonBtn.addEventListener('click', () => {
@@ -981,6 +1000,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Update the live collection of pins
         pins = document.querySelectorAll('.pin');
+    }
+
+    function validateBoardPowerSource() {
+        const selectedBoardId = document.querySelector('.board-option.active')?.dataset.board;
+        if (!selectedBoardId) return;
+
+        const boardInfo = boardData[selectedBoardId];
+        const selectedVoltage = parseInt(powerSourceSelect.value, 10);
+
+        // Clear any previous power-related errors before re-validating
+        clearValidation();
+
+        if (!boardInfo || !boardInfo.powerInput) {
+            console.warn(`Board ${selectedBoardId} has no power input specifications.`);
+            return;
+        }
+
+        const { min, max, nominal, type, warning } = boardInfo.powerInput;
+        let errors = [];
+
+        if (selectedVoltage < min) {
+            errors.push(`Power Warning: ${selectedVoltage}V is below the recommended minimum of ${min}V for the ${boardInfo.name}. The board may be unstable or fail to boot.`);
+        } else if (selectedVoltage > max) {
+            // This is a critical, destructive error.
+            errors.push(`DANGER: ${selectedVoltage}V will permanently damage the ${boardInfo.name}, which has a maximum input voltage of ${max}V.`);
+        } else if (warning && selectedVoltage > nominal) {
+            errors.push(`Power Warning: Using ${selectedVoltage}V may cause the onboard voltage regulator on the ${boardInfo.name} to overheat. ${warning}`);
+        }
+
+        if (errors.length > 0) {
+            showValidationErrors(errors, "Power Source Alert");
+        }
     }
 
     /**
