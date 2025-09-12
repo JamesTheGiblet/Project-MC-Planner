@@ -7,7 +7,7 @@ const boardData = {
         width: 2100,
         height: 1270,
         pinLayout: {
-            top: '6.9%', right: '30%', gap: '0.6% 5%' },
+            top: '6.9%', right: '30.2%', gap: '0.6% 5%' },
         layout: '2col-grid',
         pins: [
             { name: '3.3V', type: 'power', title: 'Pin 1: 3.3V Power Rail' },
