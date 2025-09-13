@@ -944,13 +944,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function toggleCategory(e) {
         const header = e.currentTarget;
         header.classList.toggle('collapsed');
-    
-        let nextEl = header.nextElementSibling;
-        while (nextEl && !nextEl.classList.contains('component-category-title')) {
-            // This simply toggles visibility. The search function will respect this.
-            nextEl.classList.toggle('hidden');
-            nextEl = nextEl.nextElementSibling;
-        }
+
+        // Instead of manually toggling items, just re-run the filter logic.
+        // This ensures that visibility is correctly determined by both the
+        // search term and the collapsed state of all categories.
+        handleComponentSearch({ target: componentSearch });
     }
 
     function renderAndAttachComponentListeners() {
@@ -1040,42 +1038,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function handleComponentSearch(e) {
         const searchTerm = e.target.value.toLowerCase();
-        const allComponents = addComponentsList.querySelectorAll('.component-item');
         const allCategories = addComponentsList.querySelectorAll('.component-category-title');
 
-        // First, filter the individual components based on search term
-        allComponents.forEach(component => {
-            const componentName = component.textContent.trim().toLowerCase();
-            const isVisible = componentName.includes(searchTerm);
-            component.classList.toggle('hidden', !isVisible);
-        });
-
-        // Then, re-apply collapsed state and hide empty categories
         allCategories.forEach(categoryTitle => {
             const isCollapsed = categoryTitle.classList.contains('collapsed');
+            let hasVisibleComponent = false;
             let nextEl = categoryTitle.nextElementSibling;
-            let hasVisibleComponentAfterSearch = false;
 
             while (nextEl && !nextEl.classList.contains('component-category-title')) {
-                if (isCollapsed) {
-                    // If category is collapsed, ensure all its items are hidden, overriding search results
-                    nextEl.classList.add('hidden');
-                } else {
-                    // If not collapsed, check if any items are visible (left visible by the search)
-                    if (nextEl.classList.contains('component-item') && !nextEl.classList.contains('hidden')) {
-                        hasVisibleComponentAfterSearch = true;
-                    }
+                const componentItem = nextEl;
+                const componentName = componentItem.textContent.trim().toLowerCase();
+                const matchesSearch = componentName.includes(searchTerm);
+
+                if (matchesSearch) {
+                    hasVisibleComponent = true;
                 }
+
+                // Determine visibility based on both search and collapsed state
+                const shouldBeHidden = isCollapsed || !matchesSearch;
+                componentItem.classList.toggle('hidden', shouldBeHidden);
+                
                 nextEl = nextEl.nextElementSibling;
             }
 
-            // Hide category title if it's not collapsed and has no visible children after search
-            if (!isCollapsed) {
-                categoryTitle.classList.toggle('hidden', !hasVisibleComponentAfterSearch);
-            } else {
-                // A collapsed category title should always be visible itself
-                categoryTitle.classList.remove('hidden');
-            }
+            // Hide category title if it has no matching children
+            categoryTitle.classList.toggle('hidden', !hasVisibleComponent);
         });
     }
 
