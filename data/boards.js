@@ -55,7 +55,7 @@ const boardData = {
     uno: {
         title: 'Arduino Uno Pinout',
         name: 'Arduino Uno R3',
-        image: 'images/arduino_schematics_pins.png',
+        image: 'images/arduino_UNO_schematics_pins.png',
         width: 1050,
         height: 815,
         layout: '2col-grid',
