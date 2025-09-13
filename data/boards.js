@@ -63,7 +63,7 @@ uno: {
         top: '33%', 
         left: '15%',      // Left column position
         right: '2.5%',     // Right column position
-        gap: '1% 60%'   // Horizontal gap between columns
+        gap: '1.5% 60%'   // Horizontal gap between columns
     },
     pins: [
         // LEFT COLUMN (Digital/Analog Pins) - Top to Bottom
