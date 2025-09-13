@@ -59,16 +59,12 @@ uno: {
     width: 1050,
     height: 815,
     layout: '2col-grid',
-    pinLayout: { 
-        left: {
-            top: '37%',  // 33% + 4% (approximately 40 units)
-            left: '15%'
-        },
-        right: {
-            top: '33%',
-            right: '2.5%'
-        },
-        gap: '1% 60%'   // Horizontal gap between columns
+    pinLayout: {
+        topRight: '33%',    // Right column top
+        topLeft: '70%',     // Left column top (33% + 37% = 70%)
+        left: '15%',
+        right: '2.5%',
+        gap: '1% 60%'
     },
     pins: [
         // LEFT COLUMN (Digital/Analog Pins) - Top to Bottom
