@@ -59,7 +59,7 @@ const boardData = {
         width: 1050,
         height: 815,
         layout: '2col-grid',
-        pinLayout: { top: '14%', right: '20%', gap: '1.4% 60%' }, // Added for 2-col layout
+        pinLayout: { top: '14%', right: '20%', gap: '0.8% 60%' }, // Added for 2-col layout
         pins: [
             // This interleaved layout creates two columns (13 left, 18 right).
             // Placeholders are used to align the longer right column.
