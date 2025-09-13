@@ -63,44 +63,41 @@ uno: {
         top: '23%', 
         left: '20%',      // Left column position
         right: '20%',     // Right column position
-        gap: '0.8% 60%'   // Reduced horizontal gap between columns
+        gap: '0.8% 60%'   // Horizontal gap between columns
     },
     pins: [
-        // Left column (top to bottom)
-        { name: 'IOREF', type: 'power', title: 'Power: I/O Voltage Reference', side: 'left' },
-        { name: 'RESET', type: 'gpio', title: 'System Reset', side: 'left' },
-        { name: '3.3V', type: 'power', title: 'Power: 3.3V Regulated Output', side: 'left' },
-        { name: '5V', type: 'power', title: 'Power: 5V Regulated Output', side: 'left' },
-        { name: 'GND', type: 'ground', title: 'Power: Ground', side: 'left' },
-        { name: 'GND', type: 'ground', title: 'Power: Ground', side: 'left' },
-        { name: 'VIN', type: 'power', title: 'Power: Voltage In (7-12V)', side: 'left' },
-        { name: 'A0', type: 'gpio', title: 'Pin A0: Analog In', side: 'left' },
-        { name: 'A1', type: 'gpio', title: 'Pin A1: Analog In', side: 'left' },
-        { name: 'A2', type: 'gpio', title: 'Pin A2: Analog In', side: 'left' },
-        { name: 'A3', type: 'gpio', title: 'Pin A3: Analog In', side: 'left' },
-        { name: 'A4', type: 'i2c', title: 'Pin A4: Analog In (I2C SDA)', side: 'left' },
-        { name: 'A5', type: 'i2c', title: 'Pin A5: Analog In (I2C SCL)', side: 'left' },
+        // LEFT COLUMN (Digital/Analog Pins) - Top to Bottom
+        { name: 'D0/RX', type: 'uart', title: 'Digital Pin 0: RX (Serial Receive)', side: 'left' },
+        { name: 'D1/TX', type: 'uart', title: 'Digital Pin 1: TX (Serial Transmit)', side: 'left' },
+        { name: 'D2', type: 'digital', title: 'Digital Pin 2 (External Interrupt)', side: 'left' },
+        { name: 'D3~', type: 'pwm', title: 'Digital Pin 3: PWM (External Interrupt)', side: 'left' },
+        { name: 'D4', type: 'digital', title: 'Digital Pin 4', side: 'left' },
+        { name: 'D5~', type: 'pwm', title: 'Digital Pin 5: PWM', side: 'left' },
+        { name: 'D6~', type: 'pwm', title: 'Digital Pin 6: PWM', side: 'left' },
+        { name: 'D7', type: 'digital', title: 'Digital Pin 7', side: 'left' },
+        { name: 'D8', type: 'digital', title: 'Digital Pin 8', side: 'left' },
+        { name: 'D9~', type: 'pwm', title: 'Digital Pin 9: PWM', side: 'left' },
+        { name: 'D10~', type: 'pwm', title: 'Digital Pin 10: PWM (SPI SS)', side: 'left' },
+        { name: 'D11~', type: 'pwm', title: 'Digital Pin 11: PWM (SPI COPI/MOSI)', side: 'left' },
+        { name: 'D12', type: 'spi', title: 'Digital Pin 12 (SPI CIPO/MISO)', side: 'left' },
+        { name: 'D13', type: 'spi', title: 'Digital Pin 13 (SPI SCK, Built-in LED)', side: 'left' },
         
-        // Right column (top to bottom)
-        { name: 'SCL', type: 'i2c', title: 'Pin SCL (I2C)', side: 'right' },
-        { name: 'SDA', type: 'i2c', title: 'Pin SDA (I2C)', side: 'right' },
-        { name: 'AREF', type: 'gpio', title: 'Power: Analog Reference', side: 'right' },
-        { name: 'GND', type: 'ground', title: 'Power: Ground', side: 'right' },
-        { name: '13', type: 'spi', title: 'Pin 13: Digital I/O (SPI SCK, LED)', side: 'right' },
-        { name: '12', type: 'spi', title: 'Pin 12: Digital I/O (SPI MISO)', side: 'right' },
-        { name: '11', type: 'spi', title: 'Pin 11: Digital I/O (SPI MOSI, PWM)', side: 'right' },
-        { name: '10', type: 'spi', title: 'Pin 10: Digital I/O (SPI SS, PWM)', side: 'right' },
-        { name: '9', type: 'gpio', title: 'Pin 9: Digital I/O (PWM)', side: 'right' },
-        { name: '8', type: 'gpio', title: 'Pin 8: Digital I/O', side: 'right' },
-        { name: '7', type: 'gpio', title: 'Pin 7: Digital I/O', side: 'right' },
-        { name: '6', type: 'gpio', title: 'Pin 6: Digital I/O (PWM)', side: 'right' },
-        { name: '5', type: 'gpio', title: 'Pin 5: Digital I/O (PWM)', side: 'right' },
-        { name: '4', type: 'gpio', title: 'Pin 4: Digital I/O', side: 'right' },
-        { name: '3', type: 'gpio', title: 'Pin 3: Digital I/O (PWM, Interrupt)', side: 'right' },
-        { name: '2', type: 'gpio', title: 'Pin 2: Digital I/O (Interrupt)', side: 'right' },
-        { name: '1', type: 'uart', title: 'Pin 1: Digital I/O (TX1)', side: 'right' },
-        { name: '0', type: 'uart', title: 'Pin 0: Digital I/O (RX0)', side: 'right' }
-    ],
+        // RIGHT COLUMN (Power & Analog Pins) - Top to Bottom
+        { name: 'GND', type: 'ground', title: 'Ground', side: 'right' },
+        { name: 'AREF', type: 'analog', title: 'Analog Reference Voltage', side: 'right' },
+        { name: 'A0', type: 'analog', title: 'Analog Input 0', side: 'right' },
+        { name: 'A1', type: 'analog', title: 'Analog Input 1', side: 'right' },
+        { name: 'A2', type: 'analog', title: 'Analog Input 2', side: 'right' },
+        { name: 'A3', type: 'analog', title: 'Analog Input 3', side: 'right' },
+        { name: 'A4', type: 'i2c', title: 'Analog Input 4 / I2C SDA', side: 'right' },
+        { name: 'A5', type: 'i2c', title: 'Analog Input 5 / I2C SCL', side: 'right' },
+        { name: 'RESET', type: 'system', title: 'Reset', side: 'right' },
+        { name: '3.3V', type: 'power', title: '3.3V Output (50mA max)', side: 'right' },
+        { name: '5V', type: 'power', title: '5V Output', side: 'right' },
+        { name: 'GND', type: 'ground', title: 'Ground', side: 'right' },
+        { name: 'GND', type: 'ground', title: 'Ground', side: 'right' },
+        { name: 'VIN', type: 'power', title: 'Voltage Input (6-20V)', side: 'right' }
+    ]
     },
     esp32: {
         title: 'ESP32 DevKitC Pinout',
