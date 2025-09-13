@@ -1285,43 +1285,53 @@ document.addEventListener('DOMContentLoaded', function() {
         validationFeedback.classList.add('hidden');
     }
 
+    function getPinTypeName(type) {
+        const typeNames = {
+            'power': 'Power',
+            'ground': 'Ground',
+            'gpio': 'General Purpose I/O',
+            'i2c': 'I²C Communication',
+            'spi': 'SPI Communication',
+            'uart': 'UART Serial'
+        };
+        return typeNames[type] || type.toUpperCase();
+    }
+
     function updatePinDetails(pin) {
         const pinName = pin.textContent.trim();
-        const pinType = pin.classList[1] || 'N/A';
+        const pinType = Array.from(pin.classList).find(cls => !['pin', 'assigned', 'conflict', 'drag-over'].includes(cls)) || 'N/A';
         const assignedComponentName = pin.dataset.assignedComponent || 'None';
         const assignedFor = pin.dataset.assignedFor;
-        let notesHTML = '';
-        let auxPinsHTML = '';
-
-        if (assignedFor) {
-            // This is an auxiliary (power/ground) pin
-            auxPinsHTML = `<div class="pin-info-item"><span class="pin-info-label">Assigned For:</span> <span>${assignedComponentName} (Pin ${assignedFor})</span></div>`;
-        } else if (assignedComponentName !== 'None') {
-            // This is a main data pin
-            const badge = projectComponentsList.querySelector(`[data-pin-number="${pinName}"]`);
-            if (badge && badge.dataset.auxPins) {
-                const auxPins = JSON.parse(badge.dataset.auxPins);
-                if (auxPins.length > 0) {
-                    auxPinsHTML = `<div class="pin-info-item"><span class="pin-info-label">Auxiliary Pins:</span> <span>${auxPins.join(', ')}</span></div>`;
+        const originalTitle = pin.dataset.originalTitle || 'No details available.';
+    
+        if (pin.classList.contains('placeholder')) {
+            pinDetailsPanel.classList.add('hidden');
+            return;
+        }
+    
+        let assignmentHTML = '';
+        if (assignedComponentName !== 'None') {
+            if (assignedFor) {
+                assignmentHTML = `<p><strong>Assignment:</strong> Auxiliary pin for ${assignedComponentName} on Pin ${assignedFor}</p>`;
+            } else {
+                const badge = projectComponentsList.querySelector(`[data-pin-number="${pinName}"]`);
+                let auxPinsHTML = '';
+                if (badge && badge.dataset.auxPins) {
+                    const auxPins = JSON.parse(badge.dataset.auxPins);
+                    if (auxPins.length > 0) {
+                        auxPinsHTML = `<p><strong>Auxiliary Pins Used:</strong> ${auxPins.join(', ')}</p>`;
+                    }
                 }
-            }
-
-            // Check if there are notes for the assigned component
-            const componentId = badge ? badge.dataset.componentId : null;
-            if (componentId && componentData[componentId] && componentData[componentId].notes) {
-                notesHTML = `<div class="pin-info-item"><span class="pin-info-label">Notes:</span> <span>${componentData[componentId].notes}</span></div>`;
+                assignmentHTML = `<p><strong>Assignment:</strong> ${assignedComponentName}</p>${auxPinsHTML}`;
             }
         }
-
+    
         pinDetailsPanel.innerHTML = `
-            <div class="pin-details-title">Selected Pin: ${pinName}</div>
-            <div class="pin-info">
-                <div class="pin-info-item"><span class="pin-info-label">Type:</span> <span>${pinType.toUpperCase()}</span></div>
-                <div class="pin-info-item"><span class="pin-info-label">Assignment:</span> <span>${assignedComponentName}</span></div>
-                ${assignedFor ? auxPinsHTML : ''}
-                ${notesHTML}
-                ${!assignedFor ? auxPinsHTML : ''}
-            </div>`;
+            <h3>Pin: ${pinName}</h3>
+            <p>${originalTitle}</p>
+            <p><strong>Type:</strong> ${getPinTypeName(pinType)}</p>
+            ${assignmentHTML}
+        `;
         pinDetailsPanel.classList.remove('hidden');
     }
 
