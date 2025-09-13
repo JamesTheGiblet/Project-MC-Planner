@@ -683,17 +683,23 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('component-name-input').value = component.name;
         document.getElementById('component-category-input').value = component.category || '';
         document.getElementById('component-icon-input').value = component.icon;
+        document.getElementById('component-tip-input').value = component.tip || '';
 
         // Determine template and set form state
         const dataReq = component.requires.data ? component.requires.data[0] : null;
-        if (dataReq === 'i2c') {
-            componentTemplateSelect.value = 'i2c';
-        } else if (dataReq === 'spi') {
-            componentTemplateSelect.value = 'spi';
-        } else if (dataReq === 'gpio') {
-            componentTemplateSelect.value = 'simple-gpio';
+        if (component.template) {
+            componentTemplateSelect.value = component.template;
         } else {
-            componentTemplateSelect.value = 'custom';
+            // Fallback for older custom components without a template property
+            if (dataReq === 'i2c') {
+                componentTemplateSelect.value = 'i2c';
+            } else if (dataReq === 'spi') {
+                componentTemplateSelect.value = 'spi';
+            } else if (dataReq === 'gpio') {
+                componentTemplateSelect.value = 'simple-gpio';
+            } else {
+                componentTemplateSelect.value = 'custom';
+            }
         }
         handleTemplateChange(); // Update UI based on template
 
@@ -761,6 +767,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const categoryInput = document.getElementById('component-category-input');
         const iconInput = document.getElementById('component-icon-input');
         const name = nameInput.value;
+        const tip = document.getElementById('component-tip-input').value.trim();
         const icon = iconInput.value;
         const dataType = componentDataSelect.value;
         const power = parseInt(document.getElementById('component-power-input').value, 10);
@@ -777,7 +784,8 @@ document.addEventListener('DOMContentLoaded', function() {
             name: name,
             icon: icon,
             category: category || 'Custom', // Use 'Custom' as a fallback
-            tip: 'Custom user component.', // Add a default tip
+            tip: tip || 'Custom user component.', // Add a default tip
+            template: template,
             requires: {
                 data: template !== 'motor' ? [dataType] : [],
                 power: power,

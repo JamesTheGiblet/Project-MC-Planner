@@ -293,18 +293,32 @@
             <div class="modal-body">
                 <form id="add-component-form">
                     <div class="form-group">
+                        <label for="component-template-select">Component Template</label>
+                        <select id="component-template-select">
+                            <option value="simple-gpio" selected>Simple GPIO Device</option>
+                            <option value="i2c">I2C Device</option>
+                            <option value="spi">SPI Device</option>
+                            <option value="motor">Motor / Driver</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="component-name-input">Component Name</label>
                         <input type="text" id="component-name-input" required placeholder="e.g., Temperature Sensor">
                     </div>
                     <div class="form-group">
                         <label for="component-category-input">Category</label>
-                        <input type="text" id="component-category-input" placeholder="e.g., Sensors (defaults to 'Custom')">
+                        <input type="text" id="component-category-input" placeholder="e.g., Sensors">
                     </div>
                     <div class="form-group">
                         <label for="component-icon-input">Font Awesome Icon</label>
                         <input type="text" id="component-icon-input" required placeholder="e.g., fas fa-thermometer-half">
                     </div>
                     <div class="form-group">
+                        <label for="component-tip-input">Description / Tip</label>
+                        <textarea id="component-tip-input" placeholder="e.g., A sensor for measuring temperature and humidity." rows="3"></textarea>
+                    </div>
+                    <div class="form-group" id="data-pin-type-group">
                         <label for="component-data-select">Data Pin Type</label>
                         <select id="component-data-select" required>
                             <option value="gpio">GPIO</option>
@@ -313,11 +327,19 @@
                             <option value="uart">UART</option>
                         </select>
                     </div>
-                    <div class="form-group">
+                    <div id="i2c-fields" class="form-group hidden">
+                        <label for="component-i2c-address-input">I2C Address (optional)</label>
+                        <input type="text" id="component-i2c-address-input" placeholder="e.g., 0x76 or 0x77">
+                    </div>
+                    <div id="spi-fields" class="form-group hidden">
+                        <label for="component-pins-required-input">Total GPIOs needed (for SPI + CS, etc.)</label>
+                        <input type="number" id="component-pins-required-input" min="1" value="3">
+                    </div>
+                    <div class="form-group" id="power-pins-group">
                         <label for="component-power-input">Power Pins Required</label>
                         <input type="number" id="component-power-input" min="0" value="1" required>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" id="ground-pins-group">
                         <label for="component-ground-input">Ground Pins Required</label>
                         <input type="number" id="component-ground-input" min="0" value="1" required>
                     </div>
@@ -397,12 +419,10 @@
     <div id="prompt-generator-modal" class="modal-overlay hidden">
         <div class="modal-content modal-lg">
             <div class="modal-header">
-                <h3><i class="fab fa-raspberry-pi raspberry-pi-icon"></i> Raspberry Pi 4B AI Prompt Generator</h3>
-                <h3 id="prompt-gen-modal-title"><i class="fab fa-raspberry-pi raspberry-pi-icon"></i> Raspberry Pi 4B AI Prompt Generator</h3>
+                <h3 id="prompt-gen-modal-title"><i class="fab fa-raspberry-pi"></i> Raspberry Pi 4B AI Prompt Generator</h3>
                 <button id="prompt-generator-modal-close-btn" class="modal-close-btn">&times;</button>
             </div>
             <div class="modal-body">
-                <p>Choose what you want to include in your AI prompt about the Raspberry Pi 4B:</p>
                 <p id="prompt-gen-modal-intro">Choose what you want to include in your AI prompt about the Raspberry Pi 4B:</p>
                 
                 <div class="prompt-gen-options-grid">
