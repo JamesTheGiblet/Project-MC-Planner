@@ -47,20 +47,26 @@ const boardDocumentation = {
                 <li><strong>Microcontroller:</strong> ATmega328P</li>
                 <li><strong>Operating Voltage:</strong> 5V</li>
                 <li><strong>Input Voltage (recommended):</strong> 7-12V</li>
+                <li><strong>Input Voltage (limits):</strong> 6-20V</li>
                 <li><strong>Digital I/O Pins:</strong> 14 (of which 6 provide PWM output)</li>
                 <li><strong>Analog Input Pins:</strong> 6</li>
-                <li><strong>Flash Memory:</strong> 32 KB</li>
+                <li><strong>DC Current per I/O Pin:</strong> 20 mA</li>
+                <li><strong>DC Current for 3.3V Pin:</strong> 50 mA</li>
+                <li><strong>Flash Memory:</strong> 32 KB (0.5 KB used by bootloader)</li>
+                <li><strong>SRAM:</strong> 2 KB</li>
+                <li><strong>EEPROM:</strong> 1 KB</li>
                 <li><strong>Clock Speed:</strong> 16 MHz</li>
             </ul>
 
             <h4>Pin Functions</h4>
-            <p>The Arduino Uno has a straightforward pin layout:</p>
+            <p>The Arduino Uno has a straightforward pin layout. The R3 revision added dedicated SDA and SCL pins near the AREF pin for I2C.</p>
             <ul>
                 <li><strong>Digital I/O (Pins 0-13):</strong> Can be used as either input or output.</li>
                 <li><strong>PWM (Pulse-Width Modulation):</strong> Pins marked with a tilde (~) (3, 5, 6, 9, 10, 11) can simulate an analog output, useful for dimming LEDs or controlling servo speed.</li>
-                <li><strong>I2C:</strong> Pins A4 (SDA) and A5 (SCL) are used for the I2C communication bus.</li>
+                <li><strong>I2C:</strong> Pins A4 (SDA) and A5 (SCL), as well as the dedicated SDA/SCL pins, are used for the I2C communication bus.</li>
                 <li><strong>SPI:</strong> Pins 10 (SS), 11 (MOSI), 12 (MISO), and 13 (SCK) are used for the SPI bus.</li>
                 <li><strong>UART:</strong> Pins 0 (RX) and 1 (TX) are used for serial communication.</li>
+                <li><strong>Interrupts:</strong> Pins 2 and 3 can be used for external interrupts.</li>
             </ul>
 
             <h4>Important Considerations</h4>
