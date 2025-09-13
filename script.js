@@ -271,6 +271,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const codeModalCloseBtn = document.getElementById('code-modal-close-btn');
     const documentationModal = document.getElementById('documentation-modal'); // This is the modal overlay
     const docsModalTitle = document.getElementById('docs-modal-title');
+    const promptGeneratorBtn = document.getElementById('prompt-generator-btn');
+    const promptGeneratorModal = document.getElementById('prompt-generator-modal');
+    const promptGeneratorModalCloseBtn = document.getElementById('prompt-generator-modal-close-btn');
     const docTabsContainer = document.querySelector('.doc-tabs');
     const boardsDocTab = document.getElementById('boards-doc-tab');
     const componentsDocTab = document.getElementById('components-doc-tab');
@@ -285,6 +288,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const boardImageEl = boardEl.querySelector('.board-image');
     const importJsonInput = document.getElementById('import-json-input');
     const addComponentForm = document.getElementById('add-component-form');
+    const componentTemplateSelect = document.getElementById('component-template-select');
+    const i2cFields = document.getElementById('i2c-fields');
+    const spiFields = document.getElementById('spi-fields');
+    const dataPinTypeGroup = document.getElementById('data-pin-type-group');
+    const powerPinsGroup = document.getElementById('power-pins-group');
+    const groundPinsGroup = document.getElementById('ground-pins-group');
+    const componentDataSelect = document.getElementById('component-data-select');
+
     const boardName = document.querySelector('.board-name');
     const pinsContainer = document.querySelector('.pins-container');
 
@@ -487,6 +498,9 @@ document.addEventListener('DOMContentLoaded', function() {
         handleAddComponent(e);
     });
 
+    // Add Component Template Change Listener
+    componentTemplateSelect.addEventListener('change', handleTemplateChange);
+
     // Confirmation Modal
     let onConfirmCallback = null;
     confirmationModalCloseBtn.addEventListener('click', () => confirmationModal.classList.add('hidden'));
@@ -580,6 +594,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Component Management Functions ---
 
+    function handleTemplateChange() {
+        const template = componentTemplateSelect.value;
+
+        // Hide all dynamic fields first
+        i2cFields.classList.add('hidden');
+        spiFields.classList.add('hidden');
+        dataPinTypeGroup.classList.remove('hidden');
+        powerPinsGroup.classList.remove('hidden');
+        groundPinsGroup.classList.remove('hidden');
+
+        // Enable data select by default, disable for specific templates
+        componentDataSelect.disabled = false;
+
+        switch (template) {
+            case 'i2c':
+                i2cFields.classList.remove('hidden');
+                componentDataSelect.value = 'i2c';
+                componentDataSelect.disabled = true;
+                break;
+            case 'spi':
+                spiFields.classList.remove('hidden');
+                componentDataSelect.value = 'spi';
+                componentDataSelect.disabled = true;
+                break;
+            case 'simple-gpio':
+                componentDataSelect.value = 'gpio';
+                componentDataSelect.disabled = true;
+                break;
+            case 'motor':
+                dataPinTypeGroup.classList.add('hidden'); // Motors are often controlled by drivers, not direct data pins
+                break;
+            // 'custom' case falls through to default
+            default: // Custom
+                break;
+        }
+    }
+
     function openEditComponentModal(componentId) {
         const component = componentData[componentId];
         if (!component) return;
@@ -588,9 +639,27 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('component-name-input').value = component.name;
         document.getElementById('component-category-input').value = component.category || '';
         document.getElementById('component-icon-input').value = component.icon;
-        document.getElementById('component-data-select').value = component.requires.data[0];
-        document.getElementById('component-power-input').value = component.requires.power || 0;
-        document.getElementById('component-ground-input').value = component.requires.ground || 0;
+
+        // Determine template and set form state
+        const dataReq = component.requires.data ? component.requires.data[0] : null;
+        if (dataReq === 'i2c') {
+            componentTemplateSelect.value = 'i2c';
+        } else if (dataReq === 'spi') {
+            componentTemplateSelect.value = 'spi';
+        } else if (dataReq === 'gpio') {
+            componentTemplateSelect.value = 'simple-gpio';
+        } else {
+            componentTemplateSelect.value = 'custom';
+        }
+        handleTemplateChange(); // Update UI based on template
+
+        // Populate fields
+        if (dataReq) componentDataSelect.value = dataReq;
+        if (component.i2cAddress) document.getElementById('component-i2c-address-input').value = component.i2cAddress;
+        if (component.pins_required) document.getElementById('component-pins-required-input').value = component.pins_required;
+
+        document.getElementById('component-power-input').value = component.requires.power ?? 1;
+        document.getElementById('component-ground-input').value = component.requires.ground ?? 1;
 
         // Change modal to "edit" mode
         addComponentModal.querySelector('h3').textContent = 'Edit Custom Component';
@@ -649,27 +718,41 @@ document.addEventListener('DOMContentLoaded', function() {
         const iconInput = document.getElementById('component-icon-input');
         const name = nameInput.value;
         const icon = iconInput.value;
-        const dataType = document.getElementById('component-data-select').value;
+        const dataType = componentDataSelect.value;
         const power = parseInt(document.getElementById('component-power-input').value, 10);
         const ground = parseInt(document.getElementById('component-ground-input').value, 10);
-    
+        const template = componentTemplateSelect.value;
+
         const category = categoryInput.value.trim();
         if (!name.trim() || !icon.trim()) {
             alert("Please fill out Name and Icon fields.");
             return;
         }
-    
+
         const componentDefinition = {
             name: name,
             icon: icon,
             category: category || 'Custom', // Use 'Custom' as a fallback
             tip: 'Custom user component.', // Add a default tip
             requires: {
-                data: [dataType],
+                data: template !== 'motor' ? [dataType] : [],
                 power: power,
                 ground: ground
             }
         };
+
+        // Add template-specific properties
+        if (template === 'i2c') {
+            const i2cAddress = document.getElementById('component-i2c-address-input').value.trim();
+            if (i2cAddress) {
+                componentDefinition.i2cAddress = i2cAddress;
+            }
+        } else if (template === 'spi') {
+            const pinsRequired = parseInt(document.getElementById('component-pins-required-input').value, 10);
+            if (pinsRequired > 0) {
+                componentDefinition.pins_required = pinsRequired;
+            }
+        }
 
         if (editingId) {
             // --- EDIT MODE ---
@@ -692,6 +775,9 @@ document.addEventListener('DOMContentLoaded', function() {
         delete addComponentForm.dataset.editingId;
         addComponentModal.querySelector('h3').textContent = 'Add Custom Component';
         addComponentForm.querySelector('button[type="submit"]').textContent = 'Add Component';
+        // Reset dynamic form to default state
+        componentTemplateSelect.value = 'simple-gpio';
+        handleTemplateChange();
     }
 
     function getCustomComponents() {
