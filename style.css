@@ -1774,7 +1774,6 @@ body.dark-mode .board-name {
 .legend-color.legend-i2c { background-color: var(--i2c); }
 .legend-color.legend-spi { background-color: var(--spi); }
 .legend-color.legend-uart { background-color: var(--uart); }
-}
 
 .upgrade-cta {
     background: linear-gradient(135deg, var(--primary), var(--secondary));
@@ -2179,5 +2178,4 @@ pre[class*="language-"] {
     max-height: 300px;
     overflow-y: auto;
     color: var(--dark);
-}
 }

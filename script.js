@@ -211,6 +211,48 @@ function getComponentsByCategory() {
 
 
 document.addEventListener('DOMContentLoaded', function() {
+    const promptGeneratorData = {
+        rpi4: {
+            name: 'Raspberry Pi 4B',
+            icon: 'fab fa-raspberry-pi',
+            color: '#c51d4e',
+            prompts: {
+                specs: "- Detailed technical specifications: processor architecture, RAM options, connectivity (WiFi, Bluetooth, Ethernet), USB ports, video output capabilities, power requirements, and physical dimensions.\n",
+                pinout: "- GPIO pinout details: complete 40-pin header layout, power pins (3.3V, 5V, GND), special function pins (I2C, SPI, UART), and PWM-capable GPIO pins. Include pin numbering schemes (BCM vs Board).\n",
+                setup: "- Setup and configuration: recommended operating systems, installation process (Raspberry Pi Imager), initial configuration (raspi-config), network setup, and essential post-installation steps.\n",
+                programming: "- Programming options: supported languages (Python, C/C++, JavaScript), recommended IDEs and tools, GPIO access libraries (RPi.GPIO, gpiozero), and communication protocol libraries (I2C, SPI).\n",
+                projects: "- Project ideas: beginner to advanced project suggestions (home automation, robotics, media center, IoT applications), required components, and implementation guidance.\n",
+                troubleshooting: "- Common troubleshooting: power issues, SD card problems, boot failures, peripheral connectivity issues, overheating, and performance optimization techniques.\n"
+            }
+        },
+        uno: {
+            name: 'Arduino Uno R3',
+            icon: 'fas fa-microchip',
+            color: '#00979D',
+            prompts: {
+                specs: "- Detailed technical specifications: ATmega328P microcontroller, operating voltage (5V), input voltage range, memory (Flash, SRAM, EEPROM), clock speed, and current limits per I/O pin.\n",
+                pinout: "- Pinout details: Digital I/O pins (0-13), PWM pins (~), Analog Input pins (A0-A5), and special function pins for I2C (SDA, SCL), SPI (SS, MOSI, MISO, SCK), and UART (RX, TX).\n",
+                setup: "- Setup and configuration: installing the Arduino IDE, connecting the board, selecting the correct board and port, and uploading a basic 'Blink' sketch.\n",
+                programming: "- Programming with the Arduino language (C/C++ based): core functions like pinMode(), digitalWrite(), analogRead(), and using essential libraries like Wire.h (for I2C) and SPI.h.\n",
+                projects: "- Project ideas: beginner projects like blinking LEDs and reading sensors, to more advanced projects like controlling motors, building simple robots, or creating interactive art.\n",
+                troubleshooting: "- Common troubleshooting: board not recognized by computer, sketch upload errors, power issues, and debugging techniques using the Serial Monitor.\n"
+            }
+        },
+        esp32: {
+            name: 'ESP32 DevKitC',
+            icon: 'fas fa-wifi',
+            color: '#E63946',
+            prompts: {
+                specs: "- Detailed technical specifications: Tensilica Xtensa LX6 dual-core processor, integrated Wi-Fi and Bluetooth, flexible GPIO multiplexing, and on-chip sensors (Hall effect, touch sensors).\n",
+                pinout: "- Pinout details: flexible GPIO mapping for I2C, SPI, and UART. Explain the concept of pin multiplexing. Mention important strapping pins (e.g., GPIO 0, 2, 12) and their role during boot-up.\n",
+                setup: "- Setup and configuration: setting up the Arduino IDE or PlatformIO for ESP32 development, installing board packages, and flashing a basic Wi-Fi scanning sketch.\n",
+                programming: "- Programming options: using the Arduino framework or Espressif's own ESP-IDF. Cover key libraries for Wi-Fi, Bluetooth, and using the dual-core capabilities.\n",
+                projects: "- Project ideas: IoT projects like web servers, MQTT clients, Bluetooth beacons, and low-power deep sleep applications for battery-powered devices.\n",
+                troubleshooting: "- Common troubleshooting: 'brownout detector was triggered' errors, Wi-Fi connection issues, flashing failures, and issues related to strapping pins.\n"
+            }
+        }
+    };
+
     // --- HACK: Augment boardData with power specs as boards.js is not in context ---
     // In a real scenario, this data would be in data/boards.js
     if (boardData.rpi4) {
@@ -274,6 +316,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const promptGeneratorBtn = document.getElementById('prompt-generator-btn');
     const promptGeneratorModal = document.getElementById('prompt-generator-modal');
     const promptGeneratorModalCloseBtn = document.getElementById('prompt-generator-modal-close-btn');
+    const promptGenModalTitle = document.getElementById('prompt-gen-modal-title');
+    const promptGenModalIntro = document.getElementById('prompt-gen-modal-intro');
     const docTabsContainer = document.querySelector('.doc-tabs');
     const boardsDocTab = document.getElementById('boards-doc-tab');
     const componentsDocTab = document.getElementById('components-doc-tab');
