@@ -60,7 +60,7 @@ uno: {
     height: 815,
     layout: '2col-grid',
     pinLayout: {
-        topRight: '33%',    // Right column top
+        topRight: '50%',    // Right column top
         topLeft: '70%',     // Left column top (33% + 37% = 70%)
         left: '15%',
         right: '2.5%',
