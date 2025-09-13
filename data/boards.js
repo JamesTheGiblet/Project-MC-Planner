@@ -60,9 +60,9 @@ uno: {
     height: 815,
     layout: '2col-grid',
     pinLayout: { 
-        top: '23%', 
+        top: '27%', 
         left: '15%',      // Left column position
-        right: '15%',     // Right column position
+        right: '5%',     // Right column position
         gap: '0.8% 60%'   // Horizontal gap between columns
     },
     pins: [
