@@ -79,7 +79,7 @@ PinPoint Planner offers two levels of assistance:
 | Wiring Diagrams        | ✅ Text-based Instructions | ✅ Fritzing-style Diagrams            | ✅ Advanced Diagrams                          |
 | Code Generation        | ✅ Arduino/Python Starter Code | ✅ Arduino/Python Starter Code        | ✅ Custom Code Templates                      |
 | Bill of Materials (BOM)  | ✅ Copy as Text       | ✅ Export to CSV                       | ✅ Export to CSV                               |
-| Custom Components      | ❌                    | ✅ Add Custom Components              | ✅ Shared Team Library                        |
+| Custom Components      | ✅ (Up to 5)          | ✅ Unlimited Custom Components        | ✅ Shared Team Library                        |
 | Collaboration          | ❌                    | ❌                                   | ✅ Real-time Editing                          |
 
 ---
@@ -97,7 +97,7 @@ PinPoint Planner offers two levels of assistance:
 | **Wiring Diagrams** | Generate and copy text-based wiring instructions. | ✅ | ✅ (Graphical) | ✅ (Advanced) |
 | **Bill of Materials** | Generate a shopping list and copy it as text. | ✅ | ✅ (CSV Export) | ✅ (CSV Export) |
 | **Code Generation** | Get starter code in Arduino (C++) and Python. | ✅ | ✅ | ✅ (Custom) |
-| **Custom Components** | Create and save your own components to a personal library. | ❌ | ✅ | ✅ (Shared) |
+| **Custom Components** | Create and save your own components to a personal library. | ✅ (Up to 5) | ✅ (Unlimited) | ✅ (Shared) |
 | **Real-time Collaboration** | Work on projects with your team simultaneously. | ❌ | ❌ | ✅ |
 
 ---

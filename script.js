@@ -524,7 +524,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Add Component Button & Modal
-    addComponentBtn.addEventListener('click', () => showUpgradeModal());
+    addComponentBtn.addEventListener('click', () => {
+        const FREE_TIER_COMPONENT_LIMIT = 5;
+        const customComponentCount = Object.keys(getCustomComponents()).length;
+
+        if (customComponentCount >= FREE_TIER_COMPONENT_LIMIT) {
+            showUpgradeModal();
+        } else {
+            resetComponentModal();
+            addComponentModal.classList.remove('hidden');
+        }
+    });
 
     addComponentModalCloseBtn.addEventListener('click', () => {
         addComponentModal.classList.add('hidden');
@@ -866,6 +876,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Basic validation
                 if (typeof packData !== 'object' || packData === null || Array.isArray(packData)) {
                     throw new Error("Component pack must be a JSON object.");
+                }
+
+                // Check against free tier limit before proceeding
+                const FREE_TIER_COMPONENT_LIMIT = 5;
+                const customComponents = getCustomComponents();
+                const customComponentCount = Object.keys(customComponents).length;
+                
+                let newComponentsCount = 0;
+                for (const id in packData) {
+                    // Only count components that are not already custom components
+                    if (!customComponents[id]) {
+                        newComponentsCount++;
+                    }
+                }
+
+                if (customComponentCount + newComponentsCount > FREE_TIER_COMPONENT_LIMIT) {
+                    alert(`Importing this pack would create ${newComponentsCount} new components, exceeding your free limit of ${FREE_TIER_COMPONENT_LIMIT}. Please upgrade to Pro for unlimited components.`);
+                    showUpgradeModal();
+                    importPackInput.value = ''; // Reset input
+                    return; // Stop the import
                 }
 
                 // More detailed validation
