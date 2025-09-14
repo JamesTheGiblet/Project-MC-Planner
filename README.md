@@ -12,9 +12,6 @@
 
 - [The Problem You've Faced](#the-problem-youve-faced)
 - [The Intelligent Solution](#the-intelligent-solution)
-- [Two Levels of Intelligence](#two-levels-of-intelligence-from-error-free-to-effortless)
-- [Find Your Plan: From Free to Pro](#find-your-plan-from-free-to-pro)
-- [Features](#features)
 - [Screenshots](#screenshots)
 - [Prerequisites](#prerequisites)
 - [Supported Hardware](#supported-hardware)
@@ -46,46 +43,10 @@ PinPoint Planner transforms this process into a fast, visual, and reliable workf
 - **Plan Visually:** See your board's pins in real-time. As you add components, the planner shows you exactly what's available.
 - **Get Instant Validation:** Our intelligent core automatically flags issues, preventing conflicts before they happen.
 - **Generate Docs in One Click:** Export a clean, professional summary of your project, including a component list and pin assignments.
-
----
-
-## Two Levels of Intelligence: From Error-Free to Effortless
-
-PinPoint Planner offers two levels of assistance:
-
-### 1. Pin Validator (Free)
-
-- **Real-time spell-checker** for your hardware.
 The Pin Validator is like a real-time spell-checker for your hardware:
 - **Catches Conflicts:** Instantly flags if a pin is already in use.
 - **Prevents Mismatches:** Warns if you try to connect a component to an incompatible bus.
 - **Stops Errors Before They Happen:** Ensures every manual connection is valid.
-
-### 2. AI Smart Planner (Pro)
-
-- **One-Click Planning:** Add all your components, click "Plan My Board," and the AI gets to work.
-- **Holistic Optimization:** Finds the best pin assignments, prioritizing stable hardware buses and respecting power constraints.
-- **Explainable Decisions:** Tells you why it made each choice, so you learn and stay in control.
-
----
-
-## Find Your Plan: From Free to Pro
-
-| Feature                | Free (Simple Projects) | Pro ($7/mo) (Hobbyists & Power Users) | Business ($25/mo/seat) (Teams & Professionals) |
-|------------------------|:---------------------:|:-------------------------------------:|:----------------------------------------------:|
-| Projects               | Unlimited Local Projects | Unlimited Public & Private Projects   | Unlimited Team Projects                        |
-| Core Planner           | ✅                    | ✅                                    | ✅                                             |
-| Intelligence           | Pin Validator         | ⭐ AI Smart Planner                   | ⭐ AI Smart Planner                            |
-| Documentation          | Markdown Export       | PDF & JSON Export                    | Custom Templates                              |
-| Wiring Diagrams        | ✅ Text-based Instructions | ✅ Fritzing-style Diagrams            | ✅ Advanced Diagrams                          |
-| Code Generation        | ✅ Arduino/Python Starter Code | ✅ Arduino/Python Starter Code        | ✅ Custom Code Templates                      |
-| Bill of Materials (BOM)  | ✅ Copy as Text       | ✅ Export to CSV                       | ✅ Export to CSV                               |
-| Custom Components      | ✅ (Up to 5)          | ✅ Unlimited Custom Components        | ✅ Shared Team Library                        |
-| Collaboration          | ❌                    | ❌                                   | ✅ Real-time Editing                          |
-
----
-
-## Features
 
 ---
 
@@ -99,20 +60,6 @@ The Pin Validator is like a real-time spell-checker for your hardware:
 ┌──────────────────────────────────────────────────────────────┐
 │ 🔴 Error: Pin Conflict!                                      │
 │ Pin 3 (SDA) is already assigned to BMP280.                   │
-└──────────────────────────────────────────────────────────────┘
-```text
-
-**AI Planner Suggestion (Pro Tier):**
-
-```text
-┌──────────────────────────────────────────────────────────────┐
-│ 🤖 AI Recommendation                                         │
-│ Assign DHT22 to GPIO4?                                       │
-│                                                              │
-│ Rationale: This is a free digital pin with no special        │
-│ functions, making it ideal for a simple data line.           │
-│                                                              │
-│ [Accept] [Manual Override]                                   │
 └──────────────────────────────────────────────────────────────┘
 ```
 
