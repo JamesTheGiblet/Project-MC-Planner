@@ -97,19 +97,29 @@ header {
 }
 
 .btn {
-    padding: 8px 16px;
+    padding: 6px 12px;
     border-radius: var(--border-radius);
     border: none;
     cursor: pointer;
-    font-weight: 500;
+    font-weight: 600;
     transition: var(--transition);
     display: flex;
     align-items: center;
     gap: 8px;
+    font-size: 0.9rem;
+    white-space: nowrap;
 }
 
 .btn-text {
     transition: var(--transition);
+}
+
+.btn-icon {
+    padding: 6px;
+    width: 34px;
+    height: 34px;
+    font-size: 1rem;
+    justify-content: center;
 }
 
 .btn-primary {
@@ -131,6 +141,73 @@ header {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
+/* --- Dropdown Styles --- */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-toggle .dropdown-caret {
+    margin-left: 6px;
+    font-size: 0.7rem;
+    transition: transform 0.2s ease;
+}
+
+.dropdown.open .dropdown-toggle .dropdown-caret {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 115%;
+    right: 0;
+    background-color: var(--surface-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    z-index: 101;
+    min-width: 220px;
+    list-style: none;
+    padding: 8px 0;
+    border: 1px solid var(--light-gray);
+    display: none;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.dropdown.open .dropdown-menu {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    color: var(--dark);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: var(--light);
+}
+
+.dropdown-item i {
+    width: 16px;
+    text-align: center;
+    color: var(--gray);
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: var(--light-gray);
+    margin: 8px 0;
+}
+
 .modal-body .btn-outline {
     border-color: var(--gray);
     color: var(--dark);
@@ -147,6 +224,27 @@ header {
 .btn-danger:hover {
     /* Fallback for browsers not supporting color-mix */
     background-color: #c72d2f; /* Approximate a darker var(--danger) */
+}
+
+.pro-badge {
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--warning);
+    background-color: #fffbe6; /* Fallback for browsers not supporting color-mix */
+    /* background-color: color-mix(in srgb, var(--warning) 20%, transparent); */
+    padding: 1px 5px;
+    border-radius: 4px;
+    margin-left: auto;
+    text-transform: uppercase;
+}
+
+.dropdown-item.pro-item {
+    color: var(--gray);
+}
+
+.dropdown-item.pro-item:hover {
+    color: var(--dark);
+    background-color: var(--light);
 }
 
 /* Sidebar Styles */
@@ -301,7 +399,8 @@ header {
     font-size: 0.7rem;
     font-weight: 600;
     color: var(--warning);
-    background-color: #fff4e1; /* Approximate 20% var(--warning) on white */
+    background-color: #fffbe6; /* Fallback for browsers not supporting color-mix */
+    /* background-color: color-mix(in srgb, var(--warning) 20%, transparent); */
     padding: 2px 6px;
     border-radius: 4px;
     text-transform: uppercase;
@@ -904,6 +1003,18 @@ body.dark-mode .board-name {
     border-bottom-color: var(--primary);
 }
 
+.doc-tab-btn.pro-feature::after {
+    content: 'PRO';
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--warning);
+    background-color: #fffbe6; /* Fallback for browsers not supporting color-mix */
+    /* background-color: color-mix(in srgb, var(--warning) 20%, transparent); */
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+}
+
 .doc-tab-content {
     padding-top: 20px;
 }
@@ -1359,13 +1470,6 @@ pre[class*="language-"] {
         display: none;
     }
 
-    .btn-text {
-        display: none;
-    }
-
-    .btn {
-        padding: 8px 12px;
-    }
 }
 
 @media (max-width: 768px) {

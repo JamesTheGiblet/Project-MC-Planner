@@ -20,44 +20,55 @@
                 <span>PinPoint Planner</span>
             </div>
             <div class="header-actions">
-                <button class="btn btn-outline" id="dark-mode-toggle" title="Toggle Dark Mode">
+                <button class="btn btn-icon" id="dark-mode-toggle" title="Toggle Dark Mode">
                     <i class="fas fa-moon"></i>
                 </button>
                 <button class="btn btn-outline" id="save-project-btn" title="Save Current Project">
-                    <i class="fas fa-save"></i> Save
+                    <i class="fas fa-save"></i> <span class="btn-text">Save</span>
                 </button>
                 <button class="btn btn-outline" id="import-json-btn" title="Import Project from JSON">
-                    <i class="fas fa-file-import"></i> Import
+                    <i class="fas fa-file-import"></i> <span class="btn-text">Import</span>
                 </button>
-                <button class="btn btn-outline" id="export-md-btn" title="Download as Markdown File (Free Feature)">
-                    <i class="fas fa-file-download"></i> MD
-                </button>
-                <button class="btn btn-outline" id="copy-md-btn" title="Copy Markdown to Clipboard (Free Feature)">
-                    <i class="fas fa-clipboard"></i> Copy MD
-                </button>
-                <button class="btn btn-outline" id="export-json-btn" title="Download as JSON File (Pro)">
-                    <i class="fas fa-file-download"></i> JSON
-                </button>
-                <button class="btn btn-outline" id="copy-json-btn" title="Copy JSON to Clipboard (Pro)">
-                    <i class="fas fa-clipboard"></i> Copy JSON
-                </button>
-                <button class="btn btn-outline" id="wiring-diagram-btn" title="Generate Wiring Diagram">
-                    <i class="fas fa-sitemap"></i> Wiring
-                </button>
-                <button class="btn btn-outline" id="generate-bom-btn" title="Generate Bill of Materials">
-                    <i class="fas fa-list-ol"></i> BOM
-                </button>
-                <button class="btn btn-outline" id="generate-code-btn" title="Generate Starter Code">
-                    <i class="fas fa-code"></i> Code
-                </button>
-                <button class="btn btn-outline" id="documentation-btn" title="View Documentation">
-                    <i class="fas fa-book-open"></i> Docs
-                </button>
-                <button class="btn btn-outline" id="prompt-generator-btn" title="AI Prompt Generator">
-                    <i class="fas fa-magic"></i> AI Prompt
+
+                <!-- Export Dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-outline dropdown-toggle">
+                        <i class="fas fa-file-export"></i> <span class="btn-text">Export</span> <i class="fas fa-chevron-down dropdown-caret"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="#" class="dropdown-item" id="export-md-btn"><i class="fas fa-file-download"></i> Export Markdown</a>
+                        <a href="#" class="dropdown-item" id="copy-md-btn"><i class="fas fa-clipboard"></i> Copy Markdown</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item pro-item" id="export-pdf-btn"><i class="fas fa-file-pdf"></i> Export PDF <span class="pro-badge">PRO</span></a>
+                        <a href="#" class="dropdown-item pro-item" id="export-json-btn"><i class="fas fa-file-download"></i> Export JSON <span class="pro-badge">PRO</span></a>
+                        <a href="#" class="dropdown-item pro-item" id="copy-json-btn"><i class="fas fa-clipboard"></i> Copy JSON <span class="pro-badge">PRO</span></a>
+                    </div>
+                </div>
+
+                <!-- Generate Dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-outline dropdown-toggle">
+                        <i class="fas fa-cogs"></i> <span class="btn-text">Generate</span> <i class="fas fa-chevron-down dropdown-caret"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="#" class="dropdown-item" id="wiring-diagram-btn"><i class="fas fa-sitemap"></i> Wiring Diagram</a>
+                        <a href="#" class="dropdown-item" id="generate-bom-btn"><i class="fas fa-list-ol"></i> Bill of Materials</a>
+                        <a href="#" class="dropdown-item" id="generate-code-btn"><i class="fas fa-code"></i> Starter Code</a>
+                    </div>
+                </div>
+
+                <!-- Tools Dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-outline dropdown-toggle">
+                        <i class="fas fa-tools"></i> <span class="btn-text">Tools</span> <i class="fas fa-chevron-down dropdown-caret"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="#" class="dropdown-item" id="documentation-btn"><i class="fas fa-book-open"></i> Documentation</a>
+                        <a href="#" class="dropdown-item" id="prompt-generator-btn"><i class="fas fa-magic"></i> AI Prompt Generator</a>
+                    </div>
                 </button>
                 <button class="btn btn-primary" id="plan-my-board-btn">
-                    <i class="fas fa-bolt"></i> Plan My Board
+                    <i class="fas fa-bolt"></i> <span class="btn-text">Plan My Board</span>
                 </button>
             </div>
         </header>
@@ -213,7 +224,7 @@
                 <button id="upgrade-modal-close-btn" class="modal-close-btn">&times;</button>
             </div>
             <div class="modal-body">
-                <p>Unlock advanced features like the AI Smart Planner, Code Generation, and more to supercharge your workflow.</p>
+                <p>Unlock advanced features like the AI Smart Planner, advanced exports, and more to supercharge your workflow.</p>
                 <table class="bom-table">
                     <thead>
                         <tr>
@@ -226,7 +237,7 @@
                     <tbody>
                         <tr>
                             <td>Projects</td>
-                            <td>3 Public Projects</td>
+                            <td>Unlimited Local Projects</td>
                             <td>Unlimited Public &amp; Private Projects</td>
                             <td>Unlimited Team Projects</td>
                         </tr>
@@ -250,15 +261,21 @@
                         </tr>
                         <tr>
                             <td>Wiring Diagrams</td>
-                            <td>❌</td>
+                            <td>✅ Text-based Instructions</td>
                             <td>✅ Fritzing-style Diagrams</td>
                             <td>✅ Advanced Diagrams</td>
                         </tr>
                         <tr>
                             <td>Code Generation</td>
-                            <td>❌</td>
+                            <td>✅ Arduino/Python Starter Code</td>
                             <td>✅ Arduino/Python Starter Code</td>
                             <td>✅ Custom Code Templates</td>
+                        </tr>
+                        <tr>
+                            <td>Bill of Materials (BOM)</td>
+                            <td>✅ Copy as Text</td>
+                            <td>✅ Export to CSV</td>
+                            <td>✅ Export to CSV</td>
                         </tr>
                         <tr>
                             <td>Custom Components</td>
@@ -282,14 +299,25 @@
     </div>
 
     <div id="wiring-modal" class="modal-overlay hidden">
-        <div class="modal-content">
+        <div class="modal-content modal-lg">
             <div class="modal-header">
                 <h3>Wiring Diagram</h3>
+                <div class="doc-tabs">
+                    <button class="doc-tab-btn active" data-tab="wiring-text-tab">Text View</button>
+                    <button id="wiring-graphical-tab-btn" class="doc-tab-btn" data-tab="wiring-graphical-tab">Graphical View</button>
+                </div>
                 <button id="copy-wiring-btn" class="btn btn-outline" title="Copy as Text"><i class="fas fa-copy"></i> Copy Text</button>
-                <button id="modal-close-btn" class="modal-close-btn">&times;</button>
+                <button id="wiring-modal-close-btn" class="modal-close-btn">&times;</button>
             </div>
-            <div id="wiring-diagram-content" class="modal-body">
-                <!-- Diagram will be generated here -->
+            <div class="modal-body">
+                <div id="wiring-text-tab" class="doc-tab-content active">
+                    <div id="wiring-diagram-content">
+                        <!-- Text diagram will be generated here -->
+                    </div>
+                </div>
+                <div id="wiring-graphical-tab" class="doc-tab-content hidden">
+                    <p class="no-items-message">Graphical wiring diagrams are a Pro feature. <a href="#" id="wiring-upgrade-link">Upgrade to Pro</a> to generate a visual layout of your project.</p>
+                </div>
             </div>
         </div>
     </div>

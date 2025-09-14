@@ -56,6 +56,7 @@ PinPoint Planner offers two levels of assistance:
 ### 1. Pin Validator (Free)
 
 - **Real-time spell-checker** for your hardware.
+The Pin Validator is like a real-time spell-checker for your hardware:
 - **Catches Conflicts:** Instantly flags if a pin is already in use.
 - **Prevents Mismatches:** Warns if you try to connect a component to an incompatible bus.
 - **Stops Errors Before They Happen:** Ensures every manual connection is valid.
@@ -72,7 +73,7 @@ PinPoint Planner offers two levels of assistance:
 
 | Feature                | Free (Simple Projects) | Pro ($7/mo) (Hobbyists & Power Users) | Business ($25/mo/seat) (Teams & Professionals) |
 |------------------------|:---------------------:|:-------------------------------------:|:----------------------------------------------:|
-| Projects               | 3 Public Projects     | Unlimited Public & Private Projects   | Unlimited Team Projects                        |
+| Projects               | Unlimited Local Projects | Unlimited Public & Private Projects   | Unlimited Team Projects                        |
 | Core Planner           | ✅                    | ✅                                    | ✅                                             |
 | Intelligence           | Pin Validator         | ⭐ AI Smart Planner                   | ⭐ AI Smart Planner                            |
 | Documentation          | Markdown Export       | PDF & JSON Export                    | Custom Templates                              |
@@ -85,20 +86,6 @@ PinPoint Planner offers two levels of assistance:
 ---
 
 ## Features
-
-| Feature | Description | Free | Pro | Business |
-| :--- | :--- | :---: | :---: | :---: |
-| **Core Visual Planner** | Drag-and-drop components onto interactive board diagrams. | ✅ | ✅ | ✅ |
-| **Pin Validator** | Get real-time feedback on pin compatibility and conflicts. | ✅ | ✅ | ✅ |
-| **Project Management** | Save projects locally in your browser. | ✅ (3) | ✅ (Unlimited) | ✅ (Team) |
-| **Basic Export** | Download or copy your project plan as a clean Markdown file. | ✅ | ✅ | ✅ |
-| **AI Smart Planner** | Automatically generate an optimized, conflict-free pin layout. | ❌ | ⭐ | ⭐ |
-| **Advanced Exports** | Export to JSON for data interchange and professional PDF documents. | ❌ | ✅ | ✅ |
-| **Wiring Diagrams** | Generate and copy text-based wiring instructions. | ✅ | ✅ (Graphical) | ✅ (Advanced) |
-| **Bill of Materials** | Generate a shopping list and copy it as text. | ✅ | ✅ (CSV Export) | ✅ (CSV Export) |
-| **Code Generation** | Get starter code in Arduino (C++) and Python. | ✅ | ✅ | ✅ (Custom) |
-| **Custom Components** | Create and save your own components to a personal library. | ✅ (Up to 5) | ✅ (Unlimited) | ✅ (Shared) |
-| **Real-time Collaboration** | Work on projects with your team simultaneously. | ❌ | ❌ | ✅ |
 
 ---
 

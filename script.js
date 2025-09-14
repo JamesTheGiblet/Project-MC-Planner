@@ -279,6 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const exportMdBtn = document.getElementById('export-md-btn');
     const copyMdBtn = document.getElementById('copy-md-btn');
     const exportJsonBtn = document.getElementById('export-json-btn');
+    const exportPdfBtn = document.getElementById('export-pdf-btn');
     const projectsList = document.getElementById('projects-list');
     const wiringDiagramBtn = document.getElementById('wiring-diagram-btn');
     const generateBomBtn = document.getElementById('generate-bom-btn');
@@ -287,6 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const planMyBoardBtn = document.getElementById('plan-my-board-btn');
     const upgradeProBtn = document.getElementById('upgrade-pro-btn');
     const wiringModal = document.getElementById('wiring-modal');
+    const wiringModalCloseBtn = document.getElementById('wiring-modal-close-btn');
     const bomModal = document.getElementById('bom-modal');
     const codeModal = document.getElementById('code-modal');
     const docsModal = document.getElementById('docs-modal');
@@ -307,7 +309,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const importPackInput = document.getElementById('import-pack-input');
     const copyWiringBtn = document.getElementById('copy-wiring-btn');
     const addComponentModal = document.getElementById('add-component-modal');
-    const modalCloseBtn = document.getElementById('modal-close-btn');
     const bomModalCloseBtn = document.getElementById('bom-modal-close-btn');
     const exportBomCsvBtn = document.getElementById('export-bom-csv-btn');
     const codeModalCloseBtn = document.getElementById('code-modal-close-btn');
@@ -357,6 +358,33 @@ document.addEventListener('DOMContentLoaded', function() {
     let newlyImportedComponentIds = []; // To track new components for highlighting
 
     // --- Event Listeners ---
+
+    // Dropdown Toggling
+    document.addEventListener('click', (e) => {
+        const isDropdownButton = e.target.closest('.dropdown-toggle');
+        
+        // If not a dropdown button, and not inside a dropdown, close all dropdowns
+        if (!isDropdownButton && e.target.closest('.dropdown-menu') === null) {
+            document.querySelectorAll('.dropdown.open').forEach(dropdown => {
+                dropdown.classList.remove('open');
+            });
+            return;
+        }
+
+        const currentDropdown = e.target.closest('.dropdown');
+        
+        // Close other open dropdowns
+        document.querySelectorAll('.dropdown.open').forEach(dropdown => {
+            if (dropdown !== currentDropdown) {
+                dropdown.classList.remove('open');
+            }
+        });
+
+        // Toggle the current one
+        if (currentDropdown) {
+            currentDropdown.classList.toggle('open');
+        }
+    });
 
     // Board selection
     boardOptions.forEach(option => {
@@ -441,35 +469,66 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Component Search
-    componentSearch.addEventListener('input', handleComponentSearch);
+    componentSearch.addEventListener('input', (e) => handleComponentSearch(e));
 
     // Export to Markdown
-    exportMdBtn.addEventListener('click', () => {
+    exportMdBtn.addEventListener('click', (e) => {
+        e.preventDefault();
         generateMarkdownExport();
     });
 
     // Copy Markdown to Clipboard
-    copyMdBtn.addEventListener('click', copyMarkdownToClipboard);
+    copyMdBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        copyMarkdownToClipboard();
+    });
 
     // Projects List (Load and Delete)
     projectsList.addEventListener('click', handleProjectsListClick);
 
     // Export to JSON
-    exportJsonBtn.addEventListener('click', () => {
+    exportJsonBtn.addEventListener('click', (e) => {
+        e.preventDefault();
         showUpgradeModal();
     });
-    copyJsonBtn.addEventListener('click', () => {
+    exportPdfBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        showUpgradeModal();
+    });
+    copyJsonBtn.addEventListener('click', (e) => {
+        e.preventDefault();
         showUpgradeModal();
     });
 
     // Wiring Diagram Button
-    wiringDiagramBtn.addEventListener('click', generateWiringDiagram);
+    wiringDiagramBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const graphicalTabBtn = document.getElementById('wiring-graphical-tab-btn');
+        graphicalTabBtn.classList.add('pro-feature');
+
+        // Reset to text tab and generate its content
+        const wiringModalTabs = wiringModal.querySelector('.doc-tabs');
+        const textTab = wiringModalTabs.querySelector('[data-tab="wiring-text-tab"]');
+        
+        // Manually set active state
+        wiringModalTabs.querySelectorAll('.doc-tab-btn').forEach(tab => tab.classList.remove('active'));
+        wiringModal.querySelectorAll('.doc-tab-content').forEach(content => content.classList.add('hidden'));
+        textTab.classList.add('active');
+        document.getElementById('wiring-text-tab').classList.remove('hidden');
+
+        generateWiringDiagram(); // This generates the text-based diagram
+        wiringModal.classList.remove('hidden');
+    });
 
     // Generate BOM Button
-    generateBomBtn.addEventListener('click', generateBOM);
+    generateBomBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        generateBOM();
+    });
 
     // Generate Code Button
-    generateCodeBtn.addEventListener('click', () => {
+    generateCodeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
         const projectData = getProjectDataObject();
         if (!projectData) {
             showValidationError("Cannot generate code for an empty board. Please assign some components first.");
@@ -486,10 +545,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Docs Button
-    documentationBtn.addEventListener('click', openDocumentationModal); // This will now call the correct function
+    documentationBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        openDocumentationModal();
+    });
 
     // Prompt Generator Button & Modal
-    promptGeneratorBtn.addEventListener('click', openPromptGeneratorModal);
+    promptGeneratorBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        openPromptGeneratorModal();
+    });
     promptGeneratorModalCloseBtn.addEventListener('click', () => promptGeneratorModal.classList.add('hidden'));
     promptGeneratorModal.addEventListener('click', (e) => {
         if (e.target === promptGeneratorModal) {
@@ -534,14 +599,35 @@ document.addEventListener('DOMContentLoaded', function() {
     copyBomBtn.addEventListener('click', copyBomToClipboard);
 
     // Modal Close Listeners
-    modalCloseBtn.addEventListener('click', () => wiringModal.classList.add('hidden'));
+    wiringModalCloseBtn.addEventListener('click', () => wiringModal.classList.add('hidden'));
     wiringModal.addEventListener('click', (e) => {
-        copyWiringBtn.addEventListener('click', copyWiringDiagramToClipboard);
         // Close modal if the overlay (the background) is clicked
         if (e.target === wiringModal) {
             wiringModal.classList.add('hidden');
         }
     });
+    copyWiringBtn.addEventListener('click', copyWiringDiagramToClipboard);
+
+    // Wiring Modal Tab Switching
+    const wiringModalTabs = wiringModal.querySelector('.doc-tabs');
+    wiringModalTabs.addEventListener('click', (e) => {
+        const clickedTab = e.target.closest('.doc-tab-btn');
+        if (!clickedTab) return;
+
+        if (clickedTab.id === 'wiring-graphical-tab-btn') {
+            showUpgradeModal();
+            return; // Prevent switching to the pro tab
+        }
+    });
+
+    // Listener for the upgrade link inside the graphical tab placeholder
+    const wiringUpgradeLink = document.getElementById('wiring-upgrade-link');
+    if (wiringUpgradeLink) {
+        wiringUpgradeLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showUpgradeModal();
+        });
+    }
 
     // Add Component Button & Modal
     addComponentBtn.addEventListener('click', () => {
