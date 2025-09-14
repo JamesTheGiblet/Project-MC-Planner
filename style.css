@@ -385,6 +385,7 @@ header {
 }
 
 .edit-component-btn,
+.duplicate-component-btn,
 .delete-component-btn {
     background: none;
     border: none;
@@ -399,6 +400,7 @@ header {
 }
 
 .component-item:hover .edit-component-btn,
+.component-item:hover .duplicate-component-btn,
 .component-item:hover .delete-component-btn {
     visibility: visible;
     opacity: 1;
@@ -406,6 +408,10 @@ header {
 
 .edit-component-btn:hover {
     color: var(--primary);
+}
+
+.duplicate-component-btn:hover {
+    color: var(--secondary);
 }
 
 .project-item {
@@ -610,6 +616,24 @@ body.dark-mode .board-name {
     gap: 15px;
 }
 
+@keyframes badge-in {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes badge-out {
+    to {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+
 .component-badge {
     padding: 10px 15px;
     background-color: var(--light);
@@ -619,6 +643,11 @@ body.dark-mode .board-name {
     gap: 8px;
     transition: var(--transition);
     cursor: pointer;
+    animation: badge-in 0.3s ease-out forwards;
+}
+
+.component-badge.removing {
+    animation: badge-out 0.3s ease-in forwards;
 }
 
 .component-badge:hover {

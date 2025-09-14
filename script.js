@@ -343,6 +343,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const boardName = document.querySelector('.board-name');
     const pinsContainer = document.querySelector('.pins-container');
 
+    // --- Prompt Generator Elements ---
+    const promptOptionCards = document.querySelectorAll('.prompt-gen-option-card');
+    const promptGenGenerateBtn = document.getElementById('prompt-gen-generate-btn');
+    const promptGenCopyBtn = document.getElementById('prompt-gen-copy-btn');
+    const promptGenCustomInput = document.getElementById('prompt-gen-custom-input');
+    const promptGenOutputBox = document.getElementById('prompt-gen-generated-prompt');
+
     // --- State ---
     let draggedComponent = null;
     let components = []; // This will be populated dynamically
@@ -477,6 +484,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Docs Button
     documentationBtn.addEventListener('click', openDocumentationModal); // This will now call the correct function
 
+    // Prompt Generator Button & Modal
+    promptGeneratorBtn.addEventListener('click', openPromptGeneratorModal);
+    promptGeneratorModalCloseBtn.addEventListener('click', () => promptGeneratorModal.classList.add('hidden'));
+    promptGeneratorModal.addEventListener('click', (e) => {
+        if (e.target === promptGeneratorModal) {
+            promptGeneratorModal.classList.add('hidden');
+        }
+    });
+
     if (documentationModal) {
         documentationModal.addEventListener('click', (e) => {
             if (e.target === documentationModal) {
@@ -584,6 +600,61 @@ document.addEventListener('DOMContentLoaded', function() {
         upgradeModal.classList.add('hidden');
     });
 
+    // --- Prompt Generator Listeners ---
+    promptOptionCards.forEach(card => {
+        card.addEventListener('click', () => {
+            card.classList.toggle('selected');
+        });
+    });
+
+    promptGenGenerateBtn.addEventListener('click', () => {
+        const activeBoardId = document.querySelector('.board-option.active')?.dataset.board;
+        if (!activeBoardId || !promptGeneratorData[activeBoardId]) return;
+
+        const boardPrompts = promptGeneratorData[activeBoardId].prompts;
+        const selectedCategories = [];
+        document.querySelectorAll('.prompt-gen-option-card.selected').forEach(card => {
+            selectedCategories.push(card.dataset.category);
+        });
+
+        if (selectedCategories.length === 0 && !promptGenCustomInput.value.trim()) {
+            promptGenOutputBox.textContent = "Please select at least one category or add custom details to generate a prompt.";
+            promptGenOutputBox.style.color = 'var(--warning)';
+            return;
+        }
+
+        let prompt = `Generate a comprehensive overview for a project using the ${promptGeneratorData[activeBoardId].name}. Include the following sections:\n\n`;
+
+        selectedCategories.forEach(category => {
+            if (boardPrompts[category]) {
+                prompt += boardPrompts[category];
+            }
+        });
+
+        const customText = promptGenCustomInput.value.trim();
+        if (customText) {
+            prompt += "\n- Additionally, address the following specific points:\n";
+            prompt += `  - ${customText}\n`;
+        }
+
+        prompt += `\nStructure the output clearly with headings for each section.`;
+
+        promptGenOutputBox.textContent = prompt;
+        promptGenOutputBox.style.color = 'var(--dark)';
+    });
+
+    promptGenCopyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(promptGenOutputBox.textContent).then(() => {
+            const originalText = promptGenCopyBtn.innerHTML;
+            promptGenCopyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            setTimeout(() => {
+                promptGenCopyBtn.innerHTML = originalText;
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy prompt: ', err);
+        });
+    });
+
     // Clear Board button
     clearBoardBtn.addEventListener('click', () => {
         // Check if there are any components assigned
@@ -620,6 +691,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const clickedBadge = e.target.closest('.component-badge');
         if (!clickedBadge) return;
 
+        // Prevent removal if it's already being removed
+        if (clickedBadge.classList.contains('removing')) return;
+
         const pinNumber = clickedBadge.dataset.pinNumber;
         const componentId = clickedBadge.dataset.componentId;
         if (!pinNumber || !componentId) return;
@@ -637,11 +711,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }, { once: true });
             
             // If the details of the cleared pin were open, close them
-            if (!pinDetailsPanel.classList.contains('hidden')) {
-                const detailsTitle = pinDetailsPanel.querySelector('.pin-details-title');
-                if (detailsTitle && detailsTitle.textContent.includes(`Pin: ${pinNumber}`)) {
-                    pinDetailsPanel.classList.add('hidden');
-                }
+            const detailsTitle = pinDetailsPanel.querySelector('h3');
+            if (detailsTitle && detailsTitle.textContent.includes(`Pin: ${pinNumber}`)) {
+                pinDetailsPanel.classList.add('hidden');
             }
         }
     });
@@ -683,6 +755,42 @@ document.addEventListener('DOMContentLoaded', function() {
             default: // Custom
                 break;
         }
+    }
+
+    function handleDuplicateComponent(componentId) {
+        const componentToDuplicate = componentData[componentId];
+        if (!componentToDuplicate) return;
+
+        // Ensure the modal is in a clean "add" state
+        resetComponentModal();
+
+        // Populate form with data from the component to duplicate
+        document.getElementById('component-name-input').value = componentToDuplicate.name + ' - Copy';
+        document.getElementById('component-category-input').value = componentToDuplicate.category || '';
+        document.getElementById('component-icon-input').value = componentToDuplicate.icon;
+        document.getElementById('component-tip-input').value = componentToDuplicate.tip || '';
+        
+        if (componentToDuplicate.template) {
+            componentTemplateSelect.value = componentToDuplicate.template;
+        } else {
+            // Fallback for older components
+            const dataReq = componentToDuplicate.requires.data ? componentToDuplicate.requires.data[0] : null;
+            if (dataReq === 'i2c') componentTemplateSelect.value = 'i2c';
+            else if (dataReq === 'spi') componentTemplateSelect.value = 'spi';
+            else if (dataReq === 'gpio') componentTemplateSelect.value = 'simple-gpio';
+            else componentTemplateSelect.value = 'custom';
+        }
+        handleTemplateChange(); // Update UI based on template
+
+        const dataReq = componentToDuplicate.requires.data ? componentToDuplicate.requires.data[0] : null;
+        if (dataReq) componentDataSelect.value = dataReq;
+        if (componentToDuplicate.i2cAddress) document.getElementById('component-i2c-address-input').value = componentToDuplicate.i2cAddress;
+        if (componentToDuplicate.pins_required) document.getElementById('component-pins-required-input').value = componentToDuplicate.pins_required;
+
+        document.getElementById('component-power-input').value = componentToDuplicate.requires.power ?? 1;
+        document.getElementById('component-ground-input').value = componentToDuplicate.requires.ground ?? 1;
+
+        addComponentModal.classList.remove('hidden');
     }
 
     function openEditComponentModal(componentId) {
@@ -759,6 +867,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             openEditComponentModal(componentId);
+            return;
+        }
+
+        const duplicateBtn = e.target.closest('.duplicate-component-btn');
+        if (duplicateBtn) {
+            const componentItem = duplicateBtn.closest('.component-item');
+            const componentId = componentItem.dataset.component;
+            handleDuplicateComponent(componentId);
         }
     }
 
@@ -1015,6 +1131,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 editBtn.innerHTML = '<i class="fas fa-pencil-alt"></i>';
                 editBtn.title = 'Edit custom component';
                 actionsWrapper.appendChild(editBtn);
+
+                const duplicateBtn = document.createElement('button');
+                duplicateBtn.className = 'duplicate-component-btn';
+                duplicateBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                duplicateBtn.title = 'Duplicate custom component';
+                actionsWrapper.appendChild(duplicateBtn);
 
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'delete-component-btn';
@@ -1565,6 +1687,31 @@ document.addEventListener('DOMContentLoaded', function() {
             html += `<div class="component-doc-category"><h3>Other</h3>${otherHtml}</div>`;
         }
         componentsDocTab.innerHTML = html;
+    }
+
+    function openPromptGeneratorModal() {
+        const activeBoardId = document.querySelector('.board-option.active')?.dataset.board;
+        if (!activeBoardId || !promptGeneratorData[activeBoardId]) {
+            alert("The AI Prompt Generator is not available for the currently selected board.");
+            return;
+        }
+
+        const boardPromptData = promptGeneratorData[activeBoardId];
+
+        // Update modal title
+        promptGenModalTitle.innerHTML = `<i class="${boardPromptData.icon}" style="color: ${boardPromptData.color};"></i> ${boardPromptData.name} AI Prompt Generator`;
+
+        // Update intro text
+        promptGenModalIntro.textContent = `Choose what you want to include in your AI prompt about the ${boardPromptData.name}:`;
+
+        // Reset selections and output
+        document.querySelectorAll('.prompt-gen-option-card').forEach(card => card.classList.remove('selected'));
+        document.getElementById('prompt-gen-custom-input').value = '';
+        const outputBox = document.getElementById('prompt-gen-generated-prompt');
+        outputBox.textContent = 'Your generated prompt will appear here after selecting options and clicking Generate.';
+        outputBox.style.color = 'var(--gray)';
+
+        promptGeneratorModal.classList.remove('hidden');
     }
 
     function openDocumentationModal() {
