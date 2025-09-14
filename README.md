@@ -156,7 +156,7 @@ Open `index.html`:
 |---------------|-------------------------|------------|
 | Raspberry Pi  | Pi 4B, Pi 3B+           | ✅ Supported |
 | Arduino       | Uno R3, Nano            | ✅ Supported |
-| ESP           | ESP32 DevKit            | ✅ Supported |
+| ESP           | ESP32 DevKit            | ⏳ Coming Soon |
 
 ---
 

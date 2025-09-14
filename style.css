@@ -271,6 +271,8 @@ header {
 .board-option-label {
     display: flex;
     align-items: center;
+    flex-grow: 1;
+    justify-content: space-between;
     gap: 8px;
 }
 
@@ -283,6 +285,26 @@ header {
     border-left-color: var(--primary);
     background-color: var(--light-gray);
     transform: none; /* remove previous transform */
+}
+
+.board-option.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.board-option.disabled:hover {
+    background-color: var(--light);
+    transform: none;
+}
+
+.coming-soon-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--warning);
+    background-color: #fff4e1; /* Approximate 20% var(--warning) on white */
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
 }
 
 .board-option img {

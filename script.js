@@ -361,6 +361,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Board selection
     boardOptions.forEach(option => {
         option.addEventListener('click', function() {
+            if (this.classList.contains('disabled')) {
+                return;
+            }
+
             // Clear current state before rendering new board
             clearBoardBtn.click();
 
